@@ -1,0 +1,75 @@
+{% set n = resultado.indicadores | length %}
+{% set suma = resultado.indicadores | sum(attribute=1) %}
+{% set p = resultado.puntaje %}
+{% set nombres = {'bajo': 'Bajo', 'medio': 'Medio', 'alto': 'Alto'} %}
+
+<section class="tarjeta" aria-labelledby="titulo-resultado">
+    <h3 id="titulo-resultado" class="solo-lectura">Resultado del análisis</h3>
+
+    <div class="resumen">
+        <div class="resumen-puntaje">
+            <span class="puntaje-grande mono">{{ p }}</span>
+            <span class="puntaje-total mono">/100</span>
+        </div>
+        <div>
+            <p class="resumen-etiqueta">Nivel de riesgo</p>
+            <p class="nivel nivel-{{ resultado.nivel }} nivel-grande">{{ nombres[resultado.nivel] }}</p>
+            <p class="resumen-detalle">
+                {% if n == 0 %}No se detectaron indicadores de riesgo.{% elif n == 1 %}Se detectó 1 indicador asociado a phishing.{% else %}Se detectaron {{ n }} indicadores asociados a phishing.{% endif %}
+                Es un nivel de riesgo según las reglas del sistema, no una garantía de que {{ frase_final }}.
+            </p>
+        </div>
+    </div>
+
+    <div class="escala" role="img" aria-label="Puntaje {{ p }} de 100, riesgo {{ resultado.nivel }}">
+        <div class="escala-barra">
+            <span class="escala-seg bajo{{ ' activo' if resultado.nivel == 'bajo' else '' }}"></span>
+            <span class="escala-seg medio{{ ' activo' if resultado.nivel == 'medio' else '' }}"></span>
+            <span class="escala-seg alto{{ ' activo' if resultado.nivel == 'alto' else '' }}"></span>
+            <div class="escala-pista pct-{{ p }}">
+                <span class="escala-marca"><span class="escala-valor mono">{{ p }}</span></span>
+            </div>
+        </div>
+        <div class="escala-etiquetas mono">
+            <span class="eti-bajo">0 · Bajo</span>
+            <span class="eti-medio">31 · Medio</span>
+            <span class="eti-alto">61 · Alto</span>
+        </div>
+    </div>
+</section>
+
+<section class="tarjeta">
+    <header class="tarjeta-cabecera">
+        <h3>Indicadores detectados</h3>
+        <span class="mono">{{ n }} detectado{{ '' if n == 1 else 's' }}</span>
+    </header>
+    {% if n %}
+    <table class="tabla-indicadores">
+        <caption class="solo-lectura">Indicadores detectados y su peso en el puntaje</caption>
+        <thead>
+            <tr><th scope="col">Peso</th><th scope="col">Indicador</th></tr>
+        </thead>
+        <tbody>
+            {% for nombre, peso, explicacion in resultado.indicadores %}
+            <tr>
+                <td class="mono celda-peso">+{{ peso }}</td>
+                <td>
+                    <strong>{{ nombre }}</strong>
+                    <p class="indicador-texto">{{ explicacion }}</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="total-fila">
+                <td colspan="2"><div class="total"><span>Puntaje total</span><span class="mono">{{ p }} / 100</span></div></td>
+            </tr>
+        </tfoot>
+    </table>
+    {% if suma > p %}
+    <p class="nota-tope">La suma de los pesos ({{ suma }}) se limita a 100.</p>
+    {% endif %}
+    {% else %}
+    <p class="vacio">No se detectaron indicadores de riesgo.</p>
+    {% endif %}
+</section>

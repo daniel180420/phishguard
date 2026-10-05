@@ -891,6 +891,226 @@ th {
 .pct-99 { width: 99%; }
 .pct-100 { width: 100%; }
 
+/* ---------- Análisis: entrada y resultado ---------- */
+
+.tarjeta-cuerpo textarea,
+.tarjeta-cuerpo input[type="text"] {
+    max-width: none;
+}
+
+.tarjeta-cuerpo textarea {
+    resize: vertical;
+}
+
+.entrada-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.entrada-ejemplos-etiqueta {
+    margin-left: 4px;
+    font-family: var(--fuente-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gris);
+}
+
+.boton-sec {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    background: var(--tarjeta);
+    color: var(--texto);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease, transform 160ms var(--ease-out);
+}
+
+.boton-sec:active {
+    transform: scale(0.97);
+}
+
+.boton-sec:focus-visible {
+    outline: 2px solid var(--azul-claro);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .boton-sec:hover {
+        background: var(--fondo);
+        border-color: var(--azul-claro);
+    }
+}
+
+/* Resumen del resultado */
+
+.resumen {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 32px;
+    padding: 24px;
+}
+
+.resumen-puntaje {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.puntaje-grande {
+    font-size: 4.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.puntaje-total {
+    font-size: 1.2rem;
+    color: var(--gris);
+}
+
+.resumen-etiqueta {
+    margin: 0 0 4px;
+    font-family: var(--fuente-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gris);
+}
+
+.nivel-grande {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.nivel-grande::before {
+    width: 10px;
+    height: 10px;
+}
+
+.nivel-grande.nivel-bajo  { color: var(--bajo); }
+.nivel-grande.nivel-medio { color: var(--medio); }
+.nivel-grande.nivel-alto  { color: var(--alto); }
+
+.resumen-detalle {
+    margin: 8px 0 0;
+    color: var(--gris);
+}
+
+/* Escala 0 a 100 */
+
+.escala {
+    padding: 8px 24px 24px;
+}
+
+.escala-barra {
+    position: relative;
+    display: flex;
+    height: 8px;
+    margin-top: 28px;
+}
+
+.escala-seg {
+    height: 100%;
+    opacity: 0.3;
+}
+
+.escala-seg + .escala-seg {
+    border-left: 2px solid var(--tarjeta);
+}
+
+.escala-seg.bajo  { flex: 31; background: var(--bajo); }
+.escala-seg.medio { flex: 30; background: var(--medio); }
+.escala-seg.alto  { flex: 39; background: var(--alto); }
+.escala-seg.activo { opacity: 1; }
+
+.escala-pista {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.escala-marca {
+    position: absolute;
+    right: 0;
+    top: -6px;
+    bottom: -6px;
+    width: 2px;
+    background: var(--texto);
+}
+
+.escala-valor {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.escala-etiquetas {
+    display: flex;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--gris);
+}
+
+.eti-bajo  { flex: 31; }
+.eti-medio { flex: 30; }
+.eti-alto  { flex: 39; }
+
+/* Tabla de indicadores */
+
+.tabla-indicadores {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-indicadores td {
+    vertical-align: top;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.celda-peso {
+    width: 72px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.indicador-texto {
+    margin: 2px 0 0;
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
+.tabla-indicadores .total-fila td {
+    border-bottom: 0;
+    background: var(--fondo);
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+.nota-tope {
+    margin: 0;
+    padding: 10px 20px;
+    border-top: 1px solid var(--borde);
+    color: var(--gris);
+    font-size: 0.8rem;
+}
+
 /* ---------- Acceso: login y registro ---------- */
 
 .acceso {
@@ -1082,6 +1302,15 @@ th {
     .cifras,
     .dash-fila {
         grid-template-columns: 1fr;
+    }
+
+    .resumen {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .puntaje-grande {
+        font-size: 3.5rem;
     }
 
     .acceso {
