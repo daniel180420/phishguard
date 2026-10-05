@@ -135,6 +135,13 @@ def exportar_csv():
                     .order_by(Analisis.fecha.desc())
                     .all())
 
+    def limpiar_celda(texto):
+        # Una sola línea, y sin fórmulas: Excel ejecuta lo que empieza con = + - @
+        texto = texto.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
+        if texto.startswith(('=', '+', '-', '@', '\t', '\r')):
+            texto = "'" + texto
+        return texto
+
     salida = io.StringIO()
     salida.write('\ufeff')
     escritor = csv.writer(salida, delimiter=';')
@@ -145,9 +152,9 @@ def exportar_csv():
     escritor.writerow(encabezado)
 
     for a in analisis:
-        fila = [a.fecha.strftime('%d/%m/%Y %H:%M'), a.tipo, a.contenido, a.puntaje, a.nivel]
+        fila = [a.fecha.strftime('%d/%m/%Y %H:%M'), a.tipo, limpiar_celda(a.contenido), a.puntaje, a.nivel]
         if current_user.es_admin:
-            fila.insert(0, a.usuario.username)
+            fila.insert(0, limpiar_celda(a.usuario.username))
         escritor.writerow(fila)
 
     respuesta = Response(salida.getvalue(), mimetype='text/csv')

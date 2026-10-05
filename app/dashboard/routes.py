@@ -31,4 +31,8 @@ def index():
 
     total_usuarios = Usuario.query.count() if current_user.es_admin else None
 
-    return render_template('dashboard/index.html', stats=stats, total_usuarios=total_usuarios)
+    # Mismo filtro que las estadísticas: admin ve todos, usuario normal solo los suyos
+    ultimos = base.order_by(Analisis.fecha.desc(), Analisis.id.desc()).limit(5).all()
+
+    return render_template('dashboard/index.html', stats=stats,
+                           total_usuarios=total_usuarios, ultimos=ultimos)

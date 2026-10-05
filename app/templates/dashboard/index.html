@@ -1,47 +1,147 @@
 {% extends "base.html" %}
 
+{% block ruta %}inicio{% endblock %}
+
 {% block content %}
-<h2>Bienvenido, {{ current_user.username }}</h2>
+{% set total = stats.total %}
+{# Con total = 0 no se divide: todos los porcentajes quedan en 0 #}
+{% set p_bajo  = (stats.bajo  * 100 / total) if total else 0 %}
+{% set p_medio = (stats.medio * 100 / total) if total else 0 %}
+{% set p_alto  = (stats.alto  * 100 / total) if total else 0 %}
+{# Anchos enteros para las barras: el último tramo va por diferencia para sumar 100 #}
+{% set w_bajo  = p_bajo  | round | int %}
+{% set w_medio = p_medio | round | int %}
+{% set w_alto  = ([100 - w_bajo - w_medio, 0] | max) if total else 0 %}
+{% set niveles = [
+    ('bajo',  'Bajo',  '0 – 30 pts',   stats.bajo,  p_bajo),
+    ('medio', 'Medio', '31 – 60 pts',  stats.medio, p_medio),
+    ('alto',  'Alto',  '61 – 100 pts', stats.alto,  p_alto),
+] %}
 
-{% if current_user.es_admin %}
-<p><em>Rol: administrador. Estás viendo estadísticas globales de todos los usuarios ({{ total_usuarios }} registrados).</em></p>
-{% else %}
-<p><em>Estas son tus estadísticas personales.</em></p>
-{% endif %}
-
-<div class="stats">
-    <div class="stat">
-        <span class="numero">{{ stats.total }}</span>
-        <span class="etiqueta">Total de análisis</span>
+<div class="encabezado">
+    <div>
+        <h2>Resumen</h2>
+        {% if current_user.es_admin %}
+        <p class="subtitulo">Estadísticas globales de {{ total_usuarios }} usuario{{ '' if total_usuarios == 1 else 's' }} registrado{{ '' if total_usuarios == 1 else 's' }}.</p>
+        {% else %}
+        <p class="subtitulo">Tus estadísticas personales.</p>
+        {% endif %}
     </div>
-    <div class="stat">
-        <span class="numero">{{ stats.urls }}</span>
-        <span class="etiqueta">URLs analizadas</span>
-    </div>
-    <div class="stat">
-        <span class="numero">{{ stats.mensajes }}</span>
-        <span class="etiqueta">Mensajes analizados</span>
-    </div>
+    <span class="chip-rol">Rol: {{ 'administrador' if current_user.es_admin else 'usuario' }}</span>
 </div>
 
-<div class="stats">
-    <div class="stat bajo">
-        <span class="numero">{{ stats.bajo }}</span>
-        <span class="etiqueta">Riesgo bajo</span>
+<div class="cifras">
+    <div class="cifra">
+        <span class="cifra-etiqueta">Total de análisis</span>
+        <span class="cifra-numero">{{ stats.total }}</span>
     </div>
-    <div class="stat medio">
-        <span class="numero">{{ stats.medio }}</span>
-        <span class="etiqueta">Riesgo medio</span>
+    <div class="cifra">
+        <span class="cifra-etiqueta">URLs analizadas</span>
+        <span class="cifra-numero">{{ stats.urls }}</span>
     </div>
-    <div class="stat alto">
-        <span class="numero">{{ stats.alto }}</span>
-        <span class="etiqueta">Riesgo alto</span>
+    <div class="cifra">
+        <span class="cifra-etiqueta">Mensajes analizados</span>
+        <span class="cifra-numero">{{ stats.mensajes }}</span>
     </div>
+    {% if current_user.es_admin %}
+    <div class="cifra cifra-ancha">
+        <span class="cifra-etiqueta">Usuarios registrados</span>
+        <span class="cifra-numero">{{ total_usuarios }}</span>
+    </div>
+    {% endif %}
 </div>
 
-<div class="acciones">
-    <a href="{{ url_for('analysis.analizar_url_view') }}">Analizar una URL</a>
-    <a href="{{ url_for('analysis.analizar_mensaje_view') }}">Analizar un mensaje</a>
-    <a href="{{ url_for('analysis.historial') }}">Ver mi historial</a>
+<div class="dash-fila">
+    <section class="tarjeta">
+        <header class="tarjeta-cabecera">
+            <h3>Distribución del riesgo</h3>
+            <span class="mono">{{ total }} análisis</span>
+        </header>
+        <div class="tarjeta-cuerpo">
+            <div class="dist-barra" role="img"
+                 aria-label="Distribución del riesgo: {{ stats.bajo }} bajo, {{ stats.medio }} medio, {{ stats.alto }} alto">
+                <div class="dist-seg bajo pct-{{ w_bajo }}"></div>
+                <div class="dist-seg medio pct-{{ w_medio }}"></div>
+                <div class="dist-seg alto pct-{{ w_alto }}"></div>
+            </div>
+            <ul class="dist-lista">
+                {% for clase, nombre, rango, cantidad, pct in niveles %}
+                <li>
+                    <span class="nivel nivel-{{ clase }}">{{ nombre }}</span>
+                    <span class="mono dist-rango">{{ rango }}</span>
+                    <span class="mono dist-cantidad">{{ cantidad }}</span>
+                    <span class="mono dist-pct">{{ '%.1f' | format(pct) | replace('.', ',') }} %</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <section class="tarjeta">
+        <header class="tarjeta-cabecera">
+            <h3>Nuevo análisis</h3>
+        </header>
+        <div class="tarjeta-cuerpo rapidos">
+            <a class="rapido" href="{{ url_for('analysis.analizar_url_view') }}">
+                <span class="rapido-icono"><svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-enlace"/></svg></span>
+                <span class="rapido-texto">
+                    <strong>Analizar una URL</strong>
+                    <small>Revisa un enlace sospechoso</small>
+                </span>
+                <svg class="icono rapido-flecha" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg>
+            </a>
+            <a class="rapido" href="{{ url_for('analysis.analizar_mensaje_view') }}">
+                <span class="rapido-icono"><svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-mensaje"/></svg></span>
+                <span class="rapido-texto">
+                    <strong>Analizar un mensaje</strong>
+                    <small>Revisa un SMS, correo o chat</small>
+                </span>
+                <svg class="icono rapido-flecha" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chevron"/></svg>
+            </a>
+        </div>
+    </section>
 </div>
+
+<section class="tarjeta">
+    <header class="tarjeta-cabecera">
+        <h3>Últimos análisis</h3>
+        <a href="{{ url_for('analysis.historial_admin' if current_user.es_admin else 'analysis.historial') }}">Ver historial completo</a>
+    </header>
+    {% if ultimos %}
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">Últimos 5 análisis</caption>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    {% if current_user.es_admin %}<th>Usuario</th>{% endif %}
+                    <th>Tipo</th>
+                    <th>Contenido</th>
+                    <th>Puntaje</th>
+                    <th>Nivel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in ultimos %}
+                <tr>
+                    <td class="mono">{{ a.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                    {% if current_user.es_admin %}<td>{{ a.usuario.username }}</td>{% endif %}
+                    <td><span class="etiqueta-tipo">{{ a.tipo }}</span></td>
+                    <td class="mono celda-contenido"><a href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">{{ a.contenido | truncate(60, True) }}</a></td>
+                    <td>
+                        <div class="puntaje">
+                            <span class="mono puntaje-num">{{ a.puntaje }}</span>
+                            <div class="mini"><div class="mini-relleno {{ a.nivel }} pct-{{ a.puntaje }}"></div></div>
+                        </div>
+                    </td>
+                    <td><span class="nivel nivel-{{ a.nivel }}">{{ a.nivel | capitalize }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="vacio">Todavía no hay análisis. Empieza con <a href="{{ url_for('analysis.analizar_url_view') }}">una URL</a> o <a href="{{ url_for('analysis.analizar_mensaje_view') }}">un mensaje</a>.</p>
+    {% endif %}
+</section>
 {% endblock %}

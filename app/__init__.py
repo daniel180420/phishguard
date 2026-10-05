@@ -30,7 +30,7 @@ def create_app():
     @app.after_request
     def agregar_cabeceras_seguridad(response):
         response.headers['Content-Security-Policy'] = (
-            "default-src 'self'; frame-ancestors 'none'; form-action 'self'"
+            "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
         )
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'DENY'
