@@ -38,3 +38,30 @@ Message analysis normalizes text (lowercase, accents stripped) before keyword ma
 ### Models
 
 `Usuario` → `Analisis` → `IndicadorDetectado`, plus a standalone `IndicadorConfig` (editable weights). Defined in `app/models.py`. Table and column names are in Spanish.
+
+## Decisiones que no se cambian
+
+- Sin IA ni ML: el análisis es solo por reglas (heurísticas).
+- Sin APIs externas.
+- Sin Bootstrap ni Tailwind: CSS propio en `app/static/css/style.css`.
+- Consultas a la base de datos solo con SQLAlchemy.
+- El control de acceso se verifica siempre en el servidor (`login_required` / `admin_required`), nunca solo ocultando elementos en el HTML.
+- Nunca leer ni mostrar el contenido de `.env`.
+
+## Reglas de diseño (por la CSP `default-src 'self'`)
+
+- Nada de CDNs, fuentes externas ni imágenes remotas: usar fuentes del sistema o archivos locales en `static/`.
+- Nada de `style="..."` ni `onclick` en el HTML: el CSS va en `static/css` y el JS en `static/js`.
+- Los templates deben conservar `url_for`, `form.hidden_tag()` (CSRF) y los bloques de Jinja.
+- Rediseñar solo templates y CSS, sin tocar `routes`, `models` ni `analyzer`.
+
+## Forma de trabajar
+
+El usuario es estudiante y debe poder explicar todo en la sustentación. Explicar qué se hace y por qué, y mostrar los cambios antes de aplicarlos.
+
+## Pendiente
+
+- Rediseño de la interfaz.
+- CSV sin saltos de línea en el contenido.
+- README.
+- Hora en zona horaria de Colombia.

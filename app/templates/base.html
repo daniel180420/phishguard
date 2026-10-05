@@ -9,18 +9,25 @@
 <body>
     <header class="barra">
         <div class="barra-contenido">
-            <a class="logo" href="{{ url_for('dashboard.index') }}">PhishGuard</a>
+            <a class="logo" href="{{ url_for('dashboard.index') }}">
+                <svg class="logo-icono" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+                PhishGuard
+            </a>
             {% if current_user.is_authenticated %}
-            <nav>
-                <a href="{{ url_for('dashboard.index') }}">Inicio</a>
-                <a href="{{ url_for('analysis.analizar_url_view') }}">Analizar URL</a>
-                <a href="{{ url_for('analysis.analizar_mensaje_view') }}">Analizar mensaje</a>
-                <a href="{{ url_for('analysis.historial') }}">Historial</a>
+            {% set ep = request.endpoint %}
+            <nav aria-label="Principal">
+                <a href="{{ url_for('dashboard.index') }}"{% if ep == 'dashboard.index' %} class="activo" aria-current="page"{% endif %}>Inicio</a>
+                <a href="{{ url_for('analysis.analizar_url_view') }}"{% if ep == 'analysis.analizar_url_view' %} class="activo" aria-current="page"{% endif %}>Analizar URL</a>
+                <a href="{{ url_for('analysis.analizar_mensaje_view') }}"{% if ep == 'analysis.analizar_mensaje_view' %} class="activo" aria-current="page"{% endif %}>Analizar mensaje</a>
+                <a href="{{ url_for('analysis.historial') }}"{% if ep in ('analysis.historial', 'analysis.detalle') %} class="activo" aria-current="page"{% endif %}>Historial</a>
                 {% if current_user.es_admin %}
-                <a href="{{ url_for('analysis.historial_admin') }}">Historial global</a>
-                <a href="{{ url_for('analysis.indicadores') }}">Indicadores</a>
+                <a href="{{ url_for('analysis.historial_admin') }}"{% if ep == 'analysis.historial_admin' %} class="activo" aria-current="page"{% endif %}>Historial global</a>
+                <a href="{{ url_for('analysis.indicadores') }}"{% if ep in ('analysis.indicadores', 'analysis.editar_indicador') %} class="activo" aria-current="page"{% endif %}>Indicadores</a>
                 {% endif %}
-                <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+                <a class="salir" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
             </nav>
             {% endif %}
         </div>

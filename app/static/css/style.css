@@ -1,11 +1,18 @@
 :root {
-    --azul: #1e3a5f;
-    --azul-claro: #2d5a8e;
-    --fondo: #f4f6f9;
+    --azul: #0f2a47;
+    --azul-claro: #2563a8;
+    --acento: #38bdf8;          /* solo en la barra superior */
+    --fondo: #eef2f6;
     --tarjeta: #ffffff;
     --texto: #1f2933;
-    --gris: #6b7785;
-    --borde: #dde3ea;
+    --gris: #5b6776;
+    --borde: #d5dde7;
+    --sombra: 0 1px 2px rgba(15, 42, 71, 0.06), 0 4px 16px rgba(15, 42, 71, 0.06);
+    --radio: 12px;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --fuente: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    --fuente-mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+
     --bajo: #1f8a4c;
     --bajo-fondo: #e3f5ea;
     --medio: #b7791f;
@@ -20,7 +27,8 @@
 
 body {
     margin: 0;
-    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    font-family: var(--fuente);
+    font-size: 1rem;
     background: var(--fondo);
     color: var(--texto);
     line-height: 1.5;
@@ -30,52 +38,90 @@ body {
 
 .barra {
     background: var(--azul);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .barra-contenido {
-    width: min(960px, calc(100% - 40px));
+    width: min(1040px, calc(100% - 40px));
     margin: 0 auto;
-    padding: 14px 0;
+    padding: 12px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px 24px;
 }
 
 .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     color: #ffffff;
-    font-size: 1.4rem;
+    font-family: var(--fuente-mono);
+    font-size: 1.25rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
     text-decoration: none;
+}
+
+.logo-icono {
+    color: var(--acento);
+}
+
+.barra nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 .barra nav a {
-    color: #dbe7f5;
+    color: #cbd9ea;
     text-decoration: none;
-    margin-left: 18px;
     font-size: 0.95rem;
+    padding: 10px 12px;
+    border-bottom: 2px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
 }
 
-.barra nav a:hover {
+.barra nav a.activo {
     color: #ffffff;
-    text-decoration: underline;
+    border-bottom-color: var(--acento);
+}
+
+.barra nav a.salir {
+    margin-left: 12px;
+    color: #9fb4cc;
+}
+
+.barra a:focus-visible {
+    outline: 2px solid var(--acento);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .barra nav a:hover {
+        color: #ffffff;
+    }
 }
 
 /* ---------- Contenido principal ---------- */
 
 main {
-    width: min(960px, calc(100% - 40px));
+    width: min(1040px, calc(100% - 40px));
     margin: 28px auto;
-    padding: 28px;
+    padding: 32px;
     background: var(--tarjeta);
     border: 1px solid var(--borde);
-    border-radius: 10px;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
 }
 
 h2 {
     margin-top: 0;
     color: var(--azul);
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
 }
 
 h3, h4 {
@@ -95,13 +141,15 @@ hr {
 pre {
     background: #f0f3f7;
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-family: var(--fuente-mono);
+    font-size: 0.9rem;
     white-space: pre-wrap;
     word-break: break-word;
 }
 
 footer {
-    width: min(960px, calc(100% - 40px));
+    width: min(1040px, calc(100% - 40px));
     margin: 0 auto 30px;
     text-align: center;
     color: var(--gris);
@@ -111,12 +159,14 @@ footer {
 /* ---------- Formularios ---------- */
 
 form p {
-    margin: 0 0 16px;
+    margin: 0 0 18px;
 }
 
 label {
+    display: block;
     font-weight: 600;
     font-size: 0.9rem;
+    color: var(--azul);
 }
 
 input[type="text"],
@@ -125,34 +175,57 @@ input[type="password"],
 textarea {
     width: 100%;
     max-width: 560px;
+    min-height: 44px;
     padding: 10px 12px;
     margin-top: 6px;
     border: 1px solid var(--borde);
-    border-radius: 6px;
+    border-radius: 8px;
     font: inherit;
     background: #ffffff;
     color: var(--texto);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 input:focus,
 textarea:focus {
-    outline: 2px solid var(--azul-claro);
+    outline: none;
     border-color: var(--azul-claro);
+    box-shadow: 0 0 0 3px rgba(37, 99, 168, 0.25);
 }
 
 input[type="submit"] {
     background: var(--azul);
     color: #ffffff;
     border: 0;
-    padding: 10px 20px;
-    border-radius: 6px;
+    min-height: 44px;
+    padding: 10px 22px;
+    border-radius: 8px;
     font: inherit;
     font-weight: 600;
     cursor: pointer;
+    transition: background-color 150ms ease, transform 160ms var(--ease-out);
 }
 
-input[type="submit"]:hover {
-    background: var(--azul-claro);
+input[type="submit"]:active {
+    transform: scale(0.97);
+}
+
+input[type="submit"]:focus-visible {
+    outline: 2px solid var(--azul-claro);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    input[type="submit"]:hover {
+        background: var(--azul-claro);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    input[type="submit"]:active,
+    .acciones a:active {
+        transform: none;
+    }
 }
 
 /* ---------- Mensajes flash ---------- */
@@ -218,7 +291,7 @@ th {
 .resultado {
     background: #f9fafc;
     border-left: 6px solid var(--borde);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 16px 20px;
     margin-top: 20px;
 }
@@ -239,7 +312,7 @@ th {
 .stat {
     background: #f7f9fc;
     border: 1px solid var(--borde);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 16px;
     text-align: center;
 }
@@ -268,16 +341,27 @@ th {
 }
 
 .acciones a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     background: var(--azul);
     color: #ffffff;
     padding: 10px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
+    transition: background-color 150ms ease, transform 160ms var(--ease-out);
 }
 
-.acciones a:hover {
-    background: var(--azul-claro);
+.acciones a:active {
+    transform: scale(0.97);
 }
+
+@media (hover: hover) and (pointer: fine) {
+    .acciones a:hover {
+        background: var(--azul-claro);
+    }
+}
+
 .error-campo {
     color: var(--alto);
     font-size: 0.85rem;
