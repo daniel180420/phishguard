@@ -59,9 +59,24 @@ Message analysis normalizes text (lowercase, accents stripped) before keyword ma
 
 El usuario es estudiante y debe poder explicar todo en la sustentación. Explicar qué se hace y por qué, y mostrar los cambios antes de aplicarlos.
 
+## Seguridad
+
+Corregido tras la revisión de seguridad:
+
+- Exportación CSV (`exportar_csv`): los textos que controla el usuario (contenido y nombre de usuario) se neutralizan contra inyección de fórmulas (si empiezan con `=`, `+`, `-`, `@`, tabulador o retorno de carro se antepone `'`), y los saltos de línea del contenido se reemplazan por un espacio.
+- `run.py` lee el modo debug de la variable de entorno `FLASK_DEBUG` (apagado por defecto). En desarrollo, agregar `FLASK_DEBUG=1` al `.env` a mano (Claude no lo lee ni lo edita).
+- La CSP incluye `base-uri 'self'`.
+
+Riesgos conocidos y aceptados:
+
+- El registro avisa "Ese usuario o correo ya está registrado", lo que revela qué usuarios existen (lo frena el límite de 10 registros por hora).
+- Las cookies de sesión no llevan `Secure` porque se usa HTTP local. Al servir con HTTPS hay que poner `SESSION_COOKIE_SECURE = True` en `config.py`.
+- El limitador de intentos usa memoria (`memory://`) y la IP: se reinicia con el servidor y no bloquea por cuenta.
+- El cierre de sesión (`/logout`) es un GET, así que una página ajena podría forzarlo.
+
 ## Pendiente
 
 - Rediseño de la interfaz.
-- CSV sin saltos de línea en el contenido.
+- [x] CSV sin saltos de línea en el contenido.
 - README.
 - Hora en zona horaria de Colombia.
