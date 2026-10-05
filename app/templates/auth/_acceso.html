@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="acceso">
+    <section class="acceso-panel">
+        <a class="acceso-logo" href="{{ url_for('dashboard.index') }}">
+            <svg class="icono icono-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-escudo"/></svg>
+            PhishGuard
+        </a>
+
+        <div class="acceso-mensaje">
+            <h1 class="acceso-titular">Antes de hacer clic, revisa el riesgo.</h1>
+            <p class="acceso-texto">Analiza una URL o un mensaje sospechoso. PhishGuard calcula un puntaje de 0 a 100 y te muestra qué indicadores lo explican.</p>
+
+            <div class="lectura" role="group" aria-label="Ejemplo ilustrativo de un análisis">
+                <div class="lectura-cabecera">
+                    <span>Análisis · mensaje</span>
+                    <span>Ejemplo</span>
+                </div>
+                <div class="lectura-puntaje">
+                    <span class="lectura-numero">85<span class="lectura-total">/100</span></span>
+                    <span class="lectura-nivel">Alto</span>
+                </div>
+                <div class="lectura-barra" aria-hidden="true">
+                    <span class="seg-bajo"></span>
+                    <span class="seg-medio"></span>
+                    <span class="seg-alto"></span>
+                </div>
+                <ul class="lectura-lista">
+                    <li><span class="lectura-peso">+25</span> Solicitud de datos sensibles</li>
+                    <li><span class="lectura-peso">+15</span> Lenguaje de urgencia</li>
+                    <li><span class="lectura-peso">+15</span> Invitación a ingresar a un enlace</li>
+                    <li><span class="lectura-peso">+15</span> Premio u oferta engañosa</li>
+                    <li><span class="lectura-peso">+10</span> Mención de una entidad conocida</li>
+                    <li><span class="lectura-peso">+5</span> Mayúsculas o exclamaciones en exceso</li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="acceso-aviso">Herramienta educativa. El resultado indica un nivel de riesgo según las reglas del sistema, no una garantía de que algo sea o no phishing.</p>
+    </section>
+
+    <section class="acceso-form">
+        <div class="acceso-caja">
+            {% block formulario %}{% endblock %}
+        </div>
+    </section>
+</div>
+{% endblock %}

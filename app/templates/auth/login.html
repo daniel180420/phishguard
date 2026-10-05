@@ -1,23 +1,26 @@
-{% extends "base.html" %}
+{% extends "auth/_acceso.html" %}
 
-{% block content %}
+{% block formulario %}
 <h2>Iniciar sesión</h2>
+<p class="acceso-subtitulo">Entra para analizar y consultar tu historial.</p>
 
 <form method="POST">
     {{ form.hidden_tag() }}
 
     <p>
-        {{ form.username.label }}<br>
-        {{ form.username() }}
+        {{ form.username.label }}
+        {{ form.username(autocomplete="username") }}
+        {% for error in form.username.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     <p>
-        {{ form.password.label }}<br>
-        {{ form.password() }}
+        {{ form.password.label }}
+        {{ form.password(autocomplete="current-password") }}
+        {% for error in form.password.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     {{ form.submit() }}
 </form>
 
-<p>¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate aquí</a></p>
+<p class="acceso-pie">¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate aquí</a></p>
 {% endblock %}

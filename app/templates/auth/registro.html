@@ -1,33 +1,38 @@
-{% extends "base.html" %}
+{% extends "auth/_acceso.html" %}
 
-{% block content %}
+{% block formulario %}
 <h2>Crear cuenta</h2>
+<p class="acceso-subtitulo">Regístrate para analizar y guardar tu historial.</p>
 
 <form method="POST">
     {{ form.hidden_tag() }}
 
     <p>
-        {{ form.username.label }}<br>
-        {{ form.username() }}
+        {{ form.username.label }}
+        {{ form.username(autocomplete="username") }}
+        {% for error in form.username.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     <p>
-        {{ form.email.label }}<br>
-        {{ form.email() }}
+        {{ form.email.label }}
+        {{ form.email(autocomplete="email") }}
+        {% for error in form.email.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     <p>
-        {{ form.password.label }}<br>
-        {{ form.password() }}
+        {{ form.password.label }}
+        {{ form.password(autocomplete="new-password") }}
+        {% for error in form.password.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     <p>
-        {{ form.confirmar_password.label }}<br>
-        {{ form.confirmar_password() }}
+        {{ form.confirmar_password.label }}
+        {{ form.confirmar_password(autocomplete="new-password") }}
+        {% for error in form.confirmar_password.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
     {{ form.submit() }}
 </form>
 
-<p>¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión aquí</a></p>
+<p class="acceso-pie">¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión aquí</a></p>
 {% endblock %}
