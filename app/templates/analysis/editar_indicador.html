@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar peso</h2>
+<p><strong>{{ indicador.nombre }}</strong></p>
+<p>{{ indicador.descripcion }}</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.peso.label }}<br>
+        {{ form.peso() }}
+    </p>
+    {{ form.submit() }}
+</form>
+
+<p><a href="{{ url_for('analysis.indicadores') }}">← Volver a la lista</a></p>
+{% endblock %}

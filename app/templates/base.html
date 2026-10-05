@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="barra">
+        <div class="barra-contenido">
+            <a class="logo" href="{{ url_for('dashboard.index') }}">PhishGuard</a>
+            {% if current_user.is_authenticated %}
+            <nav>
+                <a href="{{ url_for('dashboard.index') }}">Inicio</a>
+                <a href="{{ url_for('analysis.analizar_url_view') }}">Analizar URL</a>
+                <a href="{{ url_for('analysis.analizar_mensaje_view') }}">Analizar mensaje</a>
+                <a href="{{ url_for('analysis.historial') }}">Historial</a>
+                {% if current_user.es_admin %}
+                <a href="{{ url_for('analysis.historial_admin') }}">Historial global</a>
+                <a href="{{ url_for('analysis.indicadores') }}">Indicadores</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+            </nav>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <ul class="flashes">
+                    {% for categoria, mensaje in mensajes %}
+                        <li class="{{ categoria }}">{{ mensaje }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        PhishGuard es una herramienta educativa: el resultado indica un nivel de riesgo según los indicadores encontrados, no una garantía de que algo sea o no phishing.
+    </footer>
+    <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Bienvenido, {{ current_user.username }}</h2>
+
+{% if current_user.es_admin %}
+<p><em>Rol: administrador. Estás viendo estadísticas globales de todos los usuarios ({{ total_usuarios }} registrados).</em></p>
+{% else %}
+<p><em>Estas son tus estadísticas personales.</em></p>
+{% endif %}
+
+<div class="stats">
+    <div class="stat">
+        <span class="numero">{{ stats.total }}</span>
+        <span class="etiqueta">Total de análisis</span>
+    </div>
+    <div class="stat">
+        <span class="numero">{{ stats.urls }}</span>
+        <span class="etiqueta">URLs analizadas</span>
+    </div>
+    <div class="stat">
+        <span class="numero">{{ stats.mensajes }}</span>
+        <span class="etiqueta">Mensajes analizados</span>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="stat bajo">
+        <span class="numero">{{ stats.bajo }}</span>
+        <span class="etiqueta">Riesgo bajo</span>
+    </div>
+    <div class="stat medio">
+        <span class="numero">{{ stats.medio }}</span>
+        <span class="etiqueta">Riesgo medio</span>
+    </div>
+    <div class="stat alto">
+        <span class="numero">{{ stats.alto }}</span>
+        <span class="etiqueta">Riesgo alto</span>
+    </div>
+</div>
+
+<div class="acciones">
+    <a href="{{ url_for('analysis.analizar_url_view') }}">Analizar una URL</a>
+    <a href="{{ url_for('analysis.analizar_mensaje_view') }}">Analizar un mensaje</a>
+    <a href="{{ url_for('analysis.historial') }}">Ver mi historial</a>
+</div>
+{% endblock %}

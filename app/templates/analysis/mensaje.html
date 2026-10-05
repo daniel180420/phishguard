@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Analizar mensaje</h2>
+
+<p><strong>Ejemplos rápidos:</strong></p>
+<div class="acciones">
+    <a href="#" data-demo-campo="mensaje" data-demo-texto="URGENTE!!! Su cuenta sera bloqueada. Verifique sus datos inmediatamente ingresando al siguiente enlace: www.banco-verificacion.xyz">Ejemplo sospechoso</a>
+    <a href="#" data-demo-campo="mensaje" data-demo-texto="Hola, nos vemos mañana a las 3 en la universidad para el trabajo">Ejemplo legítimo</a>
+    <a href="#" data-demo-campo="mensaje" data-demo-texto="Estimado cliente, le recordamos que su factura vence el 30 de este mes. Ingrese a nuestro portal para consultar el detalle.">Ejemplo ambiguo</a>
+</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.mensaje.label }}<br>
+        {{ form.mensaje(rows=6, id="mensaje") }}
+    </p>
+    {{ form.submit() }}
+</form>
+
+{% if resultado %}
+<div class="resultado {{ resultado.nivel }}">
+    <h3>Resultado</h3>
+    <p><strong>Puntaje:</strong> {{ resultado.puntaje }}/100</p>
+    <p><strong>Nivel de riesgo:</strong> <span class="badge {{ resultado.nivel }}">{{ resultado.nivel }}</span></p>
+
+    {% if resultado.indicadores %}
+    <h4>Indicadores detectados</h4>
+    <ul>
+        {% for nombre, peso, explicacion in resultado.indicadores %}
+        <li><strong>{{ nombre }}</strong> (+{{ peso }}) — {{ explicacion }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No se detectaron indicadores de riesgo.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

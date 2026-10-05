@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Indicadores y pesos</h2>
+<p><em>Solo el administrador puede editar estos valores. Cambian el puntaje de los próximos análisis, no los ya guardados.</em></p>
+
+<table>
+    <tr>
+        <th>Indicador</th>
+        <th>Descripción</th>
+        <th>Peso</th>
+        <th></th>
+    </tr>
+    {% for i in indicadores %}
+    <tr>
+        <td>{{ i.nombre }}</td>
+        <td>{{ i.descripcion }}</td>
+        <td>{{ i.peso }}</td>
+        <td><a href="{{ url_for('analysis.editar_indicador', indicador_id=i.id) }}">Editar</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

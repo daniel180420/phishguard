@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Detalle del análisis</h2>
+
+{% if current_user.es_admin %}
+<p><strong>Usuario:</strong> {{ analisis.usuario.username }}</p>
+{% endif %}
+<p><strong>Fecha:</strong> {{ analisis.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
+<p><strong>Tipo:</strong> {{ analisis.tipo }}</p>
+<p><strong>Contenido analizado:</strong></p>
+<pre>{{ analisis.contenido }}</pre>
+
+<div class="resultado {{ analisis.nivel }}">
+    <p><strong>Puntaje:</strong> {{ analisis.puntaje }}/100</p>
+    <p><strong>Nivel de riesgo:</strong> <span class="badge {{ analisis.nivel }}">{{ analisis.nivel }}</span></p>
+
+    <h4>Indicadores detectados</h4>
+    {% if analisis.indicadores %}
+    <ul>
+        {% for i in analisis.indicadores %}
+        <li><strong>{{ i.nombre }}</strong> (+{{ i.peso }}) — {{ i.explicacion }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No se detectaron indicadores de riesgo.</p>
+    {% endif %}
+</div>
+
+<p><a href="{{ url_for('analysis.historial') }}">← Volver al historial</a></p>
+{% endblock %}
