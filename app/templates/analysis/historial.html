@@ -1,40 +1,66 @@
 {% extends "base.html" %}
 
-{% block content %}
-{% if vista_admin %}
-<h2>Historial global (todos los usuarios)</h2>
-{% else %}
-<h2>Mi historial de análisis</h2>
-{% endif %}
+{% block ruta %}{{ 'historial global' if vista_admin else 'historial' }}{% endblock %}
 
-{% if analisis %}
-<div class="acciones">
-    <a href="{{ url_for('analysis.exportar_csv') }}">Exportar a CSV</a>
+{% block content %}
+{% set n = analisis | length %}
+<div class="encabezado">
+    <div>
+        <h2>{{ 'Historial global' if vista_admin else 'Mi historial' }}</h2>
+        <p class="subtitulo">
+            {% if vista_admin %}{{ n }} análisis de todos los usuarios.{% else %}{{ n }} análisis guardado{{ '' if n == 1 else 's' }}.{% endif %}
+        </p>
+    </div>
+    {% if analisis %}
+    <a class="boton-sec" href="{{ url_for('analysis.exportar_csv') }}">
+        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-descarga"/></svg>
+        Exportar a CSV
+    </a>
+    {% endif %}
 </div>
 
-<table>
-    <tr>
-        {% if vista_admin %}<th>Usuario</th>{% endif %}
-        <th>Fecha</th>
-        <th>Tipo</th>
-        <th>Contenido</th>
-        <th>Puntaje</th>
-        <th>Nivel</th>
-        <th></th>
-    </tr>
-    {% for a in analisis %}
-    <tr>
-        {% if vista_admin %}<td>{{ a.usuario.username }}</td>{% endif %}
-        <td>{{ a.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
-        <td>{{ a.tipo }}</td>
-        <td>{{ a.contenido[:60] }}{% if a.contenido|length > 60 %}...{% endif %}</td>
-        <td>{{ a.puntaje }}/100</td>
-        <td><span class="badge {{ a.nivel }}">{{ a.nivel }}</span></td>
-        <td><a href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">Ver detalle</a></td>
-    </tr>
-    {% endfor %}
-</table>
+{% if analisis %}
+<section class="tarjeta">
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">{{ 'Historial de análisis de todos los usuarios' if vista_admin else 'Tu historial de análisis' }}</caption>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    {% if vista_admin %}<th>Usuario</th>{% endif %}
+                    <th>Tipo</th>
+                    <th>Contenido</th>
+                    <th>Puntaje</th>
+                    <th>Nivel</th>
+                    <th><span class="solo-lectura">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in analisis %}
+                {% set fecha = a.fecha.strftime('%d/%m/%Y %H:%M') %}
+                <tr>
+                    <td class="mono">{{ fecha }}</td>
+                    {% if vista_admin %}<td>{{ a.usuario.username }}</td>{% endif %}
+                    <td><span class="etiqueta-tipo">{{ a.tipo }}</span></td>
+                    <td class="mono celda-contenido">{{ a.contenido | truncate(60, True) }}</td>
+                    <td>
+                        <div class="puntaje">
+                            <span class="mono puntaje-num">{{ a.puntaje }}</span>
+                            <div class="mini"><div class="mini-relleno {{ a.nivel }} pct-{{ a.puntaje }}"></div></div>
+                        </div>
+                    </td>
+                    <td><span class="nivel nivel-{{ a.nivel }}">{{ a.nivel | capitalize }}</span></td>
+                    <td><a class="enlace-detalle" href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">Ver detalle<span class="solo-lectura"> del análisis del {{ fecha }}</span></a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabla-pie mono">{{ n }} análisis en total</p>
+</section>
 {% else %}
-<p>Todavía no hay análisis.</p>
+<section class="tarjeta">
+    <p class="vacio">Todavía no hay análisis. Empieza con <a href="{{ url_for('analysis.analizar_url_view') }}">una URL</a> o <a href="{{ url_for('analysis.analizar_mensaje_view') }}">un mensaje</a>.</p>
+</section>
 {% endif %}
 {% endblock %}

@@ -1,31 +1,37 @@
 {% extends "base.html" %}
 
+{% block ruta %}historial / detalle{% endblock %}
+
 {% block content %}
-<h2>Detalle del análisis</h2>
-
-{% if current_user.es_admin %}
-<p><strong>Usuario:</strong> {{ analisis.usuario.username }}</p>
-{% endif %}
-<p><strong>Fecha:</strong> {{ analisis.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
-<p><strong>Tipo:</strong> {{ analisis.tipo }}</p>
-<p><strong>Contenido analizado:</strong></p>
-<pre>{{ analisis.contenido }}</pre>
-
-<div class="resultado {{ analisis.nivel }}">
-    <p><strong>Puntaje:</strong> {{ analisis.puntaje }}/100</p>
-    <p><strong>Nivel de riesgo:</strong> <span class="badge {{ analisis.nivel }}">{{ analisis.nivel }}</span></p>
-
-    <h4>Indicadores detectados</h4>
-    {% if analisis.indicadores %}
-    <ul>
-        {% for i in analisis.indicadores %}
-        <li><strong>{{ i.nombre }}</strong> (+{{ i.peso }}) — {{ i.explicacion }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No se detectaron indicadores de riesgo.</p>
-    {% endif %}
+<div class="encabezado">
+    <div>
+        <h2>Detalle del análisis</h2>
+        <p class="subtitulo">Resultado guardado de este análisis.</p>
+    </div>
+    <a class="boton-sec" href="{{ url_for('analysis.historial_admin' if current_user.es_admin else 'analysis.historial') }}">← Volver al historial</a>
 </div>
 
-<p><a href="{{ url_for('analysis.historial') }}">← Volver al historial</a></p>
+<section class="tarjeta">
+    <header class="tarjeta-cabecera">
+        <h3>Contenido analizado</h3>
+    </header>
+    <div class="tarjeta-cuerpo">
+        <dl class="meta">
+            {% if current_user.es_admin %}
+            <div><dt>Usuario</dt><dd>{{ analisis.usuario.username }}</dd></div>
+            {% endif %}
+            <div><dt>Fecha</dt><dd class="mono">{{ analisis.fecha.strftime('%d/%m/%Y %H:%M') }}</dd></div>
+            <div><dt>Tipo</dt><dd><span class="etiqueta-tipo">{{ analisis.tipo }}</span></dd></div>
+        </dl>
+        <pre class="contenido-analizado">{{ analisis.contenido }}</pre>
+    </div>
+</section>
+
+{# Se convierte lo guardado (objetos) a la forma que espera el parcial: tuplas (nombre, peso, explicacion) #}
+{% set lista = [] %}
+{% for i in analisis.indicadores %}{% set _ = lista.append((i.nombre, i.peso, i.explicacion)) %}{% endfor %}
+{% with resultado = {'puntaje': analisis.puntaje, 'nivel': analisis.nivel, 'indicadores': lista},
+        frase_final = ('el mensaje sea fraudulento' if analisis.tipo == 'mensaje' else 'la URL sea fraudulenta') %}
+{% include "analysis/_resultado.html" %}
+{% endwith %}
 {% endblock %}

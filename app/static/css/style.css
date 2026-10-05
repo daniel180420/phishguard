@@ -408,64 +408,7 @@ th {
     color: var(--gris);
 }
 
-/* ---------- Niveles de riesgo ---------- */
 
-.badge {
-    display: inline-block;
-    padding: 2px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: capitalize;
-}
-
-.badge.bajo  { background: var(--bajo-fondo);  color: var(--bajo); }
-.badge.medio { background: var(--medio-fondo); color: var(--medio); }
-.badge.alto  { background: var(--alto-fondo);  color: var(--alto); }
-
-.resultado {
-    background: var(--tarjeta);
-    border: 1px solid var(--borde);
-    border-left: 6px solid var(--borde);
-    border-radius: var(--radio);
-    padding: 16px 20px;
-    margin-top: 20px;
-}
-
-.resultado.bajo  { border-left-color: var(--bajo); }
-.resultado.medio { border-left-color: var(--medio); }
-.resultado.alto  { border-left-color: var(--alto); }
-
-/* ---------- Acciones ---------- */
-
-.acciones {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 20px 0;
-}
-
-.acciones a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    background: var(--azul-claro);
-    color: #ffffff;
-    padding: 10px 16px;
-    border-radius: var(--radio-sm);
-    text-decoration: none;
-    transition: background-color 150ms ease, transform 160ms var(--ease-out);
-}
-
-.acciones a:active {
-    transform: scale(0.97);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .acciones a:hover {
-        background: var(--azul);
-    }
-}
 
 /* ---------- Tarjetas y datos (reutilizables) ---------- */
 
@@ -919,6 +862,10 @@ th {
 }
 
 .boton-sec {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
     min-height: 44px;
     padding: 0 16px;
     border: 1px solid var(--borde);
@@ -1109,6 +1056,47 @@ th {
     border-top: 1px solid var(--borde);
     color: var(--gris);
     font-size: 0.8rem;
+}
+
+/* ---------- Historial y detalle ---------- */
+
+.enlace-detalle {
+    white-space: nowrap;
+}
+
+.tabla-pie {
+    margin: 0;
+    padding: 12px 20px;
+    border-top: 1px solid var(--borde);
+    background: var(--fondo);
+    font-size: 0.75rem;
+    color: var(--gris);
+}
+
+.meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px 24px;
+    margin: 0 0 16px;
+}
+
+.meta dt {
+    margin-bottom: 2px;
+    font-family: var(--fuente-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gris);
+}
+
+.meta dd {
+    margin: 0;
+}
+
+.contenido-analizado {
+    margin: 0;
+    max-height: 320px;
+    overflow: auto;
 }
 
 /* ---------- Acceso: login y registro ---------- */
@@ -1356,7 +1344,7 @@ th {
 
 @media (prefers-reduced-motion: reduce) {
     input[type="submit"]:active,
-    .acciones a:active {
+    .boton-sec:active {
         transform: none;
     }
 }
