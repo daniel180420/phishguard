@@ -3,7 +3,18 @@ from urllib.parse import urlparse
 
 # ---------- Listas para análisis de URLs ----------
 
-MARCAS_CONOCIDAS = ['bancolombia', 'nequi', 'daviplata', 'davivienda', 'bbva', 'banco de bogota']
+# Dominio(s) oficial(es) de cada marca. La clave es el nombre de la marca.
+DOMINIOS_OFICIALES = {
+    'bancolombia': ['bancolombia.com', 'grupobancolombia.com'],
+    'nequi': ['nequi.com.co', 'nequi.com'],
+    'daviplata': ['daviplata.com'],
+    'davivienda': ['davivienda.com'],
+    'bbva': ['bbva.com.co', 'bbva.com'],
+    'banco de bogota': ['bancodebogota.com', 'bancodebogota.com.co'],
+}
+
+# Se deriva del diccionario para que las dos listas no se desfasen.
+MARCAS_CONOCIDAS = list(DOMINIOS_OFICIALES)
 
 ACORTADORES = ['bit.ly', 'tinyurl.com', 'goo.gl', 'ow.ly', 't.co', 'is.gd']
 
@@ -17,6 +28,12 @@ def _es_ip(host):
     if len(partes) != 4:
         return False
     return all(parte.isdigit() and 0 <= int(parte) <= 255 for parte in partes)
+
+
+def _es_dominio_oficial(host, oficiales):
+    # El host es el dominio oficial o un subdominio real de él.
+    # "bancolombia.com.seguro.xyz" NO cuenta: no termina en ".bancolombia.com".
+    return any(host == d or host.endswith('.' + d) for d in oficiales)
 
 
 def analizar_url(url, pesos):
@@ -67,8 +84,14 @@ def analizar_url(url, pesos):
         puntaje += peso
         indicadores.append(('Dominio de nivel superior inusual', peso, 'Este TLD es gratuito y frecuentemente asociado a abuso.'))
 
-    for marca in MARCAS_CONOCIDAS:
-        if marca in host and host != f'{marca}.com':
+    # hostname es el host real: descarta usuario:clave@ y el puerto, y viene en minúsculas.
+    host_real = (parsed.hostname or '').rstrip('.')
+    # La marca se busca en todo el netloc, para detectar "bancolombia.com@evil.xyz";
+    # pero lo oficial se decide solo con el host real.
+    netloc_min = parsed.netloc.lower()
+    for marca, oficiales in DOMINIOS_OFICIALES.items():
+        # En un host no hay espacios: "banco de bogota" se busca como "bancodebogota".
+        if marca.replace(' ', '') in netloc_min and not _es_dominio_oficial(host_real, oficiales):
             peso = pesos.get('Posible typosquatting', 20)
             puntaje += peso
             indicadores.append(('Posible typosquatting', peso, f'El dominio imita a "{marca}" pero no es el dominio oficial.'))
