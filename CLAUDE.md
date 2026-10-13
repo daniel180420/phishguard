@@ -73,6 +73,8 @@ Riesgos conocidos y aceptados:
 - Las cookies de sesión no llevan `Secure` porque se usa HTTP local. Al servir con HTTPS hay que poner `SESSION_COOKIE_SECURE = True` en `config.py`.
 - El limitador de intentos usa memoria (`memory://`) y la IP: se reinicia con el servidor y no bloquea por cuenta.
 - El cierre de sesión (`/logout`) es un GET, así que una página ajena podría forzarlo.
+- Con `FLASK_HOST=0.0.0.0` (para probar desde el celular en la misma WiFi) la app se sirve por HTTP sin cifrar a toda la red: la sesión y la contraseña viajan sin protección. Usarlo solo en una red de confianza. Es el servidor de desarrollo de Flask, no para producción.
+- `run.py` desactiva el modo debug si `FLASK_HOST` no es `127.0.0.1`, aunque `FLASK_DEBUG=1`, para no exponer el depurador en la red. `FLASK_HOST` se agrega a mano en el `.env` (Claude no lo lee ni lo edita).
 
 ## Pendiente
 

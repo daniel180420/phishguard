@@ -126,6 +126,22 @@ body {
     color: var(--acento);
 }
 
+.lateral-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lateral-cuerpo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-boton {
+    display: none;
+}
+
 .lateral-nav {
     flex: 1;
     display: flex;
@@ -661,6 +677,8 @@ th {
 /* Tabla de datos */
 
 .tabla-scroll {
+    position: relative;
+    max-width: 100%;
     overflow-x: auto;
 }
 
@@ -1315,30 +1333,101 @@ th {
         display: none;
     }
 
-    .app {
-        grid-template-columns: 1fr;
-    }
-
-    .lateral {
-        position: static;
-        height: auto;
-    }
-
-    .lateral-nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    .lateral-seccion {
-        width: 100%;
-        margin: 10px 0 2px 12px;
-    }
-
     .franja,
     .contenido {
         padding-left: 20px;
         padding-right: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .app {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Red de seguridad: la página nunca se desplaza de lado. */
+    body {
+        overflow-x: hidden;
+    }
+
+    .area,
+    .contenido {
+        min-width: 0;
+    }
+
+    .lateral {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        height: auto;
+        overflow-y: visible;
+        padding: 8px 16px;
+    }
+
+    .lateral-logo {
+        padding: 4px 0;
+    }
+
+    .menu-boton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--lateral-borde);
+        border-radius: var(--radio-sm);
+        background: transparent;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+    .menu-boton:focus-visible {
+        outline: 2px solid var(--acento);
+        outline-offset: 2px;
+    }
+
+    .lateral.menu-js:not(.abierto) .lateral-cuerpo {
+        display: none;
+    }
+
+    /* Menú abierto: cabe en pantalla (barra de 60 px) y se desplaza por dentro. */
+    .lateral-cuerpo {
+        flex: none;
+        padding-bottom: 8px;
+        max-height: calc(100vh - 76px);
+        max-height: calc(100dvh - 76px);
+        overflow-y: auto;
+    }
+
+    .franja,
+    .contenido {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        max-width: none;
+        font-size: 1rem;
+    }
+
+    input[type="submit"],
+    .boton-sec {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tabla-scroll {
+        position: relative;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabla-scroll table {
+        min-width: 560px;
     }
 }
 

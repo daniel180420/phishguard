@@ -26,18 +26,26 @@
         <symbol id="i-ajustes" viewBox="0 0 24 24"><path d="M4 7h10"/><path d="M18 7h2"/><path d="M4 17h2"/><path d="M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
         <symbol id="i-descarga" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></symbol>
         <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
         <symbol id="i-salir"viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
     </svg>
 
     {% if autenticado %}
     <a class="saltar" href="#contenido">Saltar al contenido</a>
     <div class="app">
-        <aside class="lateral">
-            <a class="lateral-logo" href="{{ url_for('dashboard.index') }}">
-                <svg class="icono icono-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-escudo"/></svg>
-                PhishGuard
-            </a>
+        <aside class="lateral" id="menu-lateral">
+            <div class="lateral-cabecera">
+                <a class="lateral-logo" href="{{ url_for('dashboard.index') }}">
+                    <svg class="icono icono-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-escudo"/></svg>
+                    PhishGuard
+                </a>
+                <button type="button" class="menu-boton" id="menu-boton"
+                        aria-controls="lateral-cuerpo" aria-expanded="false" aria-label="Abrir menú">
+                    <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg>
+                </button>
+            </div>
 
+            <div class="lateral-cuerpo" id="lateral-cuerpo">
             <nav class="lateral-nav" aria-label="Principal">
                 {{ item(url_for('dashboard.index'), ep == 'dashboard.index', 'inicio', 'Inicio') }}
 
@@ -62,6 +70,7 @@
                     <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-salir"/></svg>
                     Cerrar sesión
                 </a>
+            </div>
             </div>
         </aside>
 
@@ -98,5 +107,6 @@
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
 </body>
 </html>
