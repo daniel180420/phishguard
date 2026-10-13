@@ -41,7 +41,8 @@ def analizar_url(url, pesos):
     puntaje = 0
 
     parsed = urlparse(url)
-    host = parsed.netloc.split(':')[0]
+    # Host real normalizado: sin usuario@, sin puerto y en minúsculas (el puerto va en parsed.port).
+    host = (parsed.hostname or '').rstrip('.')
 
     if _es_ip(host):
         peso = pesos.get('IP en lugar de dominio', 25)
