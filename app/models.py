@@ -47,5 +47,5 @@ class IndicadorDetectado(db.Model):
     analisis_id = db.Column(db.Integer, db.ForeignKey('analisis.id'), nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     peso = db.Column(db.Integer, nullable=False)
-    explicacion = db.Column(db.String(255))
+    explicacion = db.Column(db.Text)
     

@@ -1055,6 +1055,7 @@ th {
     margin: 2px 0 0;
     color: var(--gris);
     font-size: 0.85rem;
+    overflow-wrap: anywhere;
 }
 
 .tabla-indicadores .total-fila td {

@@ -4,7 +4,7 @@ import sys
 # Permite ejecutar el archivo desde cualquier carpeta: agrega la raíz del proyecto.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.analysis.analyzer import analizar_url
+from app.analysis.analyzer import analizar_url, url_bien_formada
 
 
 def nombres(url):
@@ -37,5 +37,12 @@ print(f'OK  {url} -> {puntaje} puntos')
 puntaje, ind = nombres('https://www.google.com')
 assert puntaje == 0 and not ind, f'Falló google: {puntaje} {ind}'
 print('OK  https://www.google.com -> 0 puntos')
+
+# 4. URL mal formada: el validador del formulario la rechaza (antes daba ValueError -> 500).
+for mala in ('http://sitio.com:abc', 'http://[abc'):
+    assert not url_bien_formada(mala), f'Falló: {mala} debería ser mal formada'
+    print(f'OK  {mala} se rechaza como mal formada')
+assert url_bien_formada('https://www.google.com:8443/ruta')
+print('OK  una URL con puerto válido se acepta')
 
 print('Todos los casos pasaron.')

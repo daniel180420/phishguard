@@ -1,3 +1,4 @@
+import re
 import unicodedata
 from urllib.parse import urlparse
 
@@ -34,6 +35,15 @@ def _es_dominio_oficial(host, oficiales):
     # El host es el dominio oficial o un subdominio real de él.
     # "bancolombia.com.seguro.xyz" NO cuenta: no termina en ".bancolombia.com".
     return any(host == d or host.endswith('.' + d) for d in oficiales)
+
+
+def url_bien_formada(url):
+    # urlparse() y .port lanzan ValueError con URLs como "http://sitio.com:abc" o "http://[abc".
+    try:
+        urlparse(url).port
+    except ValueError:
+        return False
+    return True
 
 
 def analizar_url(url, pesos):
@@ -138,10 +148,49 @@ PALABRAS_PREMIO = ['ganaste', 'ha ganado', 'felicitaciones', 'premio', 'sorteo',
 
 ENTIDADES = MARCAS_CONOCIDAS + ['dian', 'colpensiones', 'sura']
 
+# Enlaces dentro de un mensaje: se revisan como texto, nunca se visitan.
+MAX_ENLACES = 3
+MAX_LARGO_ENLACE = 500
+PATRON_ENLACE = re.compile(r'''(?:https?://|www\.)[^\s<>"']+''', re.IGNORECASE)
+PUNTUACION_FINAL = '''.,;:!?)"'»'''
+
 
 def _normalizar(texto):
     texto = unicodedata.normalize('NFD', texto.lower())
     return ''.join(c for c in texto if unicodedata.category(c) != 'Mn')
+
+
+def extraer_enlaces(mensaje):
+    # Hasta MAX_ENLACES enlaces distintos, en orden de aparición. Se quita la puntuación
+    # pegada al final ("...xyz.") y se recorta a MAX_LARGO_ENLACE. Los mal formados se saltan.
+    enlaces = []
+    for encontrado in PATRON_ENLACE.findall(mensaje):
+        enlace = encontrado.rstrip(PUNTUACION_FINAL)[:MAX_LARGO_ENLACE]
+        if enlace in enlaces:
+            continue
+        if not url_bien_formada(_con_esquema(enlace)):
+            continue
+        enlaces.append(enlace)
+        if len(enlaces) == MAX_ENLACES:
+            break
+    return enlaces
+
+
+def _con_esquema(enlace):
+    # "www.sitio.com" no trae esquema: se le antepone http:// para poder analizarlo como URL.
+    if enlace.lower().startswith('www.'):
+        return 'http://' + enlace
+    return enlace
+
+
+def _revisar_enlaces(mensaje, pesos):
+    # Analiza cada enlace con analizar_url y devuelve el de mayor puntaje que sea riesgo medio o alto.
+    peor = None
+    for enlace in extraer_enlaces(mensaje):
+        puntaje, nivel, indicadores = analizar_url(_con_esquema(enlace), pesos)
+        if nivel != 'bajo' and (peor is None or puntaje > peor[1]):
+            peor = (enlace, puntaje, nivel, indicadores)
+    return peor
 
 
 def analizar_mensaje(mensaje, pesos):
@@ -171,6 +220,16 @@ def analizar_mensaje(mensaje, pesos):
             puntaje += peso
             detalle = f'{explicacion} Detectado: {", ".join(encontradas[:3])}.'
             indicadores.append((nombre, peso, detalle))
+
+    peor_enlace = _revisar_enlaces(mensaje, pesos)
+    if peor_enlace:
+        enlace, puntaje_enlace, nivel_enlace, indicadores_enlace = peor_enlace
+        principales = sorted(indicadores_enlace, key=lambda i: i[1], reverse=True)[:3]
+        peso = pesos.get('Enlace sospechoso en el mensaje', 20)
+        puntaje += peso
+        detalle = (f'El mensaje trae un enlace de riesgo {nivel_enlace}: {enlace} '
+                   f'(puntaje {puntaje_enlace}). Indicadores: {", ".join(i[0] for i in principales)}.')
+        indicadores.append(('Enlace sospechoso en el mensaje', peso, detalle))
 
     palabras_mayuscula = [p for p in mensaje.split() if p.isupper() and len(p) >= 3]
     if len(palabras_mayuscula) >= 3 or mensaje.count('!') >= 3:

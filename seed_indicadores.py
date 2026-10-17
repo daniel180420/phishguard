@@ -20,6 +20,7 @@ INDICADORES = [
     ('Premio u oferta engañosa', 15, 'Ofrece un beneficio inesperado para atraer tu atención.'),
     ('Mención de una entidad conocida', 10, 'Nombra una entidad reconocida, típico al suplantar identidades.'),
     ('Mayúsculas o exclamaciones en exceso', 5, 'El tono alarmista busca generar ansiedad.'),
+    ('Enlace sospechoso en el mensaje', 20, 'Un enlace dentro del mensaje tiene riesgo medio o alto al analizarlo como URL.'),
 ]
 
 app = create_app()
