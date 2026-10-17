@@ -20,10 +20,10 @@
             {% if current_user.es_admin %}
             <div><dt>Usuario</dt><dd>{{ analisis.usuario.username }}</dd></div>
             {% endif %}
-            <div><dt>Fecha</dt><dd class="mono">{{ analisis.fecha.strftime('%d/%m/%Y %H:%M') }}</dd></div>
+            <div><dt>Fecha</dt><dd class="mono">{{ analisis.fecha | fecha_colombia }}</dd></div>
             <div><dt>Tipo</dt><dd><span class="etiqueta-tipo">{{ analisis.tipo }}</span></dd></div>
         </dl>
-        <pre class="contenido-analizado">{{ analisis.contenido }}</pre>
+        <pre class="contenido-analizado">{{ analisis.contenido | trim }}</pre>
     </div>
 </section>
 

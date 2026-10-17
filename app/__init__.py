@@ -1,6 +1,7 @@
 from flask import Flask
 from config import Config
 from app.extensions import db, login_manager, limiter
+from app.tiempo import fecha_colombia
 
 
 def create_app():
@@ -22,6 +23,8 @@ def create_app():
     app.register_blueprint(dashboard_bp)
 
     from app.models import Usuario
+
+    app.jinja_env.filters['fecha_colombia'] = fecha_colombia
 
     @login_manager.user_loader
     def load_user(user_id):

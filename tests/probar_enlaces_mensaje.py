@@ -86,4 +86,11 @@ assert peor in expl and MALO_1 not in expl, f'Falló: {expl}'
 assert expl.split('Indicadores: ')[1].count(',') <= 2, f'Falló: más de 3 indicadores: {expl}'
 print(f'OK  gana el de mayor puntaje -> {expl}')
 
+# 11. Sin punto doble cuando la palabra detectada termina en punto ("www.").
+_, _, indicadores = analizar_mensaje('Ingrese a www.sitio.com ahora', {})
+detalles = [e for n, _, e in indicadores if n == 'Invitación a ingresar a un enlace']
+assert detalles and '..' not in detalles[0], f'Falló punto doble: {detalles}'
+assert detalles[0].endswith('www.'), f'Falló: {detalles}'
+print(f'OK  sin punto doble -> {detalles[0]}')
+
 print('Todos los casos pasaron.')

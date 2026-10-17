@@ -218,7 +218,10 @@ def analizar_mensaje(mensaje, pesos):
         if encontradas:
             peso = pesos.get(nombre, 10)
             puntaje += peso
-            detalle = f'{explicacion} Detectado: {", ".join(encontradas[:3])}.'
+            lista_detectadas = ", ".join(encontradas[:3])
+            # "www." ya termina en punto: no se agrega otro.
+            cierre = '' if lista_detectadas.endswith('.') else '.'
+            detalle = f'{explicacion} Detectado: {lista_detectadas}{cierre}'
             indicadores.append((nombre, peso, detalle))
 
     peor_enlace = _revisar_enlaces(mensaje, pesos)

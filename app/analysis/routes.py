@@ -7,6 +7,7 @@ from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Analisis, IndicadorDetectado, IndicadorConfig
 from app.decorators import admin_required
+from app.tiempo import fecha_colombia
 from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm
 from app.analysis.analyzer import analizar_url, analizar_mensaje
 
@@ -18,11 +19,22 @@ def _cargar_pesos():
     return {i.nombre: i.peso for i in activos}
 
 
+def limpiar_celda(texto):
+    # Primero se quitan espacios y saltos de los bordes: si no, "  =1+1" no empieza con "="
+    # y se saltaría la neutralización, pero Excel igual lo ejecutaría.
+    texto = texto.strip()
+    # Una sola línea, y sin fórmulas: Excel ejecuta lo que empieza con = + - @
+    texto = texto.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
+    if texto.startswith(('=', '+', '-', '@', '\t', '\r')):
+        texto = "'" + texto
+    return texto
+
+
 def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores):
     nuevo_analisis = Analisis(
         usuario_id=current_user.id,
         tipo=tipo,
-        contenido=contenido,
+        contenido=contenido.strip(),
         puntaje=puntaje,
         nivel=nivel
     )
@@ -135,13 +147,6 @@ def exportar_csv():
                     .order_by(Analisis.fecha.desc())
                     .all())
 
-    def limpiar_celda(texto):
-        # Una sola línea, y sin fórmulas: Excel ejecuta lo que empieza con = + - @
-        texto = texto.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
-        if texto.startswith(('=', '+', '-', '@', '\t', '\r')):
-            texto = "'" + texto
-        return texto
-
     salida = io.StringIO()
     salida.write('\ufeff')
     escritor = csv.writer(salida, delimiter=';')
@@ -152,7 +157,7 @@ def exportar_csv():
     escritor.writerow(encabezado)
 
     for a in analisis:
-        fila = [a.fecha.strftime('%d/%m/%Y %H:%M'), a.tipo, limpiar_celda(a.contenido), a.puntaje, a.nivel]
+        fila = [fecha_colombia(a.fecha), a.tipo, limpiar_celda(a.contenido), a.puntaje, a.nivel]
         if current_user.es_admin:
             fila.insert(0, limpiar_celda(a.usuario.username))
         escritor.writerow(fila)

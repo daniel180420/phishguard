@@ -6,3 +6,4 @@ PyMySQL
 python-dotenv
 email_validator
 Flask-Limiter
+tzdata

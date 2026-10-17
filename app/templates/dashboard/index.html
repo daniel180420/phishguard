@@ -124,10 +124,10 @@
             <tbody>
                 {% for a in ultimos %}
                 <tr>
-                    <td class="mono">{{ a.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td class="mono">{{ a.fecha | fecha_colombia }}</td>
                     {% if current_user.es_admin %}<td>{{ a.usuario.username }}</td>{% endif %}
                     <td><span class="etiqueta-tipo">{{ a.tipo }}</span></td>
-                    <td class="mono celda-contenido"><a href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">{{ a.contenido | truncate(60, True) }}</a></td>
+                    <td class="mono celda-contenido"><a href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">{{ a.contenido | trim | truncate(60, True) }}</a></td>
                     <td>
                         <div class="puntaje">
                             <span class="mono puntaje-num">{{ a.puntaje }}</span>
