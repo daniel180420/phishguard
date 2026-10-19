@@ -2,7 +2,8 @@
 // se decodifica aquí con jsQR y solo se usa el texto que contiene.
 
 const QR_MAX_BYTES = 10 * 1024 * 1024;   // 10 MB
-const QR_LADO_MAX = 1280;                // px; las fotos más grandes se reducen antes de leerlas
+const QR_MAX_PIXELES = 50 * 1000 * 1000; // 50 megapíxeles (ancho × alto); más que eso no se dibuja en el canvas
+const QR_LADO_MAX = 1280;              // px; las fotos más grandes se reducen antes de leerlas
 const URL_MAX_LARGO = 500;               // el mismo límite que valida el servidor
 const TEXTO_MAX_MOSTRADO = 300;
 
@@ -70,6 +71,12 @@ async function leerQr(archivo) {
     }
 
     try {
+        // Se revisa antes de crear el canvas: una imagen de miles de millones de píxeles agotaría la memoria.
+        if (imagen.width * imagen.height > QR_MAX_PIXELES) {
+            const megapixeles = Math.round(imagen.width * imagen.height / 1000000);
+            fallarLectura('La imagen es demasiado grande (' + megapixeles + ' megapíxeles). El máximo es 50. Elige una más pequeña.');
+            return;
+        }
         const escala = Math.min(1, QR_LADO_MAX / Math.max(imagen.width, imagen.height));
         const ancho = Math.max(1, Math.round(imagen.width * escala));
         const alto = Math.max(1, Math.round(imagen.height * escala));

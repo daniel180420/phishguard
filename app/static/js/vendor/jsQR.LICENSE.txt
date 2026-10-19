@@ -1,6 +1,7 @@
 jsQR 1.4.0 - https://github.com/cozmo/jsQR - licencia Apache-2.0
 Archivo original: dist/jsQR.js del paquete npm jsqr@1.4.0
 Integridad del paquete (sha512): dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==
+SHA-256 de jsQR.js (el archivo de esta carpeta): bc40c8a15196236b2314db0856f72ca0b49980cd5413b8c852a7349f5fee0859
 Se incluye sin modificar. Texto de la licencia:
 
                                  Apache License
