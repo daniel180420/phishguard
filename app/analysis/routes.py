@@ -1,12 +1,14 @@
 import csv
 import io
 
-from flask import Blueprint, render_template, redirect, url_for, flash, Response
+from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort
 from flask_login import login_required, current_user
+from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.models import Analisis, IndicadorDetectado, IndicadorConfig
+from app.models import Analisis, IndicadorDetectado, IndicadorConfig, EventoSeguridad
 from app.decorators import admin_required
+from app.seguridad import registrar_evento
 from app.tiempo import fecha_colombia
 from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, normalizar_origen
 from app.analysis.analyzer import analizar_url, analizar_mensaje
@@ -105,13 +107,11 @@ def historial_admin():
 @analysis_bp.route('/historial/<int:analisis_id>')
 @login_required
 def detalle(analisis_id):
-    if current_user.es_admin:
-        analisis = db.get_or_404(Analisis, analisis_id)
-    else:
-        analisis = Analisis.query.filter_by(
-            id=analisis_id,
-            usuario_id=current_user.id
-        ).first_or_404()
+    analisis = db.get_or_404(Analisis, analisis_id)
+    if analisis.usuario_id != current_user.id and not current_user.es_admin:
+        # Mismo 404 que un ID inexistente (no se revela que existe), pero queda registrado.
+        registrar_evento('analisis_ajeno', f'analisis_id={analisis_id}')
+        abort(404)
     return render_template('analysis/detalle.html', analisis=analisis)
 
 
@@ -129,12 +129,25 @@ def editar_indicador(indicador_id):
     form = EditarPesoForm(obj=indicador)
 
     if form.validate_on_submit():
+        peso_anterior = indicador.peso
         indicador.peso = form.peso.data
         db.session.commit()
+        registrar_evento('cambio_peso', f'{indicador.nombre}: {peso_anterior} -> {indicador.peso}')
         flash(f'Peso de "{indicador.nombre}" actualizado a {indicador.peso}.', 'success')
         return redirect(url_for('analysis.indicadores'))
 
     return render_template('analysis/editar_indicador.html', form=form, indicador=indicador)
+
+
+@analysis_bp.route('/admin/eventos')
+@admin_required
+def eventos():
+    lista = (EventoSeguridad.query
+             .options(joinedload(EventoSeguridad.usuario))
+             .order_by(EventoSeguridad.fecha.desc(), EventoSeguridad.id.desc())
+             .limit(200)
+             .all())
+    return render_template('analysis/eventos.html', eventos=lista)
 
 
 @analysis_bp.route('/historial/exportar')
@@ -165,4 +178,5 @@ def exportar_csv():
 
     respuesta = Response(salida.getvalue(), mimetype='text/csv')
     respuesta.headers['Content-Disposition'] = 'attachment; filename=historial_phishguard.csv'
+    registrar_evento('exportar_csv', f"{'global' if current_user.es_admin else 'propio'}, {len(analisis)} filas")
     return respuesta

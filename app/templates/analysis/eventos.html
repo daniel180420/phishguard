@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block ruta %}eventos de seguridad{% endblock %}
+
+{% block content %}
+{% set n = eventos | length %}
+<div class="encabezado">
+    <div>
+        <h2>Eventos de seguridad</h2>
+        <p class="subtitulo">Últimos {{ n }} evento{{ '' if n == 1 else 's' }} (máximo 200), del más reciente al más antiguo.</p>
+    </div>
+</div>
+
+{% if eventos %}
+<section class="tarjeta">
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">Registro de eventos de seguridad</caption>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Evento</th>
+                    <th>Usuario</th>
+                    <th>IP</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in eventos %}
+                <tr>
+                    <td class="mono">{{ e.fecha | fecha_colombia }}</td>
+                    <td><span class="etiqueta-tipo">{{ e.evento }}</span></td>
+                    <td>{{ e.usuario.username if e.usuario else '—' }}</td>
+                    <td class="mono">{{ e.ip or '—' }}</td>
+                    <td>{{ e.detalle or '—' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabla-pie mono">{{ n }} evento{{ '' if n == 1 else 's' }} mostrados</p>
+</section>
+{% else %}
+<section class="tarjeta">
+    <p class="vacio">Todavía no hay eventos registrados.</p>
+</section>
+{% endif %}
+{% endblock %}

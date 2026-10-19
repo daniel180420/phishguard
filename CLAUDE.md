@@ -37,7 +37,25 @@ Message analysis normalizes text (lowercase, accents stripped) before keyword ma
 
 ### Models
 
-`Usuario` → `Analisis` → `IndicadorDetectado`, plus a standalone `IndicadorConfig` (editable weights). Defined in `app/models.py`. Table and column names are in Spanish.
+`Usuario` → `Analisis` → `IndicadorDetectado`, plus a standalone `IndicadorConfig` (editable weights) and `EventoSeguridad` (security log; `usuario_id` nullable). Defined in `app/models.py`. Table and column names are in Spanish.
+
+## Cambios manuales de base de datos
+
+El proyecto no usa migraciones. `init_db.py` ejecuta `db.create_all()`, que **solo crea las tablas que faltan**: no agrega columnas nuevas ni cambia el tipo de las existentes. Cuando un modelo cambia una tabla que ya existe, hay que ejecutar el `ALTER TABLE` a mano en MySQL, o la app falla con `Unknown column ...`. Se ejecutaron en este orden:
+
+1. Columna `origen` de `Analisis` (indica si la URL salió de un código QR):
+
+   ```sql
+   ALTER TABLE analisis ADD COLUMN origen VARCHAR(10) NULL;
+   ```
+
+2. Columna `explicacion` de `IndicadorDetectado` pasa a `TEXT`:
+
+   ```sql
+   ALTER TABLE indicadores_detectados MODIFY explicacion TEXT;
+   ```
+
+Cada vez que se cambie una tabla existente, agregar aquí su `ALTER TABLE`, en orden. Una tabla nueva solo necesita `python init_db.py`.
 
 ## Decisiones que no se cambian
 
@@ -66,9 +84,14 @@ Corregido tras la revisión de seguridad:
 - Exportación CSV (`exportar_csv`): los textos que controla el usuario (contenido y nombre de usuario) se neutralizan contra inyección de fórmulas (si empiezan con `=`, `+`, `-`, `@`, tabulador o retorno de carro se antepone `'`), y los saltos de línea del contenido se reemplazan por un espacio.
 - `run.py` lee el modo debug de la variable de entorno `FLASK_DEBUG` (apagado por defecto). En desarrollo, agregar `FLASK_DEBUG=1` al `.env` a mano (Claude no lo lee ni lo edita).
 - La CSP incluye `base-uri 'self'`.
+- Registro de eventos de seguridad (ISO 27002 8.15): `registrar_evento()` en `app/seguridad.py`, tabla `eventos_seguridad`, vista `/admin/eventos` (últimos 200). Registra login (exitoso/fallido), logout, registro, exportación CSV, cambio de peso, 403, 404 en análisis ajeno y 429. Usa su propia sesión de BD y nunca rompe la petición. Los 403 y 429 se registran como máximo una vez por minuto por IP y usuario (`espera=60`, en memoria y por proceso), para que una ráfaga no llene la tabla ni empuje fuera de la vista los eventos importantes. No guarda contraseñas ni el usuario escrito en un login fallido; el detalle se limpia (una línea, 500 caracteres) y se escapa al mostrarlo. La tabla es nueva, así que basta `python init_db.py` (no requiere `ALTER TABLE`).
 
 Riesgos conocidos y aceptados:
 
+- La tabla `eventos_seguridad` no tiene retención ni borrado: solo crece. La IP y el `usuario_id` que guarda son datos personales (Ley 1581 de 2012, Colombia): falta definir cuánto tiempo se conservan y cómo se eliminan.
+- La inmutabilidad del registro no está garantizada a nivel de MySQL (el usuario de la app podría hacer UPDATE/DELETE); la app solo inserta y lee. Restringir esos permisos queda fuera del alcance.
+- Los 403 y 429 repetidos se limitan a una fila por minuto por IP y usuario, pero quien cambie de IP o use muchas cuentas aún puede generar filas (una por minuto y combinación). El límite está en memoria: se pierde al reiniciar y no se comparte entre procesos.
+- La etiqueta "QR" del historial (`Analisis.origen`) la envía el navegador, así que cualquiera puede falsificarla. Es informativa, no sirve como prueba.
 - El registro avisa "Ese usuario o correo ya está registrado", lo que revela qué usuarios existen (lo frena el límite de 10 registros por hora).
 - Las cookies de sesión no llevan `Secure` porque se usa HTTP local. Al servir con HTTPS hay que poner `SESSION_COOKIE_SECURE = True` en `config.py`.
 - El limitador de intentos usa memoria (`memory://`) y la IP: se reinicia con el servidor y no bloquea por cuenta.

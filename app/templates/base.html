@@ -61,6 +61,7 @@
                 <p class="lateral-seccion">Administración</p>
                 {{ item(url_for('analysis.historial_admin'), ep == 'analysis.historial_admin', 'capas', 'Historial global') }}
                 {{ item(url_for('analysis.indicadores'), ep in ('analysis.indicadores', 'analysis.editar_indicador'), 'ajustes', 'Indicadores') }}
+                {{ item(url_for('analysis.eventos'), ep == 'analysis.eventos', 'escudo', 'Eventos de seguridad') }}
                 {% endif %}
             </nav>
 

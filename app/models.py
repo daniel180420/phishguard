@@ -49,4 +49,17 @@ class IndicadorDetectado(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     peso = db.Column(db.Integer, nullable=False)
     explicacion = db.Column(db.Text)
+
+
+class EventoSeguridad(db.Model):
+    __tablename__ = 'eventos_seguridad'
+
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)  # NULL: no hay usuario (login fallido, 429 anónimo)
+    evento = db.Column(db.String(50), nullable=False)
+    detalle = db.Column(db.String(500))
+    ip = db.Column(db.String(45))  # cabe una IPv6
+    fecha = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    usuario = db.relationship('Usuario')
     

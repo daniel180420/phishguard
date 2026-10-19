@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.extensions import db, limiter
 from app.models import Usuario
+from app.seguridad import registrar_evento
 from app.auth.forms import RegistroForm, LoginForm
 
 auth_bp = Blueprint('auth', __name__)
@@ -34,6 +35,7 @@ def registro():
         db.session.add(nuevo_usuario)
         db.session.commit()
 
+        registrar_evento('registro', usuario_id=nuevo_usuario.id)
         flash('Cuenta creada correctamente. Ya puedes iniciar sesión.', 'success')
         return redirect(url_for('auth.login'))
 
@@ -54,8 +56,15 @@ def login():
         if usuario and check_password_hash(usuario.password_hash, form.password.data):
             login_user(usuario)
             session.permanent = True
+            registrar_evento('login_exitoso', usuario_id=usuario.id)
             return redirect(url_for('dashboard.index'))
 
+        # No se guarda el usuario escrito (a veces pegan ahí la contraseña) ni la contraseña.
+        registrar_evento(
+            'login_fallido',
+            'contraseña incorrecta' if usuario else 'usuario inexistente',
+            usuario_id=usuario.id if usuario else None,
+        )
         flash('Usuario o contraseña incorrectos.', 'error')
 
     return render_template('auth/login.html', form=form)
@@ -64,5 +73,6 @@ def login():
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    registrar_evento('logout')  # antes de logout_user(), para tener el usuario
     logout_user()
     return redirect(url_for('auth.login'))

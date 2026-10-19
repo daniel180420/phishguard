@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from config import Config
 from app.extensions import db, login_manager, limiter
 from app.tiempo import fecha_colombia
@@ -25,6 +25,19 @@ def create_app():
     from app.models import Usuario
 
     app.jinja_env.filters['fecha_colombia'] = fecha_colombia
+
+    from app.seguridad import registrar_evento
+
+    @app.errorhandler(403)
+    def acceso_denegado(e):
+        # Solo ruta, sin query string. Se devuelve la misma respuesta de antes.
+        registrar_evento('acceso_denegado', f'{request.method} {request.path}', espera=60)
+        return e
+
+    @app.errorhandler(429)
+    def limite_excedido(e):
+        registrar_evento('limite_excedido', f'{request.method} {request.path}', espera=60)
+        return e
 
     @login_manager.user_loader
     def load_user(user_id):
