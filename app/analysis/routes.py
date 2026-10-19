@@ -8,7 +8,7 @@ from app.extensions import db
 from app.models import Analisis, IndicadorDetectado, IndicadorConfig
 from app.decorators import admin_required
 from app.tiempo import fecha_colombia
-from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm
+from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, normalizar_origen
 from app.analysis.analyzer import analizar_url, analizar_mensaje
 
 analysis_bp = Blueprint('analysis', __name__)
@@ -30,10 +30,11 @@ def limpiar_celda(texto):
     return texto
 
 
-def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores):
+def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores, origen=None):
     nuevo_analisis = Analisis(
         usuario_id=current_user.id,
         tipo=tipo,
+        origen=origen,
         contenido=contenido.strip(),
         puntaje=puntaje,
         nivel=nivel
@@ -62,7 +63,7 @@ def analizar_url_view():
         url = form.url.data
         pesos = _cargar_pesos()
         puntaje, nivel, indicadores = analizar_url(url, pesos)
-        _guardar_analisis('url', url, puntaje, nivel, indicadores)
+        _guardar_analisis('url', url, puntaje, nivel, indicadores, normalizar_origen(form.origen.data))
         resultado = {'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
     return render_template('analysis/url.html', form=form, resultado=resultado)

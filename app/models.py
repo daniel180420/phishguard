@@ -26,6 +26,7 @@ class Analisis(db.Model):
     puntaje = db.Column(db.Integer, nullable=False)
     nivel = db.Column(db.String(10), nullable=False)  # 'bajo', 'medio', 'alto'
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    origen = db.Column(db.String(10), nullable=True)  # 'qr' si la URL salió de un código QR; NULL si no
 
     indicadores = db.relationship('IndicadorDetectado', backref='analisis', lazy=True)
 

@@ -879,6 +879,50 @@ th {
     color: var(--gris);
 }
 
+/* ---------- Lector de QR ---------- */
+
+.qr-lector {
+    margin: 0 0 18px;
+}
+
+.qr-ayuda {
+    margin: 8px 0 0;
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
+.qr-estado {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-left: 4px solid var(--borde);
+    border-radius: var(--radio-sm);
+    background: #eef2f6;
+    font-size: 0.9rem;
+}
+
+.qr-estado[hidden],
+.qr-texto[hidden] {
+    display: none;
+}
+
+.qr-ok {
+    border-left-color: var(--bajo);
+}
+
+.qr-aviso {
+    border-left-color: var(--medio);
+}
+
+.qr-error {
+    border-left-color: var(--alto);
+}
+
+.qr-texto {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+}
+
 .boton-sec {
     display: inline-flex;
     align-items: center;

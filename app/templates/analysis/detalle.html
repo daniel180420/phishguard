@@ -21,7 +21,7 @@
             <div><dt>Usuario</dt><dd>{{ analisis.usuario.username }}</dd></div>
             {% endif %}
             <div><dt>Fecha</dt><dd class="mono">{{ analisis.fecha | fecha_colombia }}</dd></div>
-            <div><dt>Tipo</dt><dd><span class="etiqueta-tipo">{{ analisis.tipo }}</span></dd></div>
+            <div><dt>Tipo</dt><dd><span class="etiqueta-tipo">{{ analisis.tipo }}</span>{% if analisis.origen == 'qr' %} <span class="etiqueta-tipo">QR</span>{% endif %}</dd></div>
         </dl>
         <pre class="contenido-analizado">{{ analisis.contenido | trim }}</pre>
     </div>

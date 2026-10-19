@@ -1,13 +1,22 @@
 import re
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, IntegerField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Length, NumberRange, ValidationError
 
 from app.analysis.analyzer import url_bien_formada
 
 
 PATRON_URL = re.compile(r'^https?://[^\s/$.?#].[^\s]*$', re.IGNORECASE)
+
+
+ORIGENES_VALIDOS = ('qr',)
+
+
+def normalizar_origen(valor):
+    # Lista blanca: cualquier otro valor (vacío, "admin", "<script>"...) se descarta.
+    # Viene del navegador, así que es solo informativo: no se puede verificar en el servidor.
+    return valor if valor in ORIGENES_VALIDOS else None
 
 
 def validar_formato_url(form, field):
@@ -24,6 +33,7 @@ class AnalisisURLForm(FlaskForm):
         Length(max=500),
         validar_formato_url
     ])
+    origen = HiddenField()
     submit = SubmitField('Analizar URL')
 
 

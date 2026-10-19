@@ -126,7 +126,7 @@
                 <tr>
                     <td class="mono">{{ a.fecha | fecha_colombia }}</td>
                     {% if current_user.es_admin %}<td>{{ a.usuario.username }}</td>{% endif %}
-                    <td><span class="etiqueta-tipo">{{ a.tipo }}</span></td>
+                    <td><span class="etiqueta-tipo">{{ a.tipo }}</span>{% if a.origen == 'qr' %} <span class="etiqueta-tipo">QR</span>{% endif %}</td>
                     <td class="mono celda-contenido"><a href="{{ url_for('analysis.detalle', analisis_id=a.id) }}">{{ a.contenido | trim | truncate(60, True) }}</a></td>
                     <td>
                         <div class="puntaje">

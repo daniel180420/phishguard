@@ -18,6 +18,13 @@
                 {{ form.url(id="url", placeholder="https://ejemplo.com/ruta") }}
                 {% for error in form.url.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
             </p>
+            <div class="qr-lector">
+                <button type="button" class="boton-sec" id="qr-boton">Leer QR desde una imagen</button>
+                <input type="file" id="qr-archivo" accept="image/*" hidden>
+                <p class="qr-ayuda">La imagen se lee en tu navegador y no se envía al servidor.</p>
+                <p id="qr-estado" class="qr-estado" role="status" aria-live="polite" hidden></p>
+                <p id="qr-texto" class="qr-texto mono" hidden></p>
+            </div>
             <div class="entrada-acciones">
                 {{ form.submit() }}
                 <span class="entrada-ejemplos-etiqueta">Ejemplos</span>
@@ -34,4 +41,7 @@
 {% include "analysis/_resultado.html" %}
 {% endwith %}
 {% endif %}
+
+<script src="{{ url_for('static', filename='js/vendor/jsQR.js') }}"></script>
+<script src="{{ url_for('static', filename='js/qr.js') }}"></script>
 {% endblock %}
