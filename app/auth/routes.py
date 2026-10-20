@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, render_template, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,7 +32,8 @@ def registro():
         nuevo_usuario = Usuario(
             username=form.username.data,
             email=form.email.data,
-            password_hash=generate_password_hash(form.password.data)
+            password_hash=generate_password_hash(form.password.data),
+            fecha_aceptacion_privacidad=datetime.utcnow()  # constancia de la autorización
         )
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -40,6 +43,12 @@ def registro():
         return redirect(url_for('auth.login'))
 
     return render_template('auth/registro.html', form=form)
+
+
+@auth_bp.route('/privacidad')
+def privacidad():
+    # Pública a propósito: debe poder leerse antes de registrarse.
+    return render_template('privacidad.html')
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])

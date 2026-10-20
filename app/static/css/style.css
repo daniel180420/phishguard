@@ -1482,3 +1482,107 @@ th {
         transform: none;
     }
 }
+
+/* ---------- Privacidad y borrado de datos ---------- */
+
+.documento {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+    line-height: 1.6;
+}
+
+/* Con sesión, .contenido ya da el margen: no se duplica. */
+.contenido .documento {
+    margin: 0;
+    padding: 0 0 24px;
+}
+
+.documento h3 {
+    margin: 28px 0 8px;
+    font-size: 1.05rem;
+}
+
+.documento p {
+    margin: 8px 0 0;
+}
+
+.documento ul {
+    margin: 8px 0 0;
+    padding-left: 22px;
+}
+
+.documento li {
+    margin-bottom: 6px;
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.acciones form {
+    margin: 0;
+}
+
+.boton-peligro {
+    border-color: var(--alto);
+    color: var(--alto);
+}
+
+.boton-peligro:focus-visible {
+    outline: 2px solid var(--alto);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .boton-peligro:hover {
+        background: var(--alto-fondo);
+    }
+}
+
+.casilla {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.casilla input[type="checkbox"] {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--azul-claro);
+}
+
+.casilla label {
+    flex: 1;
+    min-width: 0;
+    padding-top: 2px;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.casilla .error-campo {
+    flex-basis: 100%;
+}
+
+.aviso-datos {
+    margin: 6px 0 14px;
+    color: var(--gris);
+    font-size: 0.85rem;
+}
+
+.pie-enlace {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 0;
+}
+
+.acceso-privacidad {
+    margin: 12px 0 0;
+    font-size: 0.85rem;
+}

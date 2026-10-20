@@ -1,8 +1,9 @@
 import csv
 import io
 
-from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort, current_app
 from flask_login import login_required, current_user
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
@@ -30,6 +31,27 @@ def limpiar_celda(texto):
     if texto.startswith(('=', '+', '-', '@', '\t', '\r')):
         texto = "'" + texto
     return texto
+
+
+def _eliminar_analisis(usuario_id, analisis_id=None):
+    # Borra los análisis del usuario (uno, o todos si analisis_id es None) y devuelve cuántos borró,
+    # o None si falló. IndicadorDetectado.analisis_id es NOT NULL y la relación no tiene cascade, así
+    # que primero se borran los indicadores y luego los análisis, en una sola transacción.
+    filtro = [Analisis.usuario_id == usuario_id]
+    if analisis_id is not None:
+        filtro.append(Analisis.id == analisis_id)
+    try:
+        IndicadorDetectado.query.filter(
+            IndicadorDetectado.analisis_id.in_(select(Analisis.id).where(*filtro))
+        ).delete(synchronize_session=False)
+        # Aquí sin subconsulta: MySQL no permite DELETE ... WHERE id IN (SELECT ... de la misma tabla).
+        borrados = Analisis.query.filter(*filtro).delete(synchronize_session=False)
+        db.session.commit()
+        return borrados
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception('No se pudieron eliminar los análisis del usuario %s', usuario_id)
+        return None
 
 
 def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores, origen=None):
@@ -110,9 +132,40 @@ def detalle(analisis_id):
     analisis = db.get_or_404(Analisis, analisis_id)
     if analisis.usuario_id != current_user.id and not current_user.es_admin:
         # Mismo 404 que un ID inexistente (no se revela que existe), pero queda registrado.
-        registrar_evento('analisis_ajeno', f'analisis_id={analisis_id}')
+        registrar_evento('analisis_ajeno', f'analisis_id={analisis_id}', espera=60)
         abort(404)
     return render_template('analysis/detalle.html', analisis=analisis)
+
+
+@analysis_bp.route('/historial/<int:analisis_id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_analisis(analisis_id):
+    # El token CSRF lo valida CSRFProtect (global) antes de llegar aquí; no existe versión GET.
+    analisis = db.get_or_404(Analisis, analisis_id)
+    if analisis.usuario_id != current_user.id:
+        # Solo se borra lo propio, también el administrador. Mismo 404 que un ID inexistente.
+        registrar_evento('analisis_ajeno', f'eliminar analisis_id={analisis_id}', espera=60)
+        abort(404)
+    if _eliminar_analisis(current_user.id, analisis_id) is None:
+        flash('No se pudo eliminar el análisis. Inténtalo de nuevo.', 'error')
+        return redirect(url_for('analysis.detalle', analisis_id=analisis_id))
+    registrar_evento('analisis_eliminado', f'analisis_id={analisis_id}')  # solo el ID, nunca el contenido
+    flash('Análisis eliminado.', 'success')
+    return redirect(url_for('analysis.historial'))
+
+
+@analysis_bp.route('/historial/eliminar-todo', methods=['POST'])
+@login_required
+def eliminar_historial():
+    borrados = _eliminar_analisis(current_user.id)
+    if borrados is None:
+        flash('No se pudo borrar el historial. Inténtalo de nuevo.', 'error')
+    elif borrados:
+        registrar_evento('analisis_eliminado', f'todos: {borrados} análisis')
+        flash(f'Historial eliminado: {borrados} análisis.', 'success')
+    else:
+        flash('No tenías análisis para eliminar.', 'success')
+    return redirect(url_for('analysis.historial'))
 
 
 @analysis_bp.route('/admin/indicadores')

@@ -18,6 +18,7 @@
                 {{ form.mensaje(rows=5, id="mensaje") }}
                 {% for error in form.mensaje.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
             </p>
+            <p class="aviso-datos">No pegues datos personales; puedes reemplazarlos por XXX.</p>
             <div class="entrada-acciones">
                 {{ form.submit() }}
                 <span class="entrada-ejemplos-etiqueta">Ejemplos</span>

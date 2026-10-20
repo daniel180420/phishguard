@@ -100,6 +100,7 @@
         {% if autenticado %}
         <footer class="pie">
             PhishGuard es una herramienta educativa: el resultado indica un nivel de riesgo según los indicadores encontrados, no una garantía de que algo sea o no phishing.
+            <a class="pie-enlace" href="{{ url_for('auth.privacidad') }}">Aviso de privacidad</a>
         </footer>
         {% endif %}
     </main>
@@ -110,5 +111,6 @@
 
     <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
     <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/confirmar.js') }}"></script>
 </body>
 </html>

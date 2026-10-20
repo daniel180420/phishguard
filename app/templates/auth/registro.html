@@ -31,6 +31,12 @@
         {% for error in form.confirmar_password.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
     </p>
 
+    <p class="casilla">
+        {{ form.acepto(id="acepto") }}
+        <label for="acepto">Acepto el <a href="{{ url_for('auth.privacidad') }}" target="_blank" rel="noopener">aviso de privacidad</a></label>
+        {% for error in form.acepto.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
+    </p>
+
     {{ form.submit() }}
 </form>
 

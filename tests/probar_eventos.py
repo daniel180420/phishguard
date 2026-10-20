@@ -86,7 +86,8 @@ print('OK  login exitoso y logout')
 vaciar()
 c = app.test_client()
 c.post('/registro', data={'username': 'nuevo', 'email': 'nuevo@ejemplo.co',
-                          'password': 'clave-nuevo-1', 'confirmar_password': 'clave-nuevo-1'})
+                          'password': 'clave-nuevo-1', 'confirmar_password': 'clave-nuevo-1',
+                          'acepto': 'y'})
 with app.app_context():
     id_nuevo = Usuario.query.filter_by(username='nuevo').one().id
 assert eventos('registro')[0][1] == id_nuevo
@@ -218,5 +219,77 @@ with app.app_context():
 selects_eventos = [q for q in consultas if 'eventos_seguridad' in q]
 assert len(consultas) <= 5 and len(selects_eventos) == 1, (len(consultas), len(selects_eventos))
 print(f'OK  la vista hace {len(consultas)} consultas para 50+ filas (sin N+1)')
+
+# 16. Una ráfaga deja UNA fila con el número de repeticiones (se actualiza al llegar a 1, 2, 4, 8...)
+# analisis_ajeno: ana pide 75 veces el análisis de beto (1 inserta + 74 repeticiones -> "al menos 64")
+c = cliente('ana')
+for _ in range(75):
+    assert c.get(f'/historial/{ID_ANALISIS_BETO}').status_code == 404
+fila = eventos('analisis_ajeno')
+assert [(e[1], e[2]) for e in fila] == [(ID['ana'], f'analisis_id={ID_ANALISIS_BETO} (al menos 64 repeticiones más)')], fila
+
+# acceso_denegado: 40 solicitudes (1 + 39 repeticiones -> "al menos 32")
+c = cliente('ana')
+for _ in range(40):
+    assert c.get('/admin/eventos').status_code == 403
+assert [e[2] for e in eventos('acceso_denegado')] == ['GET /admin/eventos (al menos 32 repeticiones más)']
+
+# limite_excedido: 60 POST a /login = 5 permitidos + 55 respuestas 429 (1 inserta + 54 repeticiones -> 32)
+vaciar()
+limiter.enabled = True
+limiter.reset()
+c = app.test_client()
+for _ in range(60):
+    c.post('/login', data={'username': 'ana', 'password': 'mal'})
+limiter.enabled = False
+assert [e[2] for e in eventos('limite_excedido')] == ['POST /login (al menos 32 repeticiones más)'], eventos('limite_excedido')
+
+# Con una sola repetición el texto va en singular
+c = cliente('ana')
+c.get('/admin/eventos')
+c.get('/admin/eventos')
+assert [e[2] for e in eventos('acceso_denegado')] == ['GET /admin/eventos (al menos 1 repetición más)']
+
+# Pocas escrituras: 101 llamadas seguidas = 1 INSERT + 7 UPDATE (al llegar a 1, 2, 4, 8, 16, 32 y 64)
+from sqlalchemy import event as sa_event
+vaciar()
+escrituras = []
+
+
+def contar_escrituras(conn, cursor, sentencia, *resto):
+    if 'eventos_seguridad' in sentencia and sentencia.lstrip().upper().startswith(('INSERT', 'UPDATE')):
+        escrituras.append(sentencia)
+
+
+with app.app_context():
+    motor = db.engine
+    sa_event.listen(motor, 'before_cursor_execute', contar_escrituras)
+    with app.test_request_context('/'):
+        for _ in range(101):
+            registrar_evento('prueba_rafaga', 'x', espera=60)
+    sa_event.remove(motor, 'before_cursor_execute', contar_escrituras)
+assert [e[2] for e in eventos('prueba_rafaga')] == ['x (al menos 64 repeticiones más)'], eventos('prueba_rafaga')
+assert len(escrituras) == 8, len(escrituras)
+
+# Pasada la ventana (60 s) se abre una fila nueva
+vaciar()
+reloj = [1000.0]
+with mock.patch('app.seguridad.time.monotonic', lambda: reloj[0]):
+    with app.test_request_context('/'):
+        registrar_evento('prueba_ventana', 'a', espera=60)
+        reloj[0] += 30
+        registrar_evento('prueba_ventana', 'a', espera=60)  # dentro de la ventana: cuenta
+        reloj[0] += 31
+        registrar_evento('prueba_ventana', 'a', espera=60)  # 61 s después: fila nueva
+assert [e[2] for e in eventos('prueba_ventana')] == ['a (al menos 1 repetición más)', 'a'], eventos('prueba_ventana')
+
+# El detalle con el conteo nunca pasa de 500 caracteres
+vaciar()
+with app.test_request_context('/'):
+    registrar_evento('prueba_largo', 'y' * 600, espera=60)
+    registrar_evento('prueba_largo', 'y' * 600, espera=60)
+largo = eventos('prueba_largo')[0][2]
+assert len(largo) == 500 and largo.endswith(' (al menos 1 repetición más)'), len(largo)
+print('OK  ráfaga: una fila con el número de repeticiones, pocas escrituras y ventana de 60 s')
 
 print('Todos los casos pasaron.')

@@ -1,6 +1,7 @@
-from flask import Flask, request
+from flask import Flask, request, flash, redirect, url_for
+from flask_wtf.csrf import CSRFError
 from config import Config
-from app.extensions import db, login_manager, limiter
+from app.extensions import db, login_manager, limiter, csrf
 from app.tiempo import fecha_colombia
 
 
@@ -10,6 +11,7 @@ def create_app():
 
     db.init_app(app)
     limiter.init_app(app)
+    csrf.init_app(app)  # todo POST exige token, aunque la vista no use validate_on_submit
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.session_protection = 'strong'
@@ -38,6 +40,15 @@ def create_app():
     def limite_excedido(e):
         registrar_evento('limite_excedido', f'{request.method} {request.path}', espera=60)
         return e
+
+    @app.errorhandler(CSRFError)
+    def csrf_invalido(e):
+        # Token ausente o vencido (por ejemplo, la sesión de 30 minutos caducó con el formulario abierto).
+        # Sin esto se vería un 400 en inglés; así el usuario vuelve a la app (o al login) con un aviso.
+        # Solo método y ruta (nunca el token ni el cuerpo del formulario).
+        registrar_evento('csrf_invalido', f'{request.method} {request.path}', espera=60)
+        flash('El formulario venció o no es válido. Vuelve a intentarlo.', 'error')
+        return redirect(url_for('dashboard.index'))
 
     @login_manager.user_loader
     def load_user(user_id):

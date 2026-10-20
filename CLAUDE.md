@@ -20,7 +20,7 @@ Requires a `.env` with `SECRET_KEY` and `DATABASE_URL` (a SQLAlchemy MySQL URI),
 
 ## Architecture
 
-App factory in `app/__init__.py` (`create_app`) registers three blueprints with no URL prefix: `auth` (`/registro`, `/login`, `/logout`), `analysis` (analyzers, history, CSV export, admin indicator editing), and `dashboard` (`/` redirects to `/dashboard`). It also sets security headers in `after_request`, including a strict CSP of `default-src 'self'`. Templates and JS therefore cannot use inline scripts/styles or external CDNs. Shared extension instances (`db`, `login_manager`, `limiter`) live in `app/extensions.py`. The limiter uses in-memory storage, which is per-process.
+App factory in `app/__init__.py` (`create_app`) registers three blueprints with no URL prefix: `auth` (`/registro`, `/login`, `/logout`, `/privacidad`), `analysis` (analyzers, history, CSV export, admin indicator editing), and `dashboard` (`/` redirects to `/dashboard`). It also sets security headers in `after_request`, including a strict CSP of `default-src 'self'`. Templates and JS therefore cannot use inline scripts/styles or external CDNs. CSRF protection is global (`CSRFProtect`, `csrf` in `app/extensions.py`): every POST needs a token, so forms use `form.hidden_tag()` and plain HTML forms use `<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">`. An invalid or expired token redirects to the dashboard (or login) with a flash message and logs a `csrf_invalido` security event. Shared extension instances (`db`, `login_manager`, `limiter`) live in `app/extensions.py`. The limiter uses in-memory storage, which is per-process.
 
 ### Scoring flow (spans several files)
 
@@ -37,7 +37,7 @@ Message analysis normalizes text (lowercase, accents stripped) before keyword ma
 
 ### Models
 
-`Usuario` → `Analisis` → `IndicadorDetectado`, plus a standalone `IndicadorConfig` (editable weights) and `EventoSeguridad` (security log; `usuario_id` nullable). Defined in `app/models.py`. Table and column names are in Spanish.
+`Usuario` → `Analisis` → `IndicadorDetectado`, plus a standalone `IndicadorConfig` (editable weights) and `EventoSeguridad` (security log; `usuario_id` nullable). `Usuario.fecha_aceptacion_privacidad` (UTC) records when the user accepted the privacy notice at registration; it is `NULL` for users created before the notice existed. Defined in `app/models.py`. Table and column names are in Spanish.
 
 ## Cambios manuales de base de datos
 
@@ -53,6 +53,12 @@ El proyecto no usa migraciones. `init_db.py` ejecuta `db.create_all()`, que **so
 
    ```sql
    ALTER TABLE indicadores_detectados MODIFY explicacion TEXT;
+   ```
+
+3. Columna `fecha_aceptacion_privacidad` de `usuarios` (fecha y hora, en UTC, en que el usuario aceptó el aviso de privacidad; queda en `NULL` para los usuarios anteriores). **Ejecutarlo antes de arrancar el código que la usa**, o el login y el registro fallan con `Unknown column`:
+
+   ```sql
+   ALTER TABLE usuarios ADD COLUMN fecha_aceptacion_privacidad DATETIME NULL;
    ```
 
 Cada vez que se cambie una tabla existente, agregar aquí su `ALTER TABLE`, en orden. Una tabla nueva solo necesita `python init_db.py`.
@@ -84,13 +90,20 @@ Corregido tras la revisión de seguridad:
 - Exportación CSV (`exportar_csv`): los textos que controla el usuario (contenido y nombre de usuario) se neutralizan contra inyección de fórmulas (si empiezan con `=`, `+`, `-`, `@`, tabulador o retorno de carro se antepone `'`), y los saltos de línea del contenido se reemplazan por un espacio.
 - `run.py` lee el modo debug de la variable de entorno `FLASK_DEBUG` (apagado por defecto). En desarrollo, agregar `FLASK_DEBUG=1` al `.env` a mano (Claude no lo lee ni lo edita).
 - La CSP incluye `base-uri 'self'`.
-- Registro de eventos de seguridad (ISO 27002 8.15): `registrar_evento()` en `app/seguridad.py`, tabla `eventos_seguridad`, vista `/admin/eventos` (últimos 200). Registra login (exitoso/fallido), logout, registro, exportación CSV, cambio de peso, 403, 404 en análisis ajeno y 429. Usa su propia sesión de BD y nunca rompe la petición. Los 403 y 429 se registran como máximo una vez por minuto por IP y usuario (`espera=60`, en memoria y por proceso), para que una ráfaga no llene la tabla ni empuje fuera de la vista los eventos importantes. No guarda contraseñas ni el usuario escrito en un login fallido; el detalle se limpia (una línea, 500 caracteres) y se escapa al mostrarlo. La tabla es nueva, así que basta `python init_db.py` (no requiere `ALTER TABLE`).
+- Registro de eventos de seguridad (ISO 27002 8.15): `registrar_evento()` en `app/seguridad.py`, tabla `eventos_seguridad`, vista `/admin/eventos` (últimos 200). Registra login (exitoso/fallido), logout, registro, exportación CSV, cambio de peso, borrado de análisis, 403, 404 en análisis ajeno, 429 y token CSRF inválido (`csrf_invalido`). Usa su propia sesión de BD y nunca rompe la petición. Los 403, 429, CSRF inválidos y accesos a análisis ajenos se insertan como máximo una vez por minuto por IP y usuario (`espera=60`, en memoria y por proceso). Las repeticiones se cuentan en esa misma fila (`(al menos N repeticiones más)`, actualizada solo al llegar a 1, 2, 4, 8... para hacer pocas escrituras): así una ráfaga no llena la tabla ni empuja fuera de la vista los eventos importantes, y aun así queda su magnitud. No guarda contraseñas ni el usuario escrito en un login fallido; el detalle se limpia (una línea, 500 caracteres) y se escapa al mostrarlo. La tabla es nueva, así que basta `python init_db.py` (no requiere `ALTER TABLE`).
+- Protección de datos personales (Ley 1581 de 2012): aviso público en `/privacidad` (enlazado en el pie, en el login y en el registro); el registro exige la casilla "Acepto el aviso de privacidad" (validada en el servidor) y guarda la fecha en `Usuario.fecha_aceptacion_privacidad`. Cada usuario puede borrar sus análisis (`POST /historial/<id>/eliminar` y `POST /historial/eliminar-todo`, con token CSRF y confirmación en `static/js/confirmar.js`): se borran antes los `IndicadorDetectado`, solo se borra lo propio (también el administrador; lo ajeno da el mismo 404 y el evento `analisis_ajeno`) y el evento `analisis_eliminado` guarda solo el ID o el conteo, nunca el contenido. Los formularios de análisis avisan que no se peguen datos personales.
+- Para evitar `DELETE ... WHERE id IN (SELECT ... FROM la misma tabla)`, que MySQL rechaza, `_eliminar_analisis` borra los indicadores con subconsulta y los análisis con el filtro directo. Las pruebas usan SQLite, que no detecta ese error: probar el borrado en MySQL al desplegar.
 
 Riesgos conocidos y aceptados:
 
 - La tabla `eventos_seguridad` no tiene retención ni borrado: solo crece. La IP y el `usuario_id` que guarda son datos personales (Ley 1581 de 2012, Colombia): falta definir cuánto tiempo se conservan y cómo se eliminan.
 - La inmutabilidad del registro no está garantizada a nivel de MySQL (el usuario de la app podría hacer UPDATE/DELETE); la app solo inserta y lee. Restringir esos permisos queda fuera del alcance.
-- Los 403 y 429 repetidos se limitan a una fila por minuto por IP y usuario, pero quien cambie de IP o use muchas cuentas aún puede generar filas (una por minuto y combinación). El límite está en memoria: se pierde al reiniciar y no se comparte entre procesos.
+- Los 403, 429, CSRF inválidos y accesos a análisis ajenos repetidos se limitan a una fila por minuto por IP y usuario, pero quien cambie de IP o use muchas cuentas aún puede generar filas (una por minuto y combinación). El límite está en memoria: se pierde al reiniciar y no se comparte entre procesos. El número de repeticiones es aproximado ("al menos N": se actualiza solo en potencias de 2, así que puede quedar hasta a la mitad del total real) y se pierde si el proceso se reinicia dentro de la ventana.
+- Si se borra todo el historial en una pestaña mientras se crea un análisis en otra, MySQL puede rechazar el borrado (el análisis nuevo aún no tiene sus indicadores borrados y la clave foránea lo impide): se hace rollback y el usuario ve "No se pudo borrar el historial. Inténtalo de nuevo."; no se pierden ni se exponen datos.
+- Si el token CSRF vence con un formulario de análisis abierto, el aviso lleva al dashboard y se pierde lo escrito (la sesión, que se cierra a los 30 minutos sin actividad, ya habría vencido, así que antes también había que volver a entrar).
+- Los usuarios creados antes del aviso de privacidad no tienen constancia de haberlo aceptado (`fecha_aceptacion_privacidad` en `NULL`) y no se les pide aceptarlo al iniciar sesión.
+- Sin JavaScript, los botones de borrar eliminan sin pedir confirmación (la confirmación es `window.confirm` en `confirmar.js`).
+- La supresión de datos está cubierta solo en parte: se pueden borrar los análisis, pero no hay "Eliminar mi cuenta" ni "Cambiar correo"; el aviso indica pedirlo al administrador del sistema.
 - La etiqueta "QR" del historial (`Analisis.origen`) la envía el navegador, así que cualquiera puede falsificarla. Es informativa, no sirve como prueba.
 - El registro avisa "Ese usuario o correo ya está registrado", lo que revela qué usuarios existen (lo frena el límite de 10 registros por hora).
 - Las cookies de sesión no llevan `Secure` porque se usa HTTP local. Al servir con HTTPS hay que poner `SESSION_COOKIE_SECURE = True` en `config.py`.
@@ -101,6 +114,8 @@ Riesgos conocidos y aceptados:
 
 ## Pendiente
 
+- "Eliminar mi cuenta" y "Cambiar correo" (derechos de supresión y actualización, Ley 1581).
+- Definir cuánto tiempo se conservan los eventos de seguridad.
 - Rediseño de la interfaz.
 - [x] CSV sin saltos de línea en el contenido.
 - README.

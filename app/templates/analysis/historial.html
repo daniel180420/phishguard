@@ -12,10 +12,19 @@
         </p>
     </div>
     {% if analisis %}
-    <a class="boton-sec" href="{{ url_for('analysis.exportar_csv') }}">
-        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-descarga"/></svg>
-        Exportar a CSV
-    </a>
+    <div class="acciones">
+        <a class="boton-sec" href="{{ url_for('analysis.exportar_csv') }}">
+            <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-descarga"/></svg>
+            Exportar a CSV
+        </a>
+        {% if not vista_admin %}
+        <form method="post" action="{{ url_for('analysis.eliminar_historial') }}"
+              data-confirmar="¿Borrar todo tu historial ({{ n }} análisis)? No se puede deshacer.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="boton-sec boton-peligro">Borrar todo mi historial</button>
+        </form>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 

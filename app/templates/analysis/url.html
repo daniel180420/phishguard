@@ -18,6 +18,7 @@
                 {{ form.url(id="url", placeholder="https://ejemplo.com/ruta") }}
                 {% for error in form.url.errors %}<span class="error-campo">{{ error }}</span>{% endfor %}
             </p>
+            <p class="aviso-datos">No pegues datos personales; puedes reemplazarlos por XXX.</p>
             <div class="qr-lector">
                 <button type="button" class="boton-sec" id="qr-boton">Leer QR desde una imagen</button>
                 <input type="file" id="qr-archivo" accept="image/*" hidden>

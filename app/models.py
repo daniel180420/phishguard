@@ -12,6 +12,7 @@ class Usuario(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     es_admin = db.Column(db.Boolean, default=False)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_aceptacion_privacidad = db.Column(db.DateTime, nullable=True)  # UTC; NULL en usuarios anteriores al aviso
 
     analisis = db.relationship('Analisis', backref='usuario', lazy=True)
 

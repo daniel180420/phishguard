@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block ruta %}aviso de privacidad{% endblock %}
+
+{% block content %}
+<article class="documento">
+    <div class="encabezado">
+        <div>
+            <h2>Aviso de privacidad</h2>
+            <p class="subtitulo">Cómo PhishGuard trata tus datos personales, según la Ley 1581 de 2012.</p>
+        </div>
+        <a class="boton-sec" href="{{ url_for('dashboard.index') }}">← Volver</a>
+    </div>
+
+    <h3>Qué es PhishGuard</h3>
+    <p>PhishGuard es un <strong>proyecto académico</strong>: una herramienta educativa que calcula el riesgo de phishing de una URL o de un mensaje. No es un servicio comercial.</p>
+
+    <h3>Quién es el responsable</h3>
+    <p>El responsable de tus datos es el administrador del sistema (en el caso de estudio, el área de tecnología de la Corporación Universitaria Horizonte del Llano).</p>
+
+    <h3>Qué datos guardamos</h3>
+    <ul>
+        <li><strong>Tu cuenta:</strong> nombre de usuario, correo electrónico y la fecha en que aceptaste este aviso.</li>
+        <li><strong>Tu contraseña:</strong> nunca la guardamos tal cual. Solo se guarda una huella irreversible (hash) que no permite recuperarla.</li>
+        <li><strong>Tus análisis:</strong> el texto o la URL que pegas, el puntaje, el nivel de riesgo, los indicadores detectados y la fecha.</li>
+        <li><strong>Eventos de seguridad:</strong> inicios y cierres de sesión, intentos fallidos, registros, exportaciones, accesos denegados, formularios inválidos y borrados, con la fecha, tu usuario (si lo hay) y la <strong>dirección IP</strong> desde la que se hizo. No guardan tu contraseña ni el contenido de tus análisis.</li>
+        <li><strong>Una cookie de sesión</strong>, necesaria para mantenerte conectado (la sesión se cierra tras 30 minutos sin actividad).</li>
+    </ul>
+
+    <h3>Para qué los usamos</h3>
+    <ul>
+        <li>Crear tu cuenta y permitirte iniciar sesión.</li>
+        <li>Analizar lo que envías y guardar tu historial para que lo consultes.</li>
+        <li>Proteger el sistema: detectar intentos de acceso indebido y llevar un registro de lo ocurrido.</li>
+    </ul>
+
+    <h3>Quién puede ver tus datos</h3>
+    <ul>
+        <li><strong>Tú</strong> ves tus propios análisis.</li>
+        <li><strong>Los administradores del sistema</strong> ven los análisis de todos los usuarios (con el nombre de usuario) y el registro de eventos de seguridad.</li>
+    </ul>
+
+    <h3>Con quién los compartimos</h3>
+    <p>Con nadie. Tus datos no se comparten con terceros ni se envían a servicios externos. El análisis se hace en el propio servidor con reglas fijas, y la imagen de un código QR se lee en tu navegador y no se sube.</p>
+
+    <h3>Cuánto tiempo los conservamos</h3>
+    <ul>
+        <li><strong>Tus análisis:</strong> hasta que tú los borres.</li>
+        <li><strong>Tu cuenta:</strong> mientras exista.</li>
+        <li><strong>Eventos de seguridad:</strong> todavía no hay un plazo definido.</li>
+    </ul>
+
+    <h3>Tus derechos</h3>
+    <p>Como titular de los datos puedes:</p>
+    <ul>
+        <li><strong>Conocer</strong> qué datos tuyos tenemos.</li>
+        <li><strong>Actualizar</strong> los datos que cambiaron.</li>
+        <li><strong>Rectificar</strong> los que sean incorrectos.</li>
+        <li><strong>Suprimir</strong> tus datos.</li>
+        <li>Revocar la autorización que diste, y presentar una queja ante la Superintendencia de Industria y Comercio si consideras que no se respetaron tus derechos.</li>
+    </ul>
+
+    <h3>Cómo ejercerlos</h3>
+    <p><strong>Lo que puedes hacer tú mismo, ahora:</strong></p>
+    <ul>
+        <li>Conocer tus análisis en <em>Mi historial</em> y descargarlos con <em>Exportar a CSV</em>.</li>
+        <li>Suprimir un análisis con el botón <em>Eliminar</em> de su detalle, o todos con <em>Borrar todo mi historial</em>. Al borrar un análisis también se borran sus indicadores.</li>
+    </ul>
+    <p><strong>Lo que debes pedir al administrador del sistema</strong> (en el caso de estudio, el área de tecnología de la Corporación Universitaria Horizonte del Llano):</p>
+    <ul>
+        <li>Actualizar o rectificar tu correo o tu nombre de usuario.</li>
+        <li>Eliminar tu cuenta y los datos asociados.</li>
+        <li>Conocer lo que figura sobre ti en el registro de eventos de seguridad.</li>
+    </ul>
+    <p>Por ahora esas tres acciones no tienen un botón en la aplicación. Haz la solicitud directamente al administrador, indicando tu nombre de usuario.</p>
+
+    <h3>Una recomendación</h3>
+    <p>No pegues datos personales (nombres, cédulas, números de cuenta, claves) en los análisis. Si los necesitas para dar contexto, reemplázalos por XXX. El análisis funciona igual.</p>
+</article>
+{% endblock %}

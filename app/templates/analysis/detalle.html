@@ -8,7 +8,16 @@
         <h2>Detalle del análisis</h2>
         <p class="subtitulo">Resultado guardado de este análisis.</p>
     </div>
-    <a class="boton-sec" href="{{ url_for('analysis.historial_admin' if current_user.es_admin else 'analysis.historial') }}">← Volver al historial</a>
+    <div class="acciones">
+        <a class="boton-sec" href="{{ url_for('analysis.historial_admin' if current_user.es_admin else 'analysis.historial') }}">← Volver al historial</a>
+        {% if analisis.usuario_id == current_user.id %}
+        <form method="post" action="{{ url_for('analysis.eliminar_analisis', analisis_id=analisis.id) }}"
+              data-confirmar="¿Eliminar este análisis? No se puede deshacer.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="boton-sec boton-peligro">Eliminar</button>
+        </form>
+        {% endif %}
+    </div>
 </div>
 
 <section class="tarjeta">

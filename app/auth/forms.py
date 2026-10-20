@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 
@@ -10,6 +10,11 @@ class RegistroForm(FlaskForm):
     confirmar_password = PasswordField(
         'Confirmar contraseña',
         validators=[DataRequired(), EqualTo('password', message='Las contraseñas no coinciden')]
+    )
+    # DataRequired en un BooleanField falla si la casilla no está marcada: se valida en el servidor.
+    acepto = BooleanField(
+        'Acepto el aviso de privacidad',
+        validators=[DataRequired(message='Debes aceptar el aviso de privacidad para crear la cuenta.')]
     )
     submit = SubmitField('Registrarse')
 

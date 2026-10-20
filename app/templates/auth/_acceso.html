@@ -43,6 +43,7 @@
     <section class="acceso-form">
         <div class="acceso-caja">
             {% block formulario %}{% endblock %}
+            <p class="acceso-privacidad"><a href="{{ url_for('auth.privacidad') }}">Aviso de privacidad</a></p>
         </div>
     </section>
 </div>
