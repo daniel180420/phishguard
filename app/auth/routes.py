@@ -79,7 +79,7 @@ def login():
     return render_template('auth/login.html', form=form)
 
 
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['POST'])  # POST con token CSRF: un enlace ajeno no puede cerrar la sesión
 @login_required
 def logout():
     registrar_evento('logout')  # antes de logout_user(), para tener el usuario

@@ -68,10 +68,13 @@
             <div class="lateral-usuario">
                 <p class="usuario-nombre">{{ current_user.username }}</p>
                 <p class="usuario-rol">{{ 'administrador' if current_user.es_admin else 'usuario' }}</p>
-                <a class="lateral-link" href="{{ url_for('auth.logout') }}">
-                    <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-salir"/></svg>
-                    Cerrar sesión
-                </a>
+                <form method="post" action="{{ url_for('auth.logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="lateral-link">
+                        <svg class="icono" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-salir"/></svg>
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
             </div>
         </aside>

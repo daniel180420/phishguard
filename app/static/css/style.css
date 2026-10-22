@@ -178,7 +178,23 @@ body {
     color: #ffffff;
 }
 
-.lateral a:focus-visible {
+/* "Cerrar sesión" es un botón (POST), pero se ve igual que los enlaces del menú. */
+.lateral-usuario form {
+    margin: 0;
+}
+
+button.lateral-link {
+    width: 100%;
+    border: 0;
+    border-left: 2px solid transparent;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.lateral a:focus-visible,
+.lateral button:focus-visible {
     outline: 2px solid var(--acento);
     outline-offset: 2px;
 }
@@ -1585,4 +1601,35 @@ th {
 .acceso-privacidad {
     margin: 12px 0 0;
     font-size: 0.85rem;
+}
+
+/* ---------- Páginas de error (403, 404, 429, 500) ---------- */
+
+.error-pagina {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 15vh 16px 48px;
+}
+
+/* Con sesión, .contenido ya da el margen: no se duplica. */
+.contenido .error-pagina {
+    margin: 0;
+    padding: 24px 0;
+}
+
+.error-codigo {
+    margin: 0 0 8px;
+    color: var(--gris);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.error-pagina h2 {
+    margin: 0 0 8px;
+}
+
+.error-texto {
+    margin: 0 0 24px;
 }

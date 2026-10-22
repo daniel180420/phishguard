@@ -125,7 +125,7 @@ print('OK  login sin token: no entra y se muestra el aviso en el login')
 # 5. Login, registro y cierre de sesión funcionan con token
 ana = entrar('ana')
 assert ana.get('/dashboard').status_code == 200
-assert ana.get('/logout').status_code == 302  # el cierre es GET y no necesita token
+assert ana.post('/logout', data={'csrf_token': token_de(ana, '/dashboard')}).status_code == 302  # el cierre es POST con token
 assert '/login' in ana.get('/dashboard').headers['Location']
 
 c = app.test_client()
@@ -210,5 +210,38 @@ ana.post('/_sonda')  # con sesión: otra fila, con su usuario
 with app.app_context():
     assert sorted(str(e.usuario_id) for e in EventoSeguridad.query.filter_by(evento='csrf_invalido')) == sorted(['None', str(ID['ana'])])
 print('OK  CSRF inválido: evento con método y ruta, una fila por minuto, sin token ni contraseña')
+
+# 11. Cerrar sesión: solo POST con token (un enlace o una imagen ajena no puede cerrarla)
+reiniciar_limites()
+with app.app_context():
+    EventoSeguridad.query.delete()
+    db.session.commit()
+ana = entrar('ana')
+assert ana.get('/logout').status_code == 405  # GET ya no cierra la sesión
+assert ana.get('/dashboard').status_code == 200
+menu = texto(ana.get('/dashboard'))
+assert 'href="/logout"' not in menu and 'action="/logout"' in menu  # el menú es un formulario
+assert re.search(r'<form method="post" action="/logout">\s*<input type="hidden" name="csrf_token" value="[^"]+">', menu)
+r = ana.post('/logout')  # sin token: el CSRF lo rechaza y la sesión sigue abierta
+assert r.status_code == 302 and '/dashboard' in r.headers['Location'], r.headers.get('Location')
+h = texto(ana.get('/dashboard'))  # con sesión abierta NO se dice "Tu sesión ya había terminado"
+assert 'El formulario venció' in h and 'Tu sesión ya había terminado' not in h
+vencida = app.test_client()  # sesión ya terminada: va al login con el aviso propio, no el de formulario vencido
+r = vencida.post('/logout')
+assert r.status_code == 302 and r.headers['Location'].endswith('/login')
+h = texto(vencida.get('/login'))
+assert 'Tu sesión ya había terminado.' in h and 'El formulario venció' not in h
+with app.app_context():
+    assert EventoSeguridad.query.filter_by(evento='logout').count() == 0  # ni GET ni POST sin token cierran
+t = token_de(ana, '/dashboard')
+r = ana.post('/logout', data={'csrf_token': t})
+assert r.status_code == 302 and '/login' in r.headers['Location']
+assert '/login' in ana.get('/dashboard').headers['Location']  # la sesión se cerró
+with app.app_context():
+    assert [e.usuario_id for e in EventoSeguridad.query.filter_by(evento='logout')] == [ID['ana']]
+anonimo = app.test_client()
+t = token_de(anonimo, '/login')
+assert '/login' in anonimo.post('/logout', data={'csrf_token': t}).headers['Location']  # sin sesión: al login
+print('OK  cerrar sesión: GET da 405, POST sin token no cierra, POST con token sí; el menú usa formulario')
 
 print('Todos los casos pasaron.')

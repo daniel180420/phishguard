@@ -78,7 +78,7 @@ vaciar()
 c = app.test_client()
 c.post('/login', data={'username': 'ana', 'password': 'clave-ana-1'})
 assert eventos('login_exitoso')[0][1] == ID['ana']
-c.get('/logout')
+c.post('/logout')  # el cierre es POST (aquí el CSRF está apagado)
 assert eventos('logout')[0][1] == ID['ana']
 print('OK  login exitoso y logout')
 

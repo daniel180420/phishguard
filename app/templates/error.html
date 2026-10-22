@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block ruta %}error {{ codigo }}{% endblock %}
+
+{% block content %}
+<section class="error-pagina">
+    <p class="error-codigo">Error {{ codigo }}</p>
+    <h2>{{ titulo }}</h2>
+    <p class="error-texto">{{ texto }}</p>
+    <a class="boton-sec" href="{{ destino }}">{{ etiqueta }}</a>
+</section>
+{% endblock %}
