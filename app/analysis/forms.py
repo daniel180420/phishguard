@@ -2,7 +2,7 @@ import re
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, IntegerField, HiddenField, SubmitField
-from wtforms.validators import DataRequired, Length, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Length, NumberRange, Optional, ValidationError
 
 from app.analysis.analyzer import url_bien_formada
 
@@ -46,3 +46,7 @@ class EditarPesoForm(FlaskForm):
     peso = IntegerField('Peso', validators=[DataRequired(), NumberRange(min=0, max=100)])
     submit = SubmitField('Guardar')
     
+
+class ReporteForm(FlaskForm):
+    nota = StringField('Nota (opcional)', validators=[Optional(), Length(max=200)])
+    submit = SubmitField('Reportar al área de tecnología')

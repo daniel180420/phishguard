@@ -64,3 +64,24 @@ class EventoSeguridad(db.Model):
 
     usuario = db.relationship('Usuario')
     
+
+ESTADO_PENDIENTE = 'pendiente'
+ESTADO_REVISADO = 'revisado'
+
+
+class Reporte(db.Model):
+    __tablename__ = 'reportes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    # UNIQUE: un análisis solo se puede reportar una vez, aunque lleguen dos peticiones a la vez.
+    analisis_id = db.Column(db.Integer, db.ForeignKey('analisis.id'), unique=True, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)  # quien reporta
+    nota = db.Column(db.String(200), nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    estado = db.Column(db.String(10), nullable=False, default=ESTADO_PENDIENTE)  # 'pendiente' o 'revisado'
+    fecha_revision = db.Column(db.DateTime, nullable=True)
+    revisado_por_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)
+
+    analisis = db.relationship('Analisis', backref=db.backref('reporte', uselist=False))
+    usuario = db.relationship('Usuario', foreign_keys=[usuario_id])
+    revisado_por = db.relationship('Usuario', foreign_keys=[revisado_por_id])

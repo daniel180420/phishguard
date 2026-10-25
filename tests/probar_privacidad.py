@@ -92,7 +92,9 @@ html = texto(r)
 for frase in ('proyecto académico', 'Corporación Universitaria Horizonte del Llano', 'Ley 1581 de 2012',
               'Conocer', 'Actualizar', 'Rectificar', 'Suprimir', 'dirección IP',
               'no se comparten con terceros', 'todavía no hay un plazo definido', 'Borrar todo mi historial',
-              'huella irreversible', '30 minutos sin actividad'):
+              'huella irreversible', '30 minutos sin actividad',
+              'la nota que escribas', 'la fecha del reporte', 'los reportes (con la nota, la fecha y quién los hizo)',
+              'se borran junto con el análisis reportado', 'sus indicadores y su reporte, con la nota'):
     assert frase in html, f'Falta en el aviso: {frase!r}'
 assert '@' not in html, 'El aviso no debe traer correos inventados'
 assert 'lateral-nav' not in html  # sin sesión: página completa, sin menú lateral

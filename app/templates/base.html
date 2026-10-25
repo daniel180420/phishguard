@@ -28,6 +28,8 @@
         <symbol id="i-descarga" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></symbol>
         <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
         <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
+        <symbol id="i-bandera" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></symbol>
+        <symbol id="i-grafica" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/></symbol>
         <symbol id="i-salir"viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
     </svg>
 
@@ -61,6 +63,8 @@
                 <p class="lateral-seccion">Administración</p>
                 {{ item(url_for('analysis.historial_admin'), ep == 'analysis.historial_admin', 'capas', 'Historial global') }}
                 {{ item(url_for('analysis.indicadores'), ep in ('analysis.indicadores', 'analysis.editar_indicador'), 'ajustes', 'Indicadores') }}
+                {{ item(url_for('analysis.reportes_admin'), ep == 'analysis.reportes_admin', 'bandera', 'Reportes') }}
+                {{ item(url_for('analysis.tendencias_admin'), ep == 'analysis.tendencias_admin', 'grafica', 'Tendencias') }}
                 {{ item(url_for('analysis.eventos'), ep == 'analysis.eventos', 'escudo', 'Eventos de seguridad') }}
                 {% endif %}
             </nav>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block ruta %}reportes{% endblock %}
+
+{% block content %}
+{% set n = reportes | length %}
+{% set pendientes = reportes | selectattr('estado', 'equalto', 'pendiente') | list | length %}
+<div class="encabezado">
+    <div>
+        <h2>Reportes</h2>
+        <p class="subtitulo">{{ n }} reporte{{ '' if n == 1 else 's' }}, {{ pendientes }} pendiente{{ '' if pendientes == 1 else 's' }}. Los pendientes van primero.</p>
+    </div>
+</div>
+
+{% if reportes %}
+<section class="tarjeta">
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">Análisis reportados al área de tecnología</caption>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Análisis</th>
+                    <th>Nivel</th>
+                    <th>Reportó</th>
+                    <th>Nota</th>
+                    <th>Estado</th>
+                    <th><span class="solo-lectura">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reportes %}
+                <tr>
+                    <td class="mono">{{ r.fecha | fecha_colombia }}</td>
+                    <td><a href="{{ url_for('analysis.detalle', analisis_id=r.analisis_id) }}">Ver análisis #{{ r.analisis_id }}</a></td>
+                    <td><span class="nivel nivel-{{ r.analisis.nivel }}">{{ r.analisis.nivel | capitalize }}</span></td>
+                    <td>{{ r.usuario.username }}</td>
+                    <td class="celda-nota">{{ r.nota or '—' }}</td>
+                    <td>
+                        <span class="etiqueta-tipo">{{ r.estado }}</span>
+                        {% if r.estado == 'revisado' and r.fecha_revision %}<span class="mono">{{ r.fecha_revision | fecha_colombia }}</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if r.estado == 'pendiente' %}
+                        <form method="post" action="{{ url_for('analysis.revisar_reporte', reporte_id=r.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="boton-sec">Marcar como revisado</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabla-pie mono">{{ n }} reporte{{ '' if n == 1 else 's' }}</p>
+</section>
+{% else %}
+<section class="tarjeta">
+    <p class="vacio">Todavía no hay reportes.</p>
+</section>
+{% endif %}
+{% endblock %}

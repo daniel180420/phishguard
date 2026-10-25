@@ -43,4 +43,36 @@
         frase_final = ('el mensaje sea fraudulento' if analisis.tipo == 'mensaje' else 'la URL sea fraudulenta') %}
 {% include "analysis/_resultado.html" %}
 {% endwith %}
+
+{% if analisis.reporte %}
+<section class="tarjeta" aria-labelledby="titulo-reporte">
+    <header class="tarjeta-cabecera">
+        <h3 id="titulo-reporte">Reporte al área de tecnología</h3>
+    </header>
+    <div class="tarjeta-cuerpo">
+        <dl class="meta">
+            <div><dt>Reportado</dt><dd class="mono">{{ analisis.reporte.fecha | fecha_colombia }}</dd></div>
+            <div><dt>Estado</dt><dd><span class="etiqueta-tipo">{{ analisis.reporte.estado }}</span></dd></div>
+            {% if analisis.reporte.nota %}<div><dt>Nota</dt><dd>{{ analisis.reporte.nota }}</dd></div>{% endif %}
+        </dl>
+    </div>
+</section>
+{% elif analisis.usuario_id == current_user.id and analisis.nivel != 'bajo' %}
+<section class="tarjeta" aria-labelledby="titulo-reporte">
+    <header class="tarjeta-cabecera">
+        <h3 id="titulo-reporte">Reportar al área de tecnología</h3>
+    </header>
+    <div class="tarjeta-cuerpo">
+        <form method="post" action="{{ url_for('analysis.reportar_analisis', analisis_id=analisis.id) }}">
+            {{ form_reporte.hidden_tag() }}
+            <p>
+                {{ form_reporte.nota.label }}
+                {{ form_reporte.nota(maxlength=200, autocomplete='off') }}
+            </p>
+            <p class="ayuda">Se guardan la nota y la fecha, y los administradores los ven. Se borran junto con el análisis. No escribas datos personales.</p>
+            <button type="submit" class="boton-sec">Reportar al área de tecnología</button>
+        </form>
+    </div>
+</section>
+{% endif %}
 {% endblock %}

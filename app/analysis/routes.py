@@ -3,15 +3,20 @@ import io
 
 from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort, current_app
 from flask_login import login_required, current_user
-from sqlalchemy import select
+from datetime import datetime
+
+from sqlalchemy import case, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app.extensions import db
-from app.models import Analisis, IndicadorDetectado, IndicadorConfig, EventoSeguridad
+from app.extensions import db, limiter
+from app.models import (Analisis, IndicadorDetectado, IndicadorConfig, EventoSeguridad, Reporte,
+                        ESTADO_PENDIENTE, ESTADO_REVISADO)
 from app.decorators import admin_required
-from app.seguridad import registrar_evento
+from app.seguridad import registrar_evento, limpiar_detalle
+from app.tendencias import calcular_tendencias
 from app.tiempo import fecha_colombia
-from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, normalizar_origen
+from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, ReporteForm, normalizar_origen
 from app.analysis.analyzer import analizar_url, analizar_mensaje
 
 analysis_bp = Blueprint('analysis', __name__)
@@ -35,14 +40,18 @@ def limpiar_celda(texto):
 
 def _eliminar_analisis(usuario_id, analisis_id=None):
     # Borra los análisis del usuario (uno, o todos si analisis_id es None) y devuelve cuántos borró,
-    # o None si falló. IndicadorDetectado.analisis_id es NOT NULL y la relación no tiene cascade, así
-    # que primero se borran los indicadores y luego los análisis, en una sola transacción.
+    # o None si falló. IndicadorDetectado.analisis_id y Reporte.analisis_id son NOT NULL y la relación
+    # no tiene cascade, así que primero se borran los indicadores y los reportes (el reporte se borra
+    # junto con su análisis: privacidad sobre conservarlo) y luego los análisis, en una sola transacción.
     filtro = [Analisis.usuario_id == usuario_id]
     if analisis_id is not None:
         filtro.append(Analisis.id == analisis_id)
     try:
         IndicadorDetectado.query.filter(
             IndicadorDetectado.analisis_id.in_(select(Analisis.id).where(*filtro))
+        ).delete(synchronize_session=False)
+        Reporte.query.filter(
+            Reporte.analisis_id.in_(select(Analisis.id).where(*filtro))
         ).delete(synchronize_session=False)
         # Aquí sin subconsulta: MySQL no permite DELETE ... WHERE id IN (SELECT ... de la misma tabla).
         borrados = Analisis.query.filter(*filtro).delete(synchronize_session=False)
@@ -134,7 +143,81 @@ def detalle(analisis_id):
         # Mismo 404 que un ID inexistente (no se revela que existe), pero queda registrado.
         registrar_evento('analisis_ajeno', f'analisis_id={analisis_id}', espera=60)
         abort(404)
-    return render_template('analysis/detalle.html', analisis=analisis)
+    return render_template('analysis/detalle.html', analisis=analisis, form_reporte=ReporteForm())
+
+
+@analysis_bp.route('/historial/<int:analisis_id>/reportar', methods=['POST'])
+@login_required
+@limiter.limit('10 per minute')
+def reportar_analisis(analisis_id):
+    # El token CSRF lo valida CSRFProtect (global) antes de llegar aquí; no existe versión GET.
+    analisis = db.get_or_404(Analisis, analisis_id)
+    if analisis.usuario_id != current_user.id:
+        # Solo se reporta lo propio, también el administrador. Mismo 404 que un ID inexistente.
+        registrar_evento('analisis_ajeno', f'reportar analisis_id={analisis_id}', espera=60)
+        abort(404)
+    destino = redirect(url_for('analysis.detalle', analisis_id=analisis_id))
+    form = ReporteForm()
+    if not form.validate_on_submit():
+        flash('La nota no puede pasar de 200 caracteres.', 'error')
+        return destino
+    if analisis.nivel == 'bajo':
+        flash('Solo se pueden reportar análisis de riesgo medio o alto.', 'error')
+        return destino
+    if analisis.reporte is not None:
+        flash('Este análisis ya fue reportado.', 'error')
+        return destino
+    # Sin saltos de línea ni caracteres de control (el campo es de una línea, pero un POST a mano no).
+    nota = limpiar_detalle(form.nota.data)[:200] or None
+    reporte = Reporte(analisis_id=analisis.id, usuario_id=current_user.id, nota=nota)
+    db.session.add(reporte)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        # Otra petición lo reportó entre la comprobación y el guardado: lo frena el UNIQUE de la tabla.
+        db.session.rollback()
+        flash('Este análisis ya fue reportado.', 'error')
+        return destino
+    registrar_evento('reporte_creado', f'reporte={reporte.id} analisis={analisis_id}')  # solo IDs, nunca la nota
+    flash('Reporte enviado al área de tecnología.', 'success')
+    return destino
+
+
+@analysis_bp.route('/admin/reportes')
+@admin_required
+def reportes_admin():
+    pendientes_primero = case((Reporte.estado == ESTADO_PENDIENTE, 0), else_=1)
+    lista = (Reporte.query
+             .options(joinedload(Reporte.analisis), joinedload(Reporte.usuario))
+             .order_by(pendientes_primero, Reporte.fecha.desc(), Reporte.id.desc())
+             .all())
+    return render_template('analysis/reportes.html', reportes=lista)
+
+
+@analysis_bp.route('/admin/reportes/<int:reporte_id>/revisar', methods=['POST'])
+@admin_required
+def revisar_reporte(reporte_id):
+    db.get_or_404(Reporte, reporte_id)
+    # UPDATE condicionado al estado: si dos administradores lo marcan a la vez, solo uno lo cambia
+    # (rowcount 1) y solo ese deja el evento.
+    cambiados = db.session.execute(
+        update(Reporte)
+        .where(Reporte.id == reporte_id, Reporte.estado == ESTADO_PENDIENTE)
+        .values(estado=ESTADO_REVISADO, fecha_revision=datetime.utcnow(), revisado_por_id=current_user.id)
+    ).rowcount
+    db.session.commit()
+    if cambiados:
+        registrar_evento('reporte_revisado', f'reporte={reporte_id}')
+        flash('Reporte marcado como revisado.', 'success')
+    else:
+        flash('Ese reporte ya estaba revisado.', 'error')
+    return redirect(url_for('analysis.reportes_admin'))
+
+
+@analysis_bp.route('/admin/tendencias')
+@admin_required
+def tendencias_admin():
+    return render_template('analysis/tendencias.html', t=calcular_tendencias())
 
 
 @analysis_bp.route('/historial/<int:analisis_id>/eliminar', methods=['POST'])

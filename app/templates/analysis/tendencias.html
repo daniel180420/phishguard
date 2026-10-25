@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block ruta %}tendencias{% endblock %}
+
+{% macro grafica(titulo, filas, id, clase_nivel=False, con_porcentaje=False) %}
+<section class="tarjeta" aria-labelledby="{{ id }}">
+    <header class="tarjeta-cabecera">
+        <h3 id="{{ id }}">{{ titulo }}</h3>
+    </header>
+    {% if filas and filas | sum(attribute='valor') %}
+    <ul class="barras">
+        {% for f in filas %}
+        <li class="barras-fila">
+            <span class="barras-etiqueta">{{ f.etiqueta }}</span>
+            <span class="barras-pista" aria-hidden="true"><span class="barras-relleno {{ f.clave if clase_nivel else '' }} pct-{{ f.pct }}"></span></span>
+            <span class="barras-valor mono">{{ f.valor }}{% if con_porcentaje %} <span class="barras-pct">({{ f.del_total }} %)</span>{% endif %}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="vacio">Todavía no hay datos.</p>
+    {% endif %}
+</section>
+{% endmacro %}
+
+{% block content %}
+<div class="encabezado">
+    <div>
+        <h2>Tendencias</h2>
+        <p class="subtitulo">Números agregados de todos los usuarios. No se muestra el contenido de ningún análisis.</p>
+    </div>
+</div>
+
+<div class="dash-fila">
+    {{ grafica('Por nivel de riesgo (todos los análisis: ' ~ t.total ~ ')', t.por_nivel, 'g-nivel', True, True) }}
+    {{ grafica('Por tipo (todos los análisis)', t.por_tipo, 'g-tipo', False, True) }}
+</div>
+
+{{ grafica('Los 10 indicadores más detectados', t.top_indicadores, 'g-top') }}
+
+{{ grafica('Análisis por día, últimos ' ~ t.dias ~ ' días (' ~ t.total_dias ~ ' en total)', t.por_dia, 'g-dias') }}
+{% endblock %}
