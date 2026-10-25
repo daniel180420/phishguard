@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block ruta %}amenazas confirmadas{% endblock %}
+
+{% block content %}
+{% set n = amenazas | length %}
+<div class="encabezado">
+    <div>
+        <h2>Amenazas confirmadas</h2>
+        <p class="subtitulo">{{ n }} dominio{{ '' if n == 1 else 's' }}. Cualquier link de estos dominios, o de sus subdominios, se marca con puntaje 100 al analizarlo.</p>
+    </div>
+</div>
+
+{% if amenazas %}
+<section class="tarjeta">
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">Dominios confirmados como phishing</caption>
+            <thead>
+                <tr>
+                    <th>Dominio</th>
+                    <th>Confirmado</th>
+                    <th>Por</th>
+                    <th><span class="solo-lectura">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in amenazas %}
+                <tr>
+                    <td class="dominio mono">{{ a.dominio }}</td>
+                    <td class="mono">{{ a.fecha | fecha_colombia }}</td>
+                    <td>{{ a.confirmado_por.username }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('analysis.quitar_amenaza', amenaza_id=a.id) }}"
+                              data-confirmar="¿Quitar este dominio de la lista? Dejará de marcarse como amenaza.">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="boton-sec boton-peligro">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabla-pie mono">{{ n }} dominio{{ '' if n == 1 else 's' }}</p>
+</section>
+{% else %}
+<section class="tarjeta">
+    <p class="vacio">Todavía no hay amenazas confirmadas. Se confirman desde la lista de reportes.</p>
+</section>
+{% endif %}
+{% endblock %}

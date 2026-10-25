@@ -1,7 +1,7 @@
 import csv
 import io
 
-from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, Response, abort, current_app, request
 from flask_login import login_required, current_user
 from datetime import datetime
 
@@ -11,13 +11,15 @@ from sqlalchemy.orm import joinedload
 
 from app.extensions import db, limiter
 from app.models import (Analisis, IndicadorDetectado, IndicadorConfig, EventoSeguridad, Reporte,
+                        AmenazaConfirmada,
                         ESTADO_PENDIENTE, ESTADO_REVISADO)
 from app.decorators import admin_required
 from app.seguridad import registrar_evento, limpiar_detalle
 from app.tendencias import calcular_tendencias
 from app.tiempo import fecha_colombia
 from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, ReporteForm, normalizar_origen
-from app.analysis.analyzer import analizar_url, analizar_mensaje
+from app.analysis.analyzer import (analizar_url, analizar_mensaje, dominios_de_analisis, dominio_amenazado,
+                                   motivo_no_confirmable)
 
 analysis_bp = Blueprint('analysis', __name__)
 
@@ -25,6 +27,11 @@ analysis_bp = Blueprint('analysis', __name__)
 def _cargar_pesos():
     activos = IndicadorConfig.query.filter_by(activo=True).all()
     return {i.nombre: i.peso for i in activos}
+
+
+def _cargar_amenazas():
+    # Dominios que el área de tecnología confirmó como phishing (se buscan ellos y sus subdominios).
+    return set(db.session.execute(select(AmenazaConfirmada.dominio)).scalars())
 
 
 def limpiar_celda(texto):
@@ -97,7 +104,7 @@ def analizar_url_view():
     if form.validate_on_submit():
         url = form.url.data
         pesos = _cargar_pesos()
-        puntaje, nivel, indicadores = analizar_url(url, pesos)
+        puntaje, nivel, indicadores = analizar_url(url, pesos, _cargar_amenazas())
         analisis_id = _guardar_analisis('url', url, puntaje, nivel, indicadores, normalizar_origen(form.origen.data))
         resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
@@ -113,7 +120,7 @@ def analizar_mensaje_view():
     if form.validate_on_submit():
         mensaje = form.mensaje.data
         pesos = _cargar_pesos()
-        puntaje, nivel, indicadores = analizar_mensaje(mensaje, pesos)
+        puntaje, nivel, indicadores = analizar_mensaje(mensaje, pesos, _cargar_amenazas())
         analisis_id = _guardar_analisis('mensaje', mensaje, puntaje, nivel, indicadores)
         resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
@@ -196,10 +203,7 @@ def reportes_admin():
     return render_template('analysis/reportes.html', reportes=lista)
 
 
-@analysis_bp.route('/admin/reportes/<int:reporte_id>/revisar', methods=['POST'])
-@admin_required
-def revisar_reporte(reporte_id):
-    db.get_or_404(Reporte, reporte_id)
+def _marcar_revisado(reporte_id):
     # UPDATE condicionado al estado: si dos administradores lo marcan a la vez, solo uno lo cambia
     # (rowcount 1) y solo ese deja el evento.
     cambiados = db.session.execute(
@@ -208,12 +212,93 @@ def revisar_reporte(reporte_id):
         .values(estado=ESTADO_REVISADO, fecha_revision=datetime.utcnow(), revisado_por_id=current_user.id)
     ).rowcount
     db.session.commit()
-    if cambiados:
+    return cambiados
+
+
+@analysis_bp.route('/admin/reportes/<int:reporte_id>/revisar', methods=['POST'])
+@admin_required
+def revisar_reporte(reporte_id):
+    db.get_or_404(Reporte, reporte_id)
+    if _marcar_revisado(reporte_id):
         registrar_evento('reporte_revisado', f'reporte={reporte_id}')
         flash('Reporte marcado como revisado.', 'success')
     else:
         flash('Ese reporte ya estaba revisado.', 'error')
     return redirect(url_for('analysis.reportes_admin'))
+
+
+def _candidatos_amenaza(analisis):
+    # Dominios del link (o links) del análisis, cada uno con el motivo por el que no se puede confirmar (o None)
+    # y si la lista ya lo cubre. Se calcula siempre en el servidor, nunca a partir de lo que envía el formulario.
+    en_lista = _cargar_amenazas()
+    return [{'dominio': d,
+             'motivo': motivo_no_confirmable(d),
+             'ya_en_lista': dominio_amenazado(d, en_lista) is not None}
+            for d in dominios_de_analisis(analisis.tipo, analisis.contenido)]
+
+
+@analysis_bp.route('/admin/reportes/<int:reporte_id>/confirmar', methods=['GET', 'POST'])
+@admin_required
+def confirmar_reporte(reporte_id):
+    # El token CSRF del POST lo valida CSRFProtect (global). Se puede confirmar aunque el reporte ya esté revisado.
+    reporte = db.get_or_404(Reporte, reporte_id)
+    candidatos = _candidatos_amenaza(reporte.analisis)
+    if request.method == 'GET':
+        return render_template('analysis/confirmar.html', reporte=reporte, candidatos=candidatos)
+
+    # Solo cuentan los dominios elegidos que además sean candidatos válidos: lo inventado en el POST se ignora.
+    elegidos = set(request.form.getlist('dominio'))
+    validos = [c['dominio'] for c in candidatos
+               if c['dominio'] in elegidos and c['motivo'] is None and not c['ya_en_lista']]
+    if not validos:
+        flash('Elige al menos un dominio que se pueda confirmar.', 'error')
+        return redirect(url_for('analysis.confirmar_reporte', reporte_id=reporte_id))
+
+    nuevos = []
+    for dominio in validos:
+        db.session.add(AmenazaConfirmada(dominio=dominio, confirmado_por_id=current_user.id))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            # Otro administrador lo confirmó a la vez: lo frena el UNIQUE de la tabla.
+            db.session.rollback()
+            continue
+        nuevos.append(dominio)
+        registrar_evento('amenaza_confirmada', f'dominio={dominio} reporte={reporte_id}')  # nunca la nota ni el contenido
+    if not nuevos:
+        flash('Esos dominios ya estaban en la lista.', 'error')
+        return redirect(url_for('analysis.confirmar_reporte', reporte_id=reporte_id))
+    if _marcar_revisado(reporte_id):
+        registrar_evento('reporte_revisado', f'reporte={reporte_id}')
+    flash('Se confirmó 1 dominio como phishing.' if len(nuevos) == 1
+          else f'Se confirmaron {len(nuevos)} dominios como phishing.', 'success')
+    return redirect(url_for('analysis.amenazas_admin'))
+
+
+@analysis_bp.route('/admin/amenazas')
+@admin_required
+def amenazas_admin():
+    lista = (AmenazaConfirmada.query
+             .options(joinedload(AmenazaConfirmada.confirmado_por))
+             .order_by(AmenazaConfirmada.fecha.desc(), AmenazaConfirmada.id.desc())
+             .all())
+    return render_template('analysis/amenazas.html', amenazas=lista)
+
+
+@analysis_bp.route('/admin/amenazas/<int:amenaza_id>/quitar', methods=['POST'])
+@admin_required
+def quitar_amenaza(amenaza_id):
+    amenaza = db.get_or_404(AmenazaConfirmada, amenaza_id)
+    dominio = amenaza.dominio
+    # DELETE directo: si dos administradores lo quitan a la vez, solo uno borra (rowcount 1) y deja el evento.
+    borrados = AmenazaConfirmada.query.filter_by(id=amenaza_id).delete(synchronize_session=False)
+    db.session.commit()
+    if borrados:
+        registrar_evento('amenaza_quitada', f'dominio={dominio}')
+        flash('Dominio quitado de la lista de amenazas.', 'success')
+    else:
+        flash('Ese dominio ya no estaba en la lista.', 'error')
+    return redirect(url_for('analysis.amenazas_admin'))
 
 
 @analysis_bp.route('/admin/tendencias')

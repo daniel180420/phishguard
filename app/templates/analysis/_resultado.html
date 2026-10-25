@@ -2,6 +2,15 @@
 {% set suma = resultado.indicadores | sum(attribute=1) %}
 {% set p = resultado.puntaje %}
 {% set nombres = {'bajo': 'Bajo', 'medio': 'Medio', 'alto': 'Alto'} %}
+{% set ns = namespace(amenaza=false) %}
+{% for nombre, peso, explicacion in resultado.indicadores %}{% if nombre == INDICADOR_AMENAZA %}{% set ns.amenaza = true %}{% endif %}{% endfor %}
+
+{% if ns.amenaza %}
+<div class="alerta-amenaza" role="alert">
+    <strong>Amenaza confirmada</strong>
+    <p>El área de tecnología ya confirmó este sitio como phishing. No lo abras.</p>
+</div>
+{% endif %}
 
 <section class="tarjeta" aria-labelledby="titulo-resultado">
     <h3 id="titulo-resultado" class="solo-lectura">Resultado del análisis</h3>

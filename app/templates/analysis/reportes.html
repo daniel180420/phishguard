@@ -41,12 +41,15 @@
                         {% if r.estado == 'revisado' and r.fecha_revision %}<span class="mono">{{ r.fecha_revision | fecha_colombia }}</span>{% endif %}
                     </td>
                     <td>
-                        {% if r.estado == 'pendiente' %}
-                        <form method="post" action="{{ url_for('analysis.revisar_reporte', reporte_id=r.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="boton-sec">Marcar como revisado</button>
-                        </form>
-                        {% endif %}
+                        <div class="acciones">
+                            {% if r.estado == 'pendiente' %}
+                            <form method="post" action="{{ url_for('analysis.revisar_reporte', reporte_id=r.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="boton-sec">Marcar como revisado</button>
+                            </form>
+                            {% endif %}
+                            <a class="boton-sec boton-peligro" href="{{ url_for('analysis.confirmar_reporte', reporte_id=r.id) }}">Confirmar como phishing</a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

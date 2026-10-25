@@ -29,6 +29,7 @@
         <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
         <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></symbol>
         <symbol id="i-bandera" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></symbol>
+        <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5"/><path d="M12 18v.5"/></symbol>
         <symbol id="i-grafica" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/></symbol>
         <symbol id="i-salir"viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
     </svg>
@@ -63,7 +64,9 @@
                 <p class="lateral-seccion">Administración</p>
                 {{ item(url_for('analysis.historial_admin'), ep == 'analysis.historial_admin', 'capas', 'Historial global') }}
                 {{ item(url_for('analysis.indicadores'), ep in ('analysis.indicadores', 'analysis.editar_indicador'), 'ajustes', 'Indicadores') }}
-                {{ item(url_for('analysis.reportes_admin'), ep == 'analysis.reportes_admin', 'bandera', 'Reportes') }}
+                {% set n_pend = reportes_pendientes() %}
+                {{ item(url_for('analysis.reportes_admin'), ep in ('analysis.reportes_admin', 'analysis.confirmar_reporte'), 'bandera', 'Reportes (' ~ n_pend ~ ')' if n_pend else 'Reportes') }}
+                {{ item(url_for('analysis.amenazas_admin'), ep == 'analysis.amenazas_admin', 'alerta', 'Amenazas') }}
                 {{ item(url_for('analysis.tendencias_admin'), ep == 'analysis.tendencias_admin', 'grafica', 'Tendencias') }}
                 {{ item(url_for('analysis.eventos'), ep == 'analysis.eventos', 'escudo', 'Eventos de seguridad') }}
                 {% endif %}

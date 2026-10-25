@@ -85,3 +85,16 @@ class Reporte(db.Model):
     analisis = db.relationship('Analisis', backref=db.backref('reporte', uselist=False))
     usuario = db.relationship('Usuario', foreign_keys=[usuario_id])
     revisado_por = db.relationship('Usuario', foreign_keys=[revisado_por_id])
+
+
+class AmenazaConfirmada(db.Model):
+    __tablename__ = 'amenazas_confirmadas'
+
+    # Solo el dominio, la fecha y el administrador. Sin FK al análisis ni al reporte: no guarda el mensaje ni
+    # quién reportó, y sigue ahí aunque se borre el análisis.
+    id = db.Column(db.Integer, primary_key=True)
+    dominio = db.Column(db.String(255), unique=True, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    confirmado_por_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+
+    confirmado_por = db.relationship('Usuario')

@@ -1712,3 +1712,71 @@ th {
     .barras-valor    { grid-area: valor; }
     .barras-pista    { grid-area: pista; }
 }
+
+/* ---------- Amenazas confirmadas y aviso de reportes pendientes ---------- */
+
+.aviso-pendientes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    background: var(--medio-fondo);
+    border: 1px solid var(--medio);
+    border-radius: var(--radio);
+}
+
+.aviso-pendientes p {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Alerta roja del resultado: texto blanco sobre el rojo de riesgo alto. */
+.alerta-amenaza {
+    margin: 0 0 20px;
+    padding: 16px 20px;
+    background: var(--alto);
+    border-radius: var(--radio);
+    color: #ffffff;
+    overflow-wrap: anywhere;
+}
+
+.alerta-amenaza strong {
+    display: block;
+    font-size: 1.15rem;
+}
+
+.alerta-amenaza p {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+
+/* Advertencia para el administrador antes de confirmar un dominio. */
+.aviso-admin {
+    margin: 0 0 20px;
+    padding: 12px 16px;
+    background: var(--alto-fondo);
+    border: 1px solid var(--alto);
+    border-radius: var(--radio);
+}
+
+.dominio {
+    overflow-wrap: anywhere;
+}
+
+.lista-dominios {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+}
+
+.lista-dominios li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.lista-dominios .ayuda {
+    margin: 4px 0 0;
+}

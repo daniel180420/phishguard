@@ -23,6 +23,11 @@ TLDS_SOSPECHOSOS = ['.tk', '.ml', '.ga', '.xyz', '.top']
 
 PALABRAS_SOSPECHOSAS = ['verificar', 'login', 'actualizar', 'seguro', 'cuenta', 'confirmar', 'bloqueada']
 
+# Amenazas confirmadas por el área de tecnología. Este indicador es una excepción al contrato de nombres:
+# NO está en seed_indicadores.py ni en IndicadorConfig, así que su peso no se puede editar ni apagar.
+INDICADOR_AMENAZA = 'Amenaza confirmada por la institución'
+PESO_AMENAZA = 100
+
 
 def _es_ip(host):
     partes = host.split('.')
@@ -37,6 +42,46 @@ def _es_dominio_oficial(host, oficiales):
     return any(host == d or host.endswith('.' + d) for d in oficiales)
 
 
+def dominio_de_url(enlace):
+    # Host real normalizado, igual que en analizar_url: sin usuario@, sin puerto, en minúsculas y sin punto final.
+    try:
+        return (urlparse(_con_esquema(enlace.strip())).hostname or '').rstrip('.')
+    except ValueError:
+        return ''
+
+
+def dominio_amenazado(host, amenazas):
+    # Devuelve el dominio de la lista al que pertenece el host (él mismo o un subdominio real), o None.
+    # "notevil.com" NO es subdominio de "evil.com". Un dominio oficial nunca se marca, aunque estuviera en la lista.
+    if not host or not amenazas:
+        return None
+    if any(_es_dominio_oficial(host, oficiales) for oficiales in DOMINIOS_OFICIALES.values()):
+        return None
+    if _es_ip(host):
+        return host if host in amenazas else None
+    partes = host.split('.')
+    for i in range(len(partes)):
+        candidato = '.'.join(partes[i:])
+        if candidato in amenazas:
+            return candidato
+    return None
+
+
+def motivo_no_confirmable(dominio):
+    # None si el dominio se puede confirmar como amenaza; si no, el motivo para mostrárselo al administrador.
+    if not dominio or len(dominio) > 253 or '.' not in dominio or not all(dominio.split('.')):
+        return 'No es un dominio válido.'
+    for oficiales in DOMINIOS_OFICIALES.values():
+        for oficial in oficiales:
+            # El oficial, un subdominio suyo, o un dominio que lo contiene (confirmar "com.co" marcaría nequi.com.co).
+            if _es_dominio_oficial(dominio, [oficial]) or oficial.endswith('.' + dominio):
+                return 'Es un dominio oficial de una marca (o contiene uno).'
+    for acortador in ACORTADORES:
+        if _es_dominio_oficial(dominio, [acortador]) or acortador.endswith('.' + dominio):
+            return 'Es un acortador de URL: se marcarían todos sus enlaces.'
+    return None
+
+
 def url_bien_formada(url):
     # urlparse() y .port lanzan ValueError con URLs como "http://sitio.com:abc" o "http://[abc".
     try:
@@ -46,7 +91,7 @@ def url_bien_formada(url):
     return True
 
 
-def analizar_url(url, pesos):
+def analizar_url(url, pesos, amenazas=frozenset()):
     indicadores = []
     puntaje = 0
 
@@ -112,6 +157,13 @@ def analizar_url(url, pesos):
         peso = pesos.get('Puerto inusual en la URL', 10)
         puntaje += peso
         indicadores.append(('Puerto inusual en la URL', peso, 'El uso de puertos no estándar es común en intentos de ocultar la naturaleza del sitio.'))
+
+    amenaza = dominio_amenazado(host, amenazas)
+    if amenaza:
+        # Va primero y fija el puntaje en 100, sin importar los demás indicadores ni los pesos configurados.
+        indicadores.insert(0, (INDICADOR_AMENAZA, PESO_AMENAZA,
+                               f'El dominio {amenaza} está en la lista de amenazas confirmadas por el área de tecnología.'))
+        puntaje = max(puntaje, PESO_AMENAZA)
 
     puntaje_final = min(puntaje, 100)
     nivel = clasificar_riesgo(puntaje_final)
@@ -183,17 +235,29 @@ def _con_esquema(enlace):
     return enlace
 
 
-def _revisar_enlaces(mensaje, pesos):
+def _revisar_enlaces(mensaje, pesos, amenazas=frozenset()):
     # Analiza cada enlace con analizar_url y devuelve el de mayor puntaje que sea riesgo medio o alto.
     peor = None
     for enlace in extraer_enlaces(mensaje):
-        puntaje, nivel, indicadores = analizar_url(_con_esquema(enlace), pesos)
+        puntaje, nivel, indicadores = analizar_url(_con_esquema(enlace), pesos, amenazas)
         if nivel != 'bajo' and (peor is None or puntaje > peor[1]):
             peor = (enlace, puntaje, nivel, indicadores)
     return peor
 
 
-def analizar_mensaje(mensaje, pesos):
+def dominios_de_analisis(tipo, contenido):
+    # Dominios (sin repetir, en orden) de la URL analizada o de los enlaces del mensaje (los mismos que revisa
+    # el análisis: hasta MAX_ENLACES). Es lo que un administrador puede confirmar como amenaza.
+    enlaces = [contenido.strip()] if tipo == 'url' else extraer_enlaces(contenido)
+    dominios = []
+    for enlace in enlaces:
+        dominio = dominio_de_url(enlace)
+        if dominio and dominio not in dominios:
+            dominios.append(dominio)
+    return dominios
+
+
+def analizar_mensaje(mensaje, pesos, amenazas=frozenset()):
     texto = _normalizar(mensaje)
     indicadores = []
     puntaje = 0
@@ -224,7 +288,7 @@ def analizar_mensaje(mensaje, pesos):
             detalle = f'{explicacion} Detectado: {lista_detectadas}{cierre}'
             indicadores.append((nombre, peso, detalle))
 
-    peor_enlace = _revisar_enlaces(mensaje, pesos)
+    peor_enlace = _revisar_enlaces(mensaje, pesos, amenazas)
     if peor_enlace:
         enlace, puntaje_enlace, nivel_enlace, indicadores_enlace = peor_enlace
         principales = sorted(indicadores_enlace, key=lambda i: i[1], reverse=True)[:3]
@@ -233,6 +297,15 @@ def analizar_mensaje(mensaje, pesos):
         detalle = (f'El mensaje trae un enlace de riesgo {nivel_enlace}: {enlace} '
                    f'(puntaje {puntaje_enlace}). Indicadores: {", ".join(i[0] for i in principales)}.')
         indicadores.append(('Enlace sospechoso en el mensaje', peso, detalle))
+
+    for enlace in extraer_enlaces(mensaje):
+        amenaza = dominio_amenazado(dominio_de_url(enlace), amenazas)
+        if amenaza:
+            indicadores.insert(0, (INDICADOR_AMENAZA, PESO_AMENAZA,
+                                   f'El mensaje trae un enlace al dominio {amenaza}, que el área de tecnología '
+                                   f'confirmó como phishing.'))
+            puntaje = max(puntaje, PESO_AMENAZA)
+            break
 
     palabras_mayuscula = [p for p in mensaje.split() if p.isupper() and len(p) >= 3]
     if len(palabras_mayuscula) >= 3 or mensaje.count('!') >= 3:

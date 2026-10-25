@@ -29,6 +29,15 @@ def create_app():
 
     app.jinja_env.filters['fecha_colombia'] = fecha_colombia
 
+    from app.reportes import contar_reportes_pendientes
+    from app.analysis.analyzer import INDICADOR_AMENAZA
+
+    @app.context_processor
+    def datos_de_plantillas():
+        # reportes_pendientes es una función: solo se llama (y consulta la base) si la plantilla la usa, o sea
+        # para el administrador. INDICADOR_AMENAZA evita repetir el nombre del indicador en las plantillas.
+        return {'reportes_pendientes': contar_reportes_pendientes, 'INDICADOR_AMENAZA': INDICADOR_AMENAZA}
+
     from app.seguridad import registrar_evento
 
     def pagina_error(codigo, titulo, texto, cabeceras=None):

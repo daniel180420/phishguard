@@ -24,6 +24,7 @@
         <li><strong>Tu contraseña:</strong> nunca la guardamos tal cual. Solo se guarda una huella irreversible (hash) que no permite recuperarla.</li>
         <li><strong>Tus análisis:</strong> el texto o la URL que pegas, el puntaje, el nivel de riesgo, los indicadores detectados y la fecha.</li>
         <li><strong>Tus reportes:</strong> si reportas un análisis al área de tecnología, guardamos la nota que escribas (es opcional), la fecha del reporte y su estado (pendiente o revisado), junto con tu usuario y el análisis reportado.</li>
+        <li><strong>Amenazas confirmadas:</strong> si un administrador confirma un reporte como phishing, guarda solo el dominio del enlace (por ejemplo, sitio-falso.com), la fecha y qué administrador lo confirmó. No guarda el mensaje, la URL completa ni quién reportó.</li>
         <li><strong>Eventos de seguridad:</strong> inicios y cierres de sesión, intentos fallidos, registros, exportaciones, accesos denegados, formularios inválidos y borrados, con la fecha, tu usuario (si lo hay) y la <strong>dirección IP</strong> desde la que se hizo. No guardan tu contraseña ni el contenido de tus análisis.</li>
         <li><strong>Una cookie de sesión</strong>, necesaria para mantenerte conectado (la sesión se cierra tras 30 minutos sin actividad).</li>
     </ul>
@@ -33,13 +34,15 @@
         <li>Crear tu cuenta y permitirte iniciar sesión.</li>
         <li>Analizar lo que envías y guardar tu historial para que lo consultes.</li>
         <li>Avisar al área de tecnología de los análisis que consideres sospechosos, cuando tú decides reportarlos.</li>
+        <li>Avisar a todos los usuarios cuando analicen un enlace de un dominio que el área de tecnología ya confirmó como phishing.</li>
         <li>Proteger el sistema: detectar intentos de acceso indebido y llevar un registro de lo ocurrido.</li>
     </ul>
 
     <h3>Quién puede ver tus datos</h3>
     <ul>
         <li><strong>Tú</strong> ves tus propios análisis.</li>
-        <li><strong>Los administradores del sistema</strong> ven los análisis de todos los usuarios (con el nombre de usuario), los reportes (con la nota, la fecha y quién los hizo) y el registro de eventos de seguridad. También ven cifras agregadas (por ejemplo, cuántos análisis hubo por día), sin el contenido de ningún análisis.</li>
+        <li><strong>Los administradores del sistema</strong> ven los análisis de todos los usuarios (con el nombre de usuario), los reportes (con la nota, la fecha y quién los hizo) y el registro de eventos de seguridad. También ven cifras agregadas (por ejemplo, cuántos análisis hubo por día), sin el contenido de ningún análisis. También ven la lista de dominios de amenazas confirmadas y qué administrador confirmó cada uno.</li>
+        <li><strong>Todos los usuarios</strong> reciben una alerta si analizan un enlace de un dominio de esa lista, pero no ven la lista completa.</li>
     </ul>
 
     <h3>Con quién los compartimos</h3>
@@ -49,6 +52,7 @@
     <ul>
         <li><strong>Tus análisis:</strong> hasta que tú los borres.</li>
         <li><strong>Tus reportes:</strong> se borran junto con el análisis reportado.</li>
+        <li><strong>Dominios de amenazas confirmadas:</strong> no se borran con tu análisis ni con tu reporte, porque no están ligados a ti ni a tu análisis (solo guardan el dominio). Un administrador puede quitarlos de la lista.</li>
         <li><strong>Tu cuenta:</strong> mientras exista.</li>
         <li><strong>Eventos de seguridad:</strong> todavía no hay un plazo definido.</li>
     </ul>

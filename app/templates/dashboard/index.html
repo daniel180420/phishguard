@@ -30,6 +30,16 @@
     <span class="chip-rol">Rol: {{ 'administrador' if current_user.es_admin else 'usuario' }}</span>
 </div>
 
+{% if current_user.es_admin %}
+{% set pendientes = reportes_pendientes() %}
+{% if pendientes %}
+<div class="aviso-pendientes" role="status">
+    <p>Tienes {{ pendientes }} {{ 'reporte pendiente' if pendientes == 1 else 'reportes pendientes' }} de revisar.</p>
+    <a class="boton-sec" href="{{ url_for('analysis.reportes_admin') }}">Revisar reportes</a>
+</div>
+{% endif %}
+{% endif %}
+
 <div class="cifras">
     <div class="cifra">
         <span class="cifra-etiqueta">Total de análisis</span>

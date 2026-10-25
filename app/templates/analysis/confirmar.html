@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block ruta %}reportes / confirmar{% endblock %}
+
+{% block content %}
+{# Dominios que se pueden elegir: sin motivo de rechazo y que la lista aún no cubra. Si hay uno solo, viene marcado. #}
+{% set seleccionables = candidatos | selectattr('motivo', 'none') | rejectattr('ya_en_lista') | list %}
+{% set uno = seleccionables | length == 1 %}
+<div class="encabezado">
+    <div>
+        <h2>Confirmar como phishing</h2>
+        <p class="subtitulo">
+            Reporte #{{ reporte.id }} del <a href="{{ url_for('analysis.detalle', analisis_id=reporte.analisis_id) }}">análisis #{{ reporte.analisis_id }}</a>
+            ({{ reporte.analisis.tipo }}, riesgo {{ reporte.analisis.nivel }}).
+        </p>
+    </div>
+    <div class="acciones">
+        <a class="boton-sec" href="{{ url_for('analysis.reportes_admin') }}">← Volver a reportes</a>
+    </div>
+</div>
+
+<p class="aviso-admin" role="note">Confirmar un dominio marca como peligrosos TODOS sus links. No confirmes servicios compartidos como docs.google.com, forms o sitios gratuitos; para esos, avisa a la comunidad por otro medio.</p>
+
+<section class="tarjeta" aria-labelledby="titulo-dominios">
+    <header class="tarjeta-cabecera">
+        <h3 id="titulo-dominios">Dominios encontrados</h3>
+    </header>
+    <div class="tarjeta-cuerpo">
+        {% if candidatos %}
+        <form method="post" action="{{ url_for('analysis.confirmar_reporte', reporte_id=reporte.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <ul class="lista-dominios">
+                {% for c in candidatos %}
+                <li>
+                    {% if c.motivo %}
+                    <span class="dominio mono">{{ c.dominio }}</span>
+                    <p class="ayuda">{{ c.motivo }} No se puede confirmar.</p>
+                    {% elif c.ya_en_lista %}
+                    <span class="dominio mono">{{ c.dominio }}</span>
+                    <p class="ayuda">Ya está en la lista de amenazas (o lo cubre un dominio que ya está).</p>
+                    {% else %}
+                    <div class="casilla">
+                        <input type="checkbox" name="dominio" id="dominio-{{ loop.index }}" value="{{ c.dominio }}"{% if uno %} checked{% endif %}>
+                        <label for="dominio-{{ loop.index }}" class="dominio mono">{{ c.dominio }}</label>
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% if seleccionables %}
+            <p class="ayuda">Se guarda solo el dominio, la fecha y tu usuario. No se guarda el mensaje ni quién reportó. Al confirmar, el reporte queda como revisado.</p>
+            <div class="acciones">
+                <button type="submit" class="boton-sec boton-peligro">Confirmar como phishing</button>
+            </div>
+            {% else %}
+            <p class="vacio">Ninguno de estos dominios se puede confirmar.</p>
+            {% endif %}
+        </form>
+        {% else %}
+        <p class="vacio">No se encontraron links en este análisis, así que no hay dominios que confirmar.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
