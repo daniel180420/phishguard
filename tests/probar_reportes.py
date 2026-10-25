@@ -270,4 +270,40 @@ for ruta, cli in ((f'/historial/{id_p}', c), ('/admin/reportes', admin)):
     assert not re.search(r'\sonclick\s*=', html, re.I) and not re.search(r'\sstyle\s*=', html, re.I), ruta
 print('OK  menú: "Reportes" y "Tendencias" solo para el administrador; sin onclick ni style=')
 
+# 14. El botón también sale en la página de resultado justo después de analizar (URL y mensaje)
+def ultimo(usuario):
+    with app.app_context():
+        a = Analisis.query.filter_by(usuario_id=ID[usuario]).order_by(Analisis.id.desc()).first()
+        return a.id, a.nivel
+
+
+MENSAJE_SOSPECHOSO = ('URGENTE!!! Su cuenta sera bloqueada. Verifique sus datos inmediatamente '
+                      'ingresando al siguiente enlace: www.banco-verificacion.xyz')
+for ruta, campo, sospechoso, legitimo in (
+        ('/analisis/url', 'url', 'http://192.168.1.1/verificar-cuenta-login', 'https://www.google.com'),
+        ('/analisis/mensaje', 'mensaje', MENSAJE_SOSPECHOSO, 'Hola, nos vemos mañana a las 3 en la universidad')):
+    c = cliente('ana')
+    # Riesgo bajo: se muestra el resultado, pero sin formulario de reporte
+    r = c.post(ruta, data={campo: legitimo})
+    id_b, nivel = ultimo('ana')
+    assert r.status_code == 200 and nivel == 'bajo' and '/reportar"' not in texto(r), ruta
+    # Riesgo medio o alto: formulario en el resultado, con nota opcional, CSRF y con token CSRF
+    r = c.post(ruta, data={campo: sospechoso})
+    html = texto(r)
+    id_s, nivel = ultimo('ana')
+    assert r.status_code == 200 and nivel != 'bajo', (ruta, nivel)
+    assert f'action="/historial/{id_s}/reportar"' in html and 'name="nota"' in html and 'maxlength="200"' in html, ruta
+    assert re.search(rf'action="/historial/{id_s}/reportar">\s*<input type="hidden" name="csrf_token"', html), ruta
+    assert not re.search(r'\sonclick\s*=', html, re.I) and not re.search(r'\sstyle\s*=', html, re.I), ruta
+    # Reportar desde ahí usa la misma ruta y vuelve al detalle con el aviso
+    r = c.post(f'/historial/{id_s}/reportar', data={'nota': 'desde el resultado'}, follow_redirects=True)
+    assert r.request.path == f'/historial/{id_s}' and 'Reporte enviado al área de tecnología.' in texto(r), ruta
+    assert [x for x in reportes() if x[0] == id_s] == [(id_s, ID['ana'], 'desde el resultado', 'pendiente')]
+    assert len(eventos('reporte_creado')) == 1
+# El administrador también puede reportar lo que acaba de analizar (es suyo)
+admin = cliente('root')
+html = texto(admin.post('/analisis/url', data={'url': 'http://192.168.1.1/verificar-cuenta-login'}))
+assert f'action="/historial/{ultimo("root")[0]}/reportar"' in html
+print('OK  página de resultado (URL y mensaje): botón con nota solo en riesgo medio/alto; reporta por la misma ruta y vuelve al detalle')
+
 print('Todos los casos pasaron.')

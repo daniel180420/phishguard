@@ -41,6 +41,11 @@
 {% with frase_final = 'la URL sea fraudulenta' %}
 {% include "analysis/_resultado.html" %}
 {% endwith %}
+{% if resultado.nivel != 'bajo' %}
+{% with reporte_analisis_id = resultado.id %}
+{% include "analysis/_reportar.html" %}
+{% endwith %}
+{% endif %}
 {% endif %}
 
 <script src="{{ url_for('static', filename='js/vendor/jsQR.js') }}"></script>

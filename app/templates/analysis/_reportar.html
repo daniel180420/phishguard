@@ -1,0 +1,18 @@
+{# Formulario para reportar un análisis propio de riesgo medio o alto. Espera: form_reporte y reporte_analisis_id. #}
+<section class="tarjeta" aria-labelledby="titulo-reporte">
+    <header class="tarjeta-cabecera">
+        <h3 id="titulo-reporte">Reportar al área de tecnología</h3>
+    </header>
+    <div class="tarjeta-cuerpo">
+        <form method="post" action="{{ url_for('analysis.reportar_analisis', analisis_id=reporte_analisis_id) }}">
+            {# Token a mano (no hidden_tag): en la página de resultado ya hay otro formulario con id="csrf_token". #}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <p>
+                {{ form_reporte.nota.label }}
+                {{ form_reporte.nota(maxlength=200, autocomplete='off') }}
+            </p>
+            <p class="ayuda">Se guardan la nota y la fecha, y los administradores los ven. Se borran junto con el análisis. No escribas datos personales.</p>
+            <button type="submit" class="boton-sec">Reportar al área de tecnología</button>
+        </form>
+    </div>
+</section>

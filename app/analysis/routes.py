@@ -74,6 +74,7 @@ def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores, origen=None)
     )
     db.session.add(nuevo_analisis)
     db.session.flush()
+    analisis_id = nuevo_analisis.id
 
     for nombre, peso, explicacion in indicadores:
         db.session.add(IndicadorDetectado(
@@ -84,6 +85,7 @@ def _guardar_analisis(tipo, contenido, puntaje, nivel, indicadores, origen=None)
         ))
 
     db.session.commit()
+    return analisis_id
 
 
 @analysis_bp.route('/analisis/url', methods=['GET', 'POST'])
@@ -96,10 +98,10 @@ def analizar_url_view():
         url = form.url.data
         pesos = _cargar_pesos()
         puntaje, nivel, indicadores = analizar_url(url, pesos)
-        _guardar_analisis('url', url, puntaje, nivel, indicadores, normalizar_origen(form.origen.data))
-        resultado = {'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
+        analisis_id = _guardar_analisis('url', url, puntaje, nivel, indicadores, normalizar_origen(form.origen.data))
+        resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
-    return render_template('analysis/url.html', form=form, resultado=resultado)
+    return render_template('analysis/url.html', form=form, resultado=resultado, form_reporte=ReporteForm())
 
 
 @analysis_bp.route('/analisis/mensaje', methods=['GET', 'POST'])
@@ -112,10 +114,10 @@ def analizar_mensaje_view():
         mensaje = form.mensaje.data
         pesos = _cargar_pesos()
         puntaje, nivel, indicadores = analizar_mensaje(mensaje, pesos)
-        _guardar_analisis('mensaje', mensaje, puntaje, nivel, indicadores)
-        resultado = {'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
+        analisis_id = _guardar_analisis('mensaje', mensaje, puntaje, nivel, indicadores)
+        resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
-    return render_template('analysis/mensaje.html', form=form, resultado=resultado)
+    return render_template('analysis/mensaje.html', form=form, resultado=resultado, form_reporte=ReporteForm())
 
 
 @analysis_bp.route('/historial')
