@@ -36,6 +36,37 @@ def _es_ip(host):
     return all(parte.isdigit() and 0 <= int(parte) <= 255 for parte in partes)
 
 
+def _distancia(a, b):
+    # Distancia de edición (Damerau-Levenshtein simple): inserciones, borrados, cambios de letra e
+    # intercambio de dos letras vecinas cuentan como 1.
+    d = [[0] * (len(b) + 1) for _ in range(len(a) + 1)]
+    for i in range(len(a) + 1):
+        d[i][0] = i
+    for j in range(len(b) + 1):
+        d[0][j] = j
+    for i in range(1, len(a) + 1):
+        for j in range(1, len(b) + 1):
+            costo = 0 if a[i - 1] == b[j - 1] else 1
+            d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + costo)
+            if i > 1 and j > 1 and a[i - 1] == b[j - 2] and a[i - 2] == b[j - 1]:
+                d[i][j] = min(d[i][j], d[i - 2][j - 2] + 1)
+    return d[len(a)][len(b)]
+
+
+# Marcas de menos letras (bbva) solo se detectan por coincidencia exacta: con una edición de diferencia
+# darían demasiados falsos positivos.
+MIN_LARGO_MARCA_PARECIDA = 5
+
+
+def _imita_marca(host, marca):
+    # Alguna etiqueta del host (separada por "." o "-") es la marca con exactamente un error:
+    # "nequl.com.co" o "bancolonbia-pagos.com". Las palabras comunes quedan a 2 o más ediciones.
+    if len(marca) < MIN_LARGO_MARCA_PARECIDA:
+        return False
+    return any(etiqueta != marca and _distancia(etiqueta, marca) == 1
+               for etiqueta in re.split(r'[.\-]', host) if etiqueta)
+
+
 def _es_dominio_oficial(host, oficiales):
     # El host es el dominio oficial o un subdominio real de él.
     # "bancolombia.com.seguro.xyz" NO cuenta: no termina en ".bancolombia.com".
@@ -147,7 +178,9 @@ def analizar_url(url, pesos, amenazas=frozenset()):
     netloc_min = parsed.netloc.lower()
     for marca, oficiales in DOMINIOS_OFICIALES.items():
         # En un host no hay espacios: "banco de bogota" se busca como "bancodebogota".
-        if marca.replace(' ', '') in netloc_min and not _es_dominio_oficial(host_real, oficiales):
+        sin_espacios = marca.replace(' ', '')
+        parecida = sin_espacios in netloc_min or _imita_marca(host_real, sin_espacios)
+        if parecida and not _es_dominio_oficial(host_real, oficiales):
             peso = pesos.get('Posible typosquatting', 20)
             puntaje += peso
             indicadores.append(('Posible typosquatting', peso, f'El dominio imita a "{marca}" pero no es el dominio oficial.'))
@@ -203,7 +236,16 @@ ENTIDADES = MARCAS_CONOCIDAS + ['dian', 'colpensiones', 'sura']
 # Enlaces dentro de un mensaje: se revisan como texto, nunca se visitan.
 MAX_ENLACES = 3
 MAX_LARGO_ENLACE = 500
-PATRON_ENLACE = re.compile(r'''(?:https?://|www\.)[^\s<>"']+''', re.IGNORECASE)
+# Sin esquema solo se reconocen "dominio/ruta" con un TLD común o un acortador conocido (bit.ly/abc): así no se
+# confunden con texto normal ("hola.como", "Sr.Pérez", "$500.000") ni con correos (nada pegado a una @ o a un punto).
+TLDS_ENLACE = ['com.co', 'com', 'co', 'net', 'org', 'info', 'site', 'online', 'link', 'click',
+               'xyz', 'tk', 'ml', 'ga', 'top']
+_ACORTADORES_RE = '|'.join(re.escape(a) for a in ACORTADORES)
+_TLDS_RE = '|'.join(re.escape(t) for t in sorted(TLDS_ENLACE, key=len, reverse=True))
+PATRON_ENLACE = re.compile(
+    r'''(?:https?://|www\.)[^\s<>"']+'''
+    r'''|(?<![\w@./-])(?:%s|(?:[a-z0-9-]+\.)+(?:%s))/[^\s<>"']+''' % (_ACORTADORES_RE, _TLDS_RE),
+    re.IGNORECASE)
 PUNTUACION_FINAL = '''.,;:!?)"'»'''
 
 
@@ -229,18 +271,20 @@ def extraer_enlaces(mensaje):
 
 
 def _con_esquema(enlace):
-    # "www.sitio.com" no trae esquema: se le antepone http:// para poder analizarlo como URL.
-    if enlace.lower().startswith('www.'):
-        return 'http://' + enlace
-    return enlace
+    # "www.sitio.com" o "bit.ly/abc" no traen esquema: se les antepone http:// para poder analizarlos como URL.
+    if re.match(r'[a-z][a-z0-9+.-]*://', enlace, re.IGNORECASE):
+        return enlace
+    return 'http://' + enlace
 
 
 def _revisar_enlaces(mensaje, pesos, amenazas=frozenset()):
-    # Analiza cada enlace con analizar_url y devuelve el de mayor puntaje que sea riesgo medio o alto.
+    # Analiza cada enlace con analizar_url y devuelve el de mayor puntaje que sea riesgo medio o alto, o que
+    # imite a una marca (aunque use HTTPS y quede en riesgo bajo: el candado no lo hace legítimo).
     peor = None
     for enlace in extraer_enlaces(mensaje):
         puntaje, nivel, indicadores = analizar_url(_con_esquema(enlace), pesos, amenazas)
-        if nivel != 'bajo' and (peor is None or puntaje > peor[1]):
+        imita = any(nombre == 'Posible typosquatting' for nombre, _, _ in indicadores)
+        if (nivel != 'bajo' or imita) and (peor is None or puntaje > peor[1]):
             peor = (enlace, puntaje, nivel, indicadores)
     return peor
 

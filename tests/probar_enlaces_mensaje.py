@@ -4,7 +4,7 @@ import sys
 # Permite ejecutar el archivo desde cualquier carpeta: agrega la raíz del proyecto.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.analysis.analyzer import analizar_mensaje, extraer_enlaces
+from app.analysis.analyzer import analizar_mensaje, extraer_enlaces, dominios_de_analisis, INDICADOR_AMENAZA
 
 NOMBRE = 'Enlace sospechoso en el mensaje'
 
@@ -92,5 +92,55 @@ detalles = [e for n, _, e in indicadores if n == 'Invitación a ingresar a un en
 assert detalles and '..' not in detalles[0], f'Falló punto doble: {detalles}'
 assert detalles[0].endswith('www.'), f'Falló: {detalles}'
 print(f'OK  sin punto doble -> {detalles[0]}')
+
+# 12. Typosquatting con HTTPS (solo 20 puntos, riesgo bajo) igual cuenta como enlace sospechoso.
+_, expl = enlace_sospechoso('Reclame su premio en https://nequl.com.co/premio ya')
+assert expl and 'https://nequl.com.co/premio' in expl and 'Posible typosquatting' in expl, f'Falló: {expl}'
+assert 'riesgo bajo' in expl, f'Falló: {expl}'
+_, _, ind = analizar_mensaje('Reclame su premio en https://nequl.com.co/premio ya', {})
+assert any(n == NOMBRE for n, _, _ in ind)
+print(f'OK  https://nequl.com.co/premio -> {expl}')
+
+# 13. Un oficial con HTTPS sigue sin marcarse.
+_, expl = enlace_sospechoso('Entre a https://www.nequi.com.co/ayuda')
+assert expl is None, f'Falló: {expl}'
+print('OK  https://www.nequi.com.co -> sin indicador')
+
+# 14. Enlaces sin esquema: acortadores conocidos y dominio con ruta.
+assert extraer_enlaces('Confirma en bit.ly/bono-nequi') == ['bit.ly/bono-nequi']
+assert extraer_enlaces('Reclámalo:bit.ly/bono.') == ['bit.ly/bono']
+assert extraer_enlaces('Entra a nequl.com.co/premio ya') == ['nequl.com.co/premio']
+assert extraer_enlaces('Mira tinyurl.com/abc123, y t.co/xyz') == ['tinyurl.com/abc123', 't.co/xyz']
+assert extraer_enlaces('www.sitio.com y http://a.com/x') == ['www.sitio.com', 'http://a.com/x']
+assert extraer_enlaces('Ver BIT.LY/Abc') == ['BIT.LY/Abc']
+print('OK  acortadores y dominios con ruta sin esquema se reconocen')
+
+# 15. Texto normal: no se confunde con un enlace.
+NORMALES = ['hola.como estás', 'Sr.Pérez dijo que sí', 'Pagó $500.000.', 'Son 3.500.000 pesos', 'versión v1.2.3 y 3.5',
+            'Fin.Sigue la reunión', 'nos vemos a las 10.30/11.00', 'ver www', 'usa bit.ly para acortar',
+            'escríbeme a juan@nequi.com.co/x', 'archivo.pdf/otro', 'a.b/c', 'Dr.Gómez/Pérez']
+for texto in NORMALES:
+    assert extraer_enlaces(texto) == [], f'Falló falso positivo: {texto!r} -> {extraer_enlaces(texto)}'
+print('OK  texto normal, números con puntos, "Sr.Pérez" y correos no son enlaces')
+
+# 16. Un acortador solo (25 puntos, riesgo bajo) no cuenta como enlace sospechoso.
+_, expl = enlace_sospechoso('Mira esto: bit.ly/bono-nequi')
+assert expl is None, f'Falló: {expl}'
+print('OK  acortador solo -> sin indicador')
+
+# 17. El mensaje completo del caso reportado: el typosquatting se detecta aunque el acortador no sume.
+MENSAJE = ('Felicidades! Ganaste un bono de $500.000 de Nequi. Reclamalo antes de 24 horas: '
+           'http://nequl.com.co/premio y confirma en bit.ly/bono-nequi')
+assert extraer_enlaces(MENSAJE) == ['http://nequl.com.co/premio', 'bit.ly/bono-nequi']
+_, expl = enlace_sospechoso(MENSAJE)
+assert expl and 'http://nequl.com.co/premio' in expl and 'Posible typosquatting' in expl, f'Falló: {expl}'
+print(f'OK  mensaje de Nequi -> {expl}')
+
+# 18. Los dominios sin esquema cuentan en el cupo de 3 y se pueden confirmar como amenaza.
+assert extraer_enlaces('bit.ly/a nequl.com.co/b www.c.com http://d.com/e') == ['bit.ly/a', 'nequl.com.co/b', 'www.c.com']
+assert dominios_de_analisis('mensaje', 'Entra a nequl.com.co/premio ya') == ['nequl.com.co']
+puntaje, _, ind = analizar_mensaje('Entra a nequl.com.co/premio', {}, {'nequl.com.co'})
+assert puntaje == 100 and ind[0][0] == INDICADOR_AMENAZA, f'Falló: {puntaje} {ind}'
+print('OK  cupo de 3 y amenazas confirmadas también para enlaces sin esquema')
 
 print('Todos los casos pasaron.')
