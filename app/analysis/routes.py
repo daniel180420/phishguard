@@ -18,20 +18,11 @@ from app.seguridad import registrar_evento, limpiar_detalle
 from app.tendencias import calcular_tendencias
 from app.tiempo import fecha_colombia
 from app.analysis.forms import AnalisisURLForm, AnalisisMensajeForm, EditarPesoForm, ReporteForm, normalizar_origen
+from app.analysis.datos import cargar_pesos, cargar_amenazas
 from app.analysis.analyzer import (analizar_url, analizar_mensaje, dominios_de_analisis, dominio_amenazado,
                                    motivo_no_confirmable)
 
 analysis_bp = Blueprint('analysis', __name__)
-
-
-def _cargar_pesos():
-    activos = IndicadorConfig.query.filter_by(activo=True).all()
-    return {i.nombre: i.peso for i in activos}
-
-
-def _cargar_amenazas():
-    # Dominios que el área de tecnología confirmó como phishing (se buscan ellos y sus subdominios).
-    return set(db.session.execute(select(AmenazaConfirmada.dominio)).scalars())
 
 
 def limpiar_celda(texto):
@@ -103,8 +94,8 @@ def analizar_url_view():
 
     if form.validate_on_submit():
         url = form.url.data
-        pesos = _cargar_pesos()
-        puntaje, nivel, indicadores = analizar_url(url, pesos, _cargar_amenazas())
+        pesos = cargar_pesos()
+        puntaje, nivel, indicadores = analizar_url(url, pesos, cargar_amenazas())
         analisis_id = _guardar_analisis('url', url, puntaje, nivel, indicadores, normalizar_origen(form.origen.data))
         resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
@@ -119,8 +110,8 @@ def analizar_mensaje_view():
 
     if form.validate_on_submit():
         mensaje = form.mensaje.data
-        pesos = _cargar_pesos()
-        puntaje, nivel, indicadores = analizar_mensaje(mensaje, pesos, _cargar_amenazas())
+        pesos = cargar_pesos()
+        puntaje, nivel, indicadores = analizar_mensaje(mensaje, pesos, cargar_amenazas())
         analisis_id = _guardar_analisis('mensaje', mensaje, puntaje, nivel, indicadores)
         resultado = {'id': analisis_id, 'puntaje': puntaje, 'nivel': nivel, 'indicadores': indicadores}
 
@@ -230,7 +221,7 @@ def revisar_reporte(reporte_id):
 def _candidatos_amenaza(analisis):
     # Dominios del link (o links) del análisis, cada uno con el motivo por el que no se puede confirmar (o None)
     # y si la lista ya lo cubre. Se calcula siempre en el servidor, nunca a partir de lo que envía el formulario.
-    en_lista = _cargar_amenazas()
+    en_lista = cargar_amenazas()
     return [{'dominio': d,
              'motivo': motivo_no_confirmable(d),
              'ya_en_lista': dominio_amenazado(d, en_lista) is not None}

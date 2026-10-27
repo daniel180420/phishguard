@@ -37,8 +37,11 @@ class AnalisisURLForm(FlaskForm):
     submit = SubmitField('Analizar URL')
 
 
+MAX_LARGO_MENSAJE = 2000  # también lo usa el bot de Telegram
+
+
 class AnalisisMensajeForm(FlaskForm):
-    mensaje = TextAreaField('Mensaje a analizar', validators=[DataRequired(), Length(max=2000)])
+    mensaje = TextAreaField('Mensaje a analizar', validators=[DataRequired(), Length(max=MAX_LARGO_MENSAJE)])
     submit = SubmitField('Analizar mensaje')
 
 

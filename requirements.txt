@@ -7,3 +7,4 @@ python-dotenv
 email_validator
 Flask-Limiter
 tzdata
+requests==2.34.2
