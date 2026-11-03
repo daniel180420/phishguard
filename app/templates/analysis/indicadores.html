@@ -1,25 +1,46 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h2>Indicadores y pesos</h2>
-<p><em>Solo el administrador puede editar estos valores. Cambian el puntaje de los próximos análisis, no los ya guardados.</em></p>
+{% block ruta %}indicadores y pesos{% endblock %}
 
-<div class="tabla-scroll">
-<table>
-    <tr>
-        <th>Indicador</th>
-        <th>Descripción</th>
-        <th>Peso</th>
-        <th></th>
-    </tr>
-    {% for i in indicadores %}
-    <tr>
-        <td>{{ i.nombre }}</td>
-        <td>{{ i.descripcion }}</td>
-        <td>{{ i.peso }}</td>
-        <td><a href="{{ url_for('analysis.editar_indicador', indicador_id=i.id) }}">Editar</a></td>
-    </tr>
-    {% endfor %}
-</table>
+{% block content %}
+{% set n = indicadores | length %}
+<div class="encabezado">
+    <div>
+        <h2>Indicadores y pesos</h2>
+        <p class="subtitulo">Solo el administrador puede editar estos valores. Cambian el puntaje de los próximos análisis, no los ya guardados.</p>
+    </div>
 </div>
+
+{% if indicadores %}
+<section class="tarjeta">
+    <div class="tabla-scroll">
+        <table class="tabla-datos">
+            <caption class="solo-lectura">Indicadores de phishing y su peso</caption>
+            <thead>
+                <tr>
+                    <th>Indicador</th>
+                    <th>Descripción</th>
+                    <th>Peso</th>
+                    <th><span class="solo-lectura">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in indicadores %}
+                <tr>
+                    <td>{{ i.nombre }}</td>
+                    <td>{{ i.descripcion }}</td>
+                    <td class="mono">{{ i.peso }}</td>
+                    <td><a class="boton-sec" href="{{ url_for('analysis.editar_indicador', indicador_id=i.id) }}">Editar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabla-pie mono">{{ n }} indicador{{ '' if n == 1 else 'es' }}</p>
+</section>
+{% else %}
+<section class="tarjeta">
+    <p class="vacio">Todavía no hay indicadores. Se cargan con <span class="mono">python seed_indicadores.py</span>.</p>
+</section>
+{% endif %}
 {% endblock %}

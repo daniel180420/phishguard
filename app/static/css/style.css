@@ -335,6 +335,7 @@ label {
 input[type="text"],
 input[type="email"],
 input[type="password"],
+input[type="number"],
 textarea {
     width: 100%;
     max-width: 560px;
@@ -347,6 +348,10 @@ textarea {
     background: #ffffff;
     color: var(--texto);
     transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+input[type="number"] {
+    max-width: 160px;
 }
 
 input:focus,
@@ -1469,6 +1474,7 @@ th {
     input[type="text"],
     input[type="email"],
     input[type="password"],
+    input[type="number"],
     textarea {
         max-width: none;
         font-size: 1rem;

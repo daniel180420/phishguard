@@ -158,7 +158,7 @@ Riesgos conocidos y aceptados:
 - "Eliminar mi cuenta" y "Cambiar correo" (derechos de supresión y actualización, Ley 1581).
 - Definir cuánto tiempo se conservan los eventos de seguridad.
 - Probar en MySQL el borrado de análisis con reporte (las pruebas usan SQLite) y que `init_db.py` cree `reportes` y `amenazas_confirmadas` (índice UNIQUE de `dominio`, VARCHAR(255)).
-- Rediseño de la interfaz: falta solo `indicadores.html` y `editar_indicador.html` (pantallas de administrador que aún usan el marcado simple, sin `encabezado` ni `tarjeta`). El resto de las páginas ya usa el diseño nuevo.
+- [x] Rediseño de la interfaz: todas las páginas usan el diseño nuevo (`encabezado`, `tarjeta`, adaptable a celular); las últimas fueron `indicadores.html` y `editar_indicador.html`.
 - [x] CSV sin saltos de línea en el contenido.
 - README.
 - [x] Hora en zona horaria de Colombia (se muestra con `zoneinfo` y `tzdata`; las tendencias agrupan por día de Colombia).
