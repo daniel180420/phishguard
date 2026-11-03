@@ -1,3 +1,5 @@
+import argparse
+
 from app import create_app
 from app.extensions import db
 from app.models import IndicadorConfig
@@ -25,11 +27,45 @@ INDICADORES = [
     ('Enlace sospechoso en el mensaje', 20, 'Aplica a mensajes. Cada enlace del mensaje se analiza como URL; cuenta si es de riesgo medio o alto, o si trae "Posible typosquatting" aunque sea de riesgo bajo (por ejemplo, con HTTPS).'),
 ]
 
-app = create_app()
-with app.app_context():
+def insertar_faltantes():
+    # Solo agrega los indicadores que no están (por nombre); los que ya existen no se tocan.
     for nombre, peso, descripcion in INDICADORES:
         existente = IndicadorConfig.query.filter_by(nombre=nombre).first()
         if not existente:
             db.session.add(IndicadorConfig(nombre=nombre, peso=peso, descripcion=descripcion, activo=True))
     db.session.commit()
-    print(f'Listo. {IndicadorConfig.query.count()} indicadores en la tabla.')
+
+
+def actualizar_descripciones():
+    # Cambia solo la descripción de los que ya existen (por nombre). No toca el peso ni "activo", que el
+    # administrador pudo haber editado, y tampoco inserta los que faltan. Devuelve (actualizados, al_dia, faltan).
+    actualizados = al_dia = faltan = 0
+    for nombre, _peso, descripcion in INDICADORES:
+        existente = IndicadorConfig.query.filter_by(nombre=nombre).first()
+        if existente is None:
+            faltan += 1
+        elif existente.descripcion == descripcion:
+            al_dia += 1
+        else:
+            existente.descripcion = descripcion
+            actualizados += 1
+    db.session.commit()
+    return actualizados, al_dia, faltan
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Carga los indicadores de phishing en la tabla indicadores_config.')
+    parser.add_argument('--actualizar-descripciones', action='store_true',
+                        help='actualiza la descripción de los indicadores que ya existen (no cambia pesos ni activo)')
+    args = parser.parse_args()
+
+    app = create_app()
+    with app.app_context():
+        if args.actualizar_descripciones:
+            actualizados, al_dia, faltan = actualizar_descripciones()
+            print(f'Descripciones actualizadas: {actualizados}. Ya estaban al día: {al_dia}.')
+            if faltan:
+                print(f'Faltan {faltan} indicadores en la tabla: corre "python seed_indicadores.py" (sin opciones) para insertarlos.')
+        else:
+            insertar_faltantes()
+            print(f'Listo. {IndicadorConfig.query.count()} indicadores en la tabla.')

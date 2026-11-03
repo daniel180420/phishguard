@@ -13,7 +13,7 @@ Windows; a `venv/` is checked into the project directory.
 - Activate venv: `venv\Scripts\activate`
 - Install deps: `pip install -r requirements.txt`
 - Create tables: `python init_db.py` (`db.create_all()`; no migrations)
-- Seed indicator weights: `python seed_indicadores.py` (idempotent, matches by `nombre`)
+- Seed indicator weights: `python seed_indicadores.py` (idempotent, matches by `nombre`; solo inserta los que faltan y no actualiza los existentes). Para refrescar solo las descripciones de los que ya están: `python seed_indicadores.py --actualizar-descripciones` (no toca pesos ni `activo`, no inserta, e informa cuántas actualizó)
 - Run dev server: `python run.py` (debug mode)
 - Run the Telegram bot: `python bot.py` (needs `TELEGRAM_BOT_TOKEN` in `.env`; separate process from the web app)
 - Run a test file: `python tests\probar_<nombre>.py` (each file is standalone, uses in-memory SQLite and exits 0 on success)
