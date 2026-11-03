@@ -121,13 +121,21 @@ assert '<td class="mono">45</td>' in lista and 'actualizado a 45' in lista
 assert eventos('cambio_peso') == ['indicador_uno: 20 -> 45']
 print('OK  peso válido: guarda, redirige, la lista lo muestra y queda el evento cambio_peso')
 
-# 8. Los extremos válidos se aceptan; un indicador inexistente da 404.
-# Nota: el 0 hoy se rechaza (EditarPesoForm usa DataRequired, que trata el 0 como vacío) aunque
-# el rango declarado es 0-100; no se prueba aquí para no dar por buena esa conducta.
-for limite in (1, 100):
+# 8. Los extremos válidos se aceptan (el 0 incluido); un indicador inexistente da 404
+for limite in (0, 1, 100):
     r = root.post(EDITAR, data={'peso': limite})
     assert r.status_code == 302 and peso_de(ID_UNO) == limite, limite
 assert root.get('/admin/indicadores/99999').status_code == 404
-print('OK  pesos 1 y 100 se aceptan; un indicador inexistente da 404')
+print('OK  pesos 0, 1 y 100 se aceptan; un indicador inexistente da 404')
+
+# 9. Con el 0 ya guardado, vacío y texto siguen siendo errores y no pisan el peso
+root.post(EDITAR, data={'peso': 0})
+for malo in ('', 'abc', ' ', '1.5'):
+    r = root.post(EDITAR, data={'peso': malo})
+    assert r.status_code == 200 and 'class="error-campo"' in texto(r), repr(malo)
+    assert peso_de(ID_UNO) == 0, repr(malo)
+r = root.post(EDITAR, data={})  # sin el campo
+assert r.status_code == 200 and 'class="error-campo"' in texto(r) and peso_de(ID_UNO) == 0
+print('OK  vacío, texto, espacio, decimal y campo ausente siguen dando error y no cambian el peso')
 
 print('Todos los casos pasaron.')
