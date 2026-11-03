@@ -1,0 +1,1200 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-tabla]{babel}
+\usepackage[margin=2.54cm]{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.multipart,shapes.geometric}
+\usepackage{graphicx}
+\usepackage[labelfont=bf,textfont=it,labelsep=newline,justification=raggedright,singlelinecheck=false,skip=4pt]{caption}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=top}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2.2em}
+\setlength{\cftsubsecnumwidth}{3.2em}
+\setlength{\cftsubsubsecnumwidth}{4em}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+\renewcommand{\cftsubsubsecaftersnum}{.}
+\setlength{\cftfignumwidth}{2.5em}
+\setlength{\cfttabnumwidth}{2.5em}
+\usepackage[hidelinks]{hyperref}
+
+% Colores usados en tablas y diagramas
+\definecolor{riesgobajo}{RGB}{198,239,206}
+\definecolor{riesgomedio}{RGB}{255,235,156}
+\definecolor{riesgoalto}{RGB}{244,176,176}
+\definecolor{azulclaro}{RGB}{221,235,247}
+\definecolor{grisclaro}{RGB}{237,237,237}
+
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{0pt}
+
+
+\addto\captionsspanish{%
+  \renewcommand{\contentsname}{Tabla de contenido}%
+  \renewcommand{\listfigurename}{Lista de figuras}%
+  \renewcommand{\listtablename}{Lista de tablas}%
+}
+
+% Encabezado sin número dentro de una subsección
+% Cada capítulo empieza en una hoja nueva
+\usepackage{etoolbox}
+\pretocmd{\section}{\clearpage}{}{}
+
+\newcommand{\apartado}[1]{\par\medskip\noindent\textbf{#1}\par\smallskip}
+
+% Captura de pantalla: si la imagen no está en la carpeta, deja un recuadro que lo avisa
+\newcommand{\captura}[4]{%
+\begin{figure}[htbp]
+\centering
+\caption{#3}\label{#4}
+\IfFileExists{#1/#2}{\includegraphics[width=0.85\textwidth]{#1/#2}}{\fbox{\parbox[c][3.5cm][c]{0.8\textwidth}{\centering Falta la imagen \texttt{#1/#2}}}}
+\end{figure}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{3cm}
+{\LARGE\bfseries PHISHGUARD\par}
+\vspace{0.6cm}
+{\large Proyecto de aula\par}
+\vspace{1.4cm}
+Daniel A. Arias C., Juan C. García\par
+\vspace{0.8cm}
+Seguridad Informática, Ingeniería de Sistemas\par
+Universidad Cooperativa de Colombia\par
+\vspace{0.8cm}
+Carlos I. Torres L.\par
+\vspace{0.8cm}
+Villavicencio\par
+Octubre de 2026\par
+\end{titlepage}
+
+
+\section*{Resumen}
+
+PhishGuard es una aplicación web que ayuda a la comunidad de una institución de educación superior a identificar posibles intentos de phishing en enlaces (URL) y mensajes de texto. El sistema analiza la información que ingresa el usuario con un motor de reglas de 17 indicadores (10 para URL y 7 para mensajes), calcula un puntaje de riesgo de 0 a 100, lo clasifica como bajo, medio o alto y explica qué indicadores influyeron en el resultado. No utiliza inteligencia artificial, para que cada resultado se pueda explicar. El caso de estudio es una institución ficticia, la Corporación Universitaria Horizonte del Llano, en Villavicencio. El documento presenta el marco legal y normativo (Ley 1273 de 2009, Ley 1581 de 2012 e ISO/IEC 27001 y 27002), un análisis de riesgos basado en MAGERIT con 16 riesgos, de los cuales 8 son altos, un análisis de brechas frente a ISO/IEC 27002 y el diseño de los controles según los modelos AAA y CID. La aplicación se desarrolló en Python con Flask y MySQL, e incorpora contraseñas con hash, consultas parametrizadas, protección contra CSRF, control de acceso por rol y límite de intentos de inicio de sesión.
+
+\textbf{Palabras clave:} phishing, ingeniería social, análisis de riesgos, MAGERIT, seguridad de aplicaciones web.
+
+\newpage
+\section*{Abstract}
+
+PhishGuard is a web application that helps the community of a higher education institution identify possible phishing attempts in links (URLs) and text messages. The system analyzes the information entered by the user with a rule engine of 17 indicators (10 for URLs and 7 for messages), calculates a risk score from 0 to 100, classifies it as low, medium or high, and explains which indicators influenced the result. It does not use artificial intelligence, so that every result can be explained. The case study is a fictitious institution, Corporación Universitaria Horizonte del Llano, in Villavicencio, Colombia. The document presents the legal and regulatory framework (Law 1273 of 2009, Law 1581 of 2012, and ISO/IEC 27001 and 27002), a risk analysis based on MAGERIT with 16 risks, 8 of which are high, a gap analysis against ISO/IEC 27002, and the design of controls according to the AAA and CIA models. The application was developed in Python with Flask and MySQL, and includes hashed passwords, parameterized queries, CSRF protection, role-based access control and a login attempt limit.
+
+\textbf{Keywords:} phishing, social engineering, risk analysis, MAGERIT, web application security.
+
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+\newpage
+\section*{Glosario}
+
+\begin{description}
+  \item[AAA:] modelo de control de acceso compuesto por autenticación, autorización y contabilidad (registro de las acciones).
+  \item[Activo:] recurso de valor que debe protegerse: información, servicios, aplicaciones, equipos o personas.
+  \item[Amenaza:] evento que puede causar daño a un activo.
+  \item[CID:] confidencialidad, integridad y disponibilidad de la información.
+  \item[CSP (política de seguridad de contenido):] cabecera que indica al navegador desde dónde puede cargar recursos una página.
+  \item[CSRF:] ataque que hace que el navegador de un usuario envíe una petición que este no autorizó.
+  \item[Hash:] transformación de un dato, como una contraseña, en un valor del que no se puede recuperar el original.
+  \item[IDOR:] acceso a datos ajenos cambiando el identificador de un objeto en la dirección de una página.
+  \item[Ingeniería social:] manipulación de las personas para que revelen información o actúen en contra de su propia seguridad.
+  \item[Inyección SQL:] ataque que introduce instrucciones de base de datos a través de los datos que escribe el usuario.
+  \item[ORM:] herramienta que permite trabajar con la base de datos mediante objetos, sin escribir consultas SQL a mano.
+  \item[Phishing:] engaño que suplanta a una entidad de confianza para obtener credenciales o datos personales.
+  \item[Riesgo:] estimación del daño posible, a partir de la probabilidad de que una amenaza ocurra y de su impacto.
+  \item[Smishing:] phishing por mensajes de texto (SMS).
+  \item[Typosquatting:] uso de dominios parecidos a los de una entidad legítima para engañar al usuario.
+  \item[Vishing:] phishing por llamadas telefónicas.
+  \item[Vulnerabilidad:] debilidad que permite que una amenaza se materialice.
+  \item[XSS:] ataque que introduce código en una página web para que se ejecute en el navegador de otro usuario.
+\end{description}
+
+\newpage
+\section{Introducción}
+
+El phishing es una de las técnicas de ingeniería social utilizadas para engañar a los usuarios mediante comunicaciones que aparentan ser legítimas, con el propósito de obtener información confidencial o dirigirlos hacia sitios potencialmente fraudulentos. En el contexto educativo, el uso frecuente de plataformas académicas, cuentas de correo electrónico y diferentes servicios digitales hace necesario que los usuarios puedan reconocer señales asociadas a este tipo de amenazas. PhishGuard surge como una propuesta de aplicación web orientada al análisis de URLs y mensajes de texto. El sistema busca identificar diferentes indicadores asociados a posibles intentos de phishing, asignar un nivel de riesgo y presentar al usuario una explicación de los elementos detectados. El proyecto se plantea como una herramienta de apoyo para la identificación temprana de posibles amenazas de ingeniería social, utilizando un mecanismo basado en reglas e indicadores definidos durante el desarrollo del proyecto.
+
+Como caso de estudio se plantea la Corporación Universitaria Horizonte del Llano (CUHL), una institución ficticia de educación superior ubicada en Villavicencio (Meta), con unos 3.800 estudiantes, 210 docentes y 140 integrantes del personal administrativo. La CUHL usa correo institucional, una plataforma de aprendizaje virtual, un sistema de información académica y un portal de pagos de matrícula, servicios que la exponen a mensajes y sitios fraudulentos.
+
+El documento se organiza así: el capítulo 2 plantea el problema y justifica la propuesta; el capítulo 3 presenta los objetivos; el capítulo 4 reúne el marco referencial (estado del arte, marco teórico y marco legal); el capítulo 5 describe la metodología y el cronograma; el capítulo 6 presenta los resultados, es decir, los requisitos, el modelado del sistema y de su seguridad, el diseño de la interfaz y la descripción técnica; el capítulo 7 analiza el proceso de desarrollo; el capítulo 8 recoge las conclusiones preliminares, y el capítulo 9, las referencias. Los anexos incluyen evidencias de las pruebas de seguridad.
+
+\section{Planteamiento del problema}
+
+\subsection{Descripción del problema}\label{sec:problema}
+
+\subsubsection{Magnitud del problema}
+
+El phishing es una de las formas de ingeniería social más extendidas. El Anti-Phishing Working Group (APWG), que consolida reportes de la industria, observó cerca de 3,8 millones de ataques de phishing durante 2025, ligeramente por encima de los 3,76 millones de 2024 (APWG, 2026c). En el primer trimestre de 2026 el volumen aumentó 13,8\,\% frente al trimestre anterior, al pasar de 853.244 a 971.181 ataques (APWG, 2026a), y en el segundo trimestre volvió a crecer 10,1\,\%, hasta 1.069.681 ataques (APWG, 2026b). En ese último periodo, la categoría de servicios en la nube y correo web (SaaS/webmail) fue la más atacada, con 29,1\,\% de los casos (APWG, 2026b), que es la misma categoría de servicios que usa a diario una comunidad universitaria.
+
+En Colombia, según el informe \emph{Estado de la ciberseguridad en Colombia} de la Cámara Colombiana de Informática y Telecomunicaciones (CCIT) y la Universidad Externado, que cita datos del Centro Cibernético de la Policía Nacional, en 2024 se presentaron 77.866 denuncias por delitos informáticos, un aumento de 23\,\% frente a 2023, año en que se registraron 63.249 (Telesemana, 2025). Dentro de esos delitos, la suplantación de sitios web para capturar datos personales, tipificada en el artículo 269G del Código Penal, fue el cuarto más frecuente, con 1.038 denuncias entre enero y comienzos de abril de 2024, 10,19\,\% más que en el mismo periodo de 2023 (Semana, 2024). Al tratarse de denuncias, es probable que estas cifras subestimen la magnitud real del fenómeno.
+
+\subsubsection{La institución del caso de estudio}
+
+Para este proyecto se define una institución ficticia, la \textbf{Corporación Universitaria Horizonte del Llano (CUHL)}. Tanto el nombre como las cifras que siguen son supuestos de diseño del grupo y no corresponden a una institución real.
+
+La CUHL es una corporación universitaria privada sin ánimo de lucro, con sede única en Villavicencio (Meta) y tres bloques académicos. Cuenta con unos 3.800 estudiantes de pregrado distribuidos en ocho programas, 210 docentes y 140 integrantes del personal administrativo. Su área de tecnología tiene seis personas (coordinación, soporte, administración de sistemas, desarrollo y administración de bases de datos) y no dispone de un centro de operaciones de seguridad ni de un oficial de seguridad dedicado.
+
+La institución usa los siguientes servicios digitales:
+
+\begin{itemize}
+  \item Correo institucional con dominio propio, prestado por un proveedor de correo web.
+  \item Plataforma de aprendizaje virtual, alojada en un servidor propio.
+  \item Sistema de información académica (matrícula, notas y certificados).
+  \item Portal de pagos de matrícula, conectado a una pasarela bancaria.
+  \item Red inalámbrica institucional para estudiantes y docentes.
+  \item Cuentas institucionales en redes sociales y grupos de mensajería.
+\end{itemize}
+
+\textbf{Escenario de amenaza (hipotético).} Al inicio de cada semestre, época de matrículas y pagos, circulan correos y mensajes que imitan al portal de pagos o a bienestar universitario e incluyen un enlace a páginas que copian el inicio de sesión institucional. Una credencial capturada permite acceder al correo, a la plataforma y a datos personales y académicos de la persona afectada. Este escenario es el que PhishGuard busca ayudar a prevenir.
+
+\subsubsection{Situación actual y problemas identificados}
+
+En el escenario planteado, la CUHL no cuenta con un mecanismo para que su comunidad verifique los mensajes y enlaces sospechosos antes de actuar. La situación actual depende del criterio de cada persona y presenta los siguientes problemas:
+
+\begin{enumerate}
+  \item \textbf{Cada usuario decide solo.} Ante un correo o mensaje dudoso, estudiantes, docentes y administrativos deciden por su cuenta si es confiable, sin un criterio común ni una herramienta de apoyo.
+  \item \textbf{Los mensajes imitan servicios reales.} Los ataques suplantan al portal de pagos, a bienestar universitario o a la mesa de ayuda, y se concentran en las épocas de matrícula, cuando los usuarios esperan ese tipo de mensajes.
+  \item \textbf{El área de tecnología no da abasto.} Con seis personas y sin centro de operaciones de seguridad ni oficial de seguridad, no puede revisar cada caso que le reportan.
+  \item \textbf{La formación no llega a todos.} La comunidad cambia cada semestre y tiene niveles muy distintos de conocimiento en seguridad, por lo que las campañas de concientización tienen un alcance limitado.
+  \item \textbf{Un solo error tiene un impacto alto.} Una credencial capturada da acceso al correo, a la plataforma de aprendizaje, a las notas y a los datos personales de la persona.
+  \item \textbf{No hay registro de los intentos.} La institución no sabe qué tipo de mensajes fraudulentos llegan con más frecuencia, lo que dificulta orientar la prevención.
+\end{enumerate}
+
+\subsection{Justificación}\label{sec:just}
+
+\subsubsection{Sistema propuesto}
+
+Se propone PhishGuard, una aplicación web de uso preventivo y educativo para la comunidad de la CUHL. El proceso que se busca apoyar mediante PhishGuard corresponde a la identificación de posibles intentos de phishing presentes en comunicaciones digitales. El funcionamiento propuesto es el siguiente:
+
+\begin{enumerate}
+  \item El usuario recibe o dispone de una URL o mensaje que considera sospechoso.
+  \item El usuario ingresa la información en PhishGuard.
+  \item El sistema analiza las características de la URL o del mensaje.
+  \item Se identifican los indicadores asociados a posibles intentos de phishing.
+  \item El sistema calcula un puntaje de riesgo.
+  \item Se clasifica el resultado como riesgo bajo, medio o alto.
+  \item Se muestran al usuario los indicadores encontrados y una explicación del resultado.
+\end{enumerate}
+
+PhishGuard será desarrollado como una aplicación web orientada al análisis de posibles indicadores de phishing presentes en URLs y mensajes de texto. El sistema permitirá:
+
+\begin{itemize}
+  \item Registrar usuarios e iniciar sesión.
+  \item Analizar URLs.
+  \item Analizar mensajes de texto.
+  \item Identificar indicadores asociados a posibles intentos de phishing.
+  \item Generar un puntaje de riesgo entre 0 y 100.
+  \item Clasificar el resultado como riesgo bajo, medio o alto.
+  \item Mostrar los indicadores detectados y una explicación del resultado.
+  \item Almacenar el historial de análisis.
+  \item Consultar el historial de cada usuario.
+  \item Presentar estadísticas generales de los análisis realizados.
+  \item Aplicar medidas básicas de seguridad durante el desarrollo de la aplicación.
+\end{itemize}
+
+\subsubsection{Beneficios}
+
+Una institución de educación superior concentra en pocos servicios información de alto valor: credenciales institucionales, correo, datos personales y académicos, y procesos de pago. Una sola credencial capturada mediante un mensaje o un enlace falso puede dar acceso a todos ellos. A esto se suma que la comunidad universitaria es numerosa, cambia cada semestre y tiene niveles muy distintos de formación en seguridad, lo que hace difícil depender únicamente de controles técnicos. Por eso resulta pertinente una herramienta que ayude a cada persona a reconocer, antes de actuar, los indicadores que hacen sospechoso un enlace o un mensaje. Candanedo-Yau (2026) llega a una conclusión en la misma línea: al analizar los riesgos de la ingeniería social en instituciones de educación superior, plantea estrategias de prevención que combinan las dimensiones tecnológica, organizativa y humana. A su vez, Zwilling et al. (2022) encontraron que los usuarios de internet tienen una conciencia adecuada de las amenazas, pero aplican solo medidas de protección mínimas, y que un mayor conocimiento se asocia con una mayor conciencia; es decir, enseñar a reconocer las señales tiene efecto.
+
+El proyecto aporta una herramienta preventiva y educativa que explica por qué una URL o un mensaje resulta sospechoso, y a la vez sirve como caso práctico de desarrollo seguro: contraseñas con hash, consultas parametrizadas, validación de entradas, control de acceso por usuario y por rol, y gestión segura de sesiones, cuyo cumplimiento se verifica mediante pruebas descritas en el documento.
+
+La relación del proyecto con los temas del curso se desarrolla en el marco teórico (sección~\ref{sec:teorico}).
+
+\subsubsection{Por qué un enfoque basado en reglas}
+
+PhishGuard no utiliza inteligencia artificial ni aprendizaje automático. Esta decisión es deliberada, tiene respaldo en trabajos que detectan phishing con reglas explícitas (Jeeva y Rajsingh, 2016; Moghimi y Varjani, 2016) y responde a tres razones:
+
+\begin{itemize}
+  \item \textbf{Explicabilidad.} Cada punto del puntaje de riesgo se puede justificar con un indicador concreto y su peso. El usuario no recibe un veredicto, sino una explicación que puede aprender a reproducir por sí mismo.
+  \item \textbf{Control y ajuste.} Los pesos de los indicadores se almacenan en la base de datos y un administrador puede modificarlos sin cambiar el código, lo que permite calibrar el sistema y mostrar con claridad el efecto de cada regla.
+  \item \textbf{Coherencia con el objetivo del curso.} El propósito del proyecto es aplicar y demostrar prácticas de seguridad informática, tanto en la detección como en la propia aplicación. Un modelo de aprendizaje automático exigiría datos de entrenamiento y validación que no son el foco de la asignatura.
+\end{itemize}
+
+El enfoque tiene límites que se reconocen de forma explícita: un análisis por reglas no detecta ataques que no presenten los indicadores programados y no sustituye controles técnicos como los filtros de correo o la autenticación multifactor. Por esa razón el resultado se presenta como un \emph{nivel de riesgo} y no como una garantía de que algo sea o no phishing.
+
+\subsubsection{Limitaciones}
+
+El proyecto tendrá las siguientes limitaciones:
+
+\begin{itemize}
+  \item PhishGuard no utilizará inteligencia artificial ni modelos de aprendizaje automático para determinar el nivel de riesgo.
+  \item El análisis se realizará mediante reglas e indicadores previamente definidos para el proyecto.
+  \item El sistema analizará únicamente la información proporcionada por el usuario, principalmente URLs y mensajes de texto.
+  \item PhishGuard no realizará análisis de archivos, malware, documentos adjuntos ni dispositivos.
+  \item El sistema no realizará ataques, pruebas de penetración ni escaneos sobre sistemas externos.
+  \item El proyecto no dependerá de servicios externos de inteligencia de amenazas para determinar el resultado.
+  \item El desarrollo y las pruebas se realizarán en un entorno de desarrollo o pruebas, sin establecer como requisito la publicación del sistema en Internet o su despliegue en la nube.
+\end{itemize}
+
+\section{Objetivos}
+
+\subsection{Objetivo general}
+
+Diseñar e implementar un sistema web denominado PhishGuard que permita analizar URLs y mensajes, identificar indicadores asociados a posibles ataques de phishing y clasificar su nivel de riesgo, con el fin de apoyar la identificación temprana de amenazas de ingeniería social.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Identificar y analizar las principales características presentes en URLs y mensajes que puedan estar asociadas a posibles ataques de phishing.
+  \item Desarrollar un mecanismo de análisis que permita asignar un puntaje y clasificar el nivel de riesgo de las URLs y mensajes a partir de los indicadores identificados.
+  \item Implementar una aplicación web que permita al usuario ingresar URLs y mensajes, ejecutar el análisis y visualizar los indicadores detectados y el nivel de riesgo obtenido.
+\end{enumerate}
+
+\section{Marco referencial}
+
+\subsection{Estado del arte}\label{sec:estado}
+
+En el mercado existen servicios que ayudan a identificar sitios y enlaces maliciosos. Google Safe Browsing mantiene listas de sitios inseguros que los navegadores consultan para advertir al usuario antes de abrirlos (Google, s.f.). VirusTotal permite enviar una URL o un archivo para que sea revisado por múltiples motores antivirus y servicios de análisis (VirusTotal, s.f.). PhishTank es una comunidad en la que los usuarios reportan y verifican URL de phishing (PhishTank, s.f.). Estos servicios dependen de listas o de motores externos, entregan un veredicto y, en general, no le explican al usuario por qué un enlace es sospechoso; además, no analizan el texto de un mensaje. PhishGuard se diferencia en que funciona sin servicios externos, analiza también mensajes y explica cada indicador, con un fin educativo.
+
+\apartado{Enfoques en la literatura académica}
+
+La detección automática de phishing se ha abordado con dos enfoques principales. Una parte importante de los trabajos recientes usa aprendizaje automático: Jain y Gupta (2019) clasifican sitios web a partir de la información de los hipervínculos de su código HTML, y Jalil y Usman (2020) revisan los clasificadores de aprendizaje automático aplicados a la detección de URL de phishing. El segundo enfoque usa reglas explícitas: Moghimi y Varjani (2016) proponen un método basado en reglas para detectar phishing contra la banca por internet, implementado como una extensión de navegador, y Jeeva y Rajsingh (2016) definen catorce características heurísticas de la URL, entre ellas la presencia de ciertas palabras clave, de las que obtienen reglas del tipo ``si\ldots{} entonces'' para distinguir URL legítimas de fraudulentas.
+
+Sobre las características que se analizan, Hong et al. (2020) reúnen características léxicas de la URL identificadas en trabajos previos y las combinan con listas de dominios maliciosos. Para los mensajes, Yeboah-Boateng y Amanor (2014) proponen una taxonomía de palabras ``atrayentes'' y ``señuelo'' usadas en los ataques de phishing, smishing y vishing, como referencia para que los usuarios se protejan. PhishGuard toma de estos trabajos la idea de analizar características léxicas de la URL y palabras típicas de los mensajes fraudulentos, y se ubica en el enfoque basado en reglas por las razones que se exponen a continuación.
+
+\subsection{Marco teórico}\label{sec:teorico}
+
+El proyecto se relaciona con los tres temas obligatorios de la asignatura de la siguiente manera:
+
+\begin{itemize}
+  \item \textbf{Fundamentos de la seguridad de la información.} El análisis de riesgos del proyecto (sección~\ref{sec:riesgos}) parte de los conceptos de activo, amenaza, vulnerabilidad, impacto y riesgo, y valora los activos según las dimensiones de confidencialidad, integridad, disponibilidad, autenticidad y trazabilidad.
+  \item \textbf{Amenazas y vulnerabilidades.} Se estudian dos planos: la amenaza de ingeniería social (phishing) que explota la vulnerabilidad humana, y las vulnerabilidades de la propia aplicación web (control de acceso, inyección, XSS, CSRF, gestión de sesiones), tomando como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025).
+  \item \textbf{Vectores de ataque.} Los vectores que analiza PhishGuard son los enlaces (URL) y los mensajes de texto, que llegan por correo, SMS o mensajería instantánea (Yeboah-Boateng y Amanor, 2014). El canal SMS gana peso: el smishing aumentó 40\,\% entre el primer y el segundo trimestre de 2026 (APWG, 2026b). Los indicadores del sistema corresponden a características observables de esos vectores.
+\end{itemize}
+
+\subsubsection{Fundamentos de la seguridad de la información}
+
+La seguridad de la información busca preservar la confidencialidad, la integridad y la disponibilidad de la información mediante un proceso de gestión de riesgos (ISO \& IEC, 2022a). La confidencialidad asegura que solo accedan a la información las personas autorizadas; la integridad, que no sea alterada de forma indebida, y la disponibilidad, que esté accesible cuando se necesita. MAGERIT agrega dos dimensiones útiles para este proyecto: la autenticidad, que garantiza que una persona o un origen son quienes dicen ser, y la trazabilidad, que permite saber quién hizo qué y cuándo (Ministerio de Hacienda y Administraciones Públicas, 2012).
+
+Para analizar la seguridad se usan cuatro conceptos relacionados: un \emph{activo} es un recurso de valor que debe protegerse; una \emph{amenaza} es un evento que puede dañarlo; una \emph{vulnerabilidad} es una debilidad que permite que la amenaza se materialice, y el \emph{riesgo} estima el daño posible a partir de la probabilidad y el impacto de la amenaza (Ministerio de Hacienda y Administraciones Públicas, 2012).
+
+Para controlar el acceso a un sistema se usa el modelo AAA: la \emph{autenticación} verifica la identidad del usuario, la \emph{autorización} determina qué puede hacer y la \emph{contabilidad} registra lo que hace. Este modelo organiza el diseño de los controles de PhishGuard (sección~\ref{sec:controles}).
+
+\subsubsection{Ingeniería social y phishing}
+
+La ingeniería social consiste en manipular a las personas para que revelen información o actúen en contra de su propia seguridad. El APWG define el phishing como un delito que combina ingeniería social y engaño técnico para robar datos de identidad y credenciales financieras: el atacante se hace pasar por una entidad de confianza mediante direcciones de correo y mensajes engañosos, sitios web falsos o nombres de dominio que imitan a los legítimos (APWG, 2026b). Además del correo, el phishing usa los mensajes de texto (smishing) y las llamadas (vishing) (Yeboah-Boateng y Amanor, 2014). Estos medios son los vectores de ataque que analiza el proyecto (sección~\ref{sec:vectores}).
+
+\subsubsection{Seguridad en aplicaciones web}
+
+Para el plano de la aplicación web se toma como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025). Las categorías más relacionadas con las medidas del proyecto son: control de acceso roto (A01), configuración de seguridad incorrecta (A02), inyección (A05), fallos de autenticación (A07), y fallos en el registro y alerta de seguridad (A09), esta última identificada como brecha.
+
+\subsubsection{Análisis y gestión de riesgos}
+
+MAGERIT es la metodología de análisis y gestión de riesgos de los sistemas de información elaborada por el Ministerio de Hacienda y Administraciones Públicas de España. Su versión 3 se publicó en 2012 y se organiza en tres libros: método, catálogo de elementos y guía de técnicas (Ministerio de Hacienda y Administraciones Públicas, 2012). Es de uso libre y sigue la terminología de ISO 31000. El método identifica \emph{activos}, \emph{amenazas} y \emph{salvaguardas}, y estima el \emph{impacto} y el \emph{riesgo}, tanto potencial como residual. El catálogo propone tipos de activos, cinco dimensiones de valoración (disponibilidad, integridad, confidencialidad, autenticidad y trazabilidad) y una lista de amenazas agrupadas por origen.
+
+En este proyecto se adopta MAGERIT de forma \textbf{simplificada y cualitativa} (sección~\ref{sec:metriesgos}): se usan sus conceptos y su catálogo como vocabulario, pero con escalas de tres niveles y sin la herramienta PILAR ni el cálculo completo de frecuencia y degradación.
+
+\subsection{Marco legal}\label{sec:marco}
+
+\textbf{Ley 1273 de 2009.} Modifica el Código Penal y crea el bien jurídico tutelado ``de la protección de la información y de los datos'' (Congreso de la República de Colombia, 2009). Tiene relación directa con el phishing por los siguientes tipos penales:
+
+\begin{itemize}
+  \item \textbf{Artículo 269F, violación de datos personales:} sanciona obtener, compilar, divulgar o emplear códigos y datos personales sin estar facultado para ello.
+  \item \textbf{Artículo 269G, suplantación de sitios web para capturar datos personales:} es la conducta que corresponde a las páginas falsas a las que dirigen muchos mensajes de phishing.
+  \item \textbf{Artículo 269I, hurto por medios informáticos y semejantes} y \textbf{artículo 269J, transferencia no consentida de activos:} cubren el uso de credenciales o datos capturados para sustraer dinero.
+\end{itemize}
+
+\textbf{Ley Estatutaria 1581 de 2012.} Establece el régimen general de protección de datos personales (Congreso de la República de Colombia, 2012). Su artículo 4, literal g, consagra el \emph{principio de seguridad}: la información sujeta a tratamiento debe manejarse con las medidas técnicas, humanas y administrativas necesarias para evitar su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento. El Decreto 1377 de 2013 desarrolla el deber de los responsables de poder demostrar, ante la Superintendencia de Industria y Comercio, que han implementado medidas apropiadas y efectivas (Presidencia de la República de Colombia, 2013).
+
+\begin{table}[htbp]
+\centering
+\caption{Relación de las leyes colombianas con PhishGuard}\label{tab:leyes}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.30\textwidth}|p{0.60\textwidth}|}
+\hline
+\textbf{Norma} & \textbf{Relación con PhishGuard} \\ \hline
+Ley 1273/2009, art.\ 269G & PhishGuard analiza URL y mensajes que pueden dirigir a sitios que suplantan a una entidad; al explicar los indicadores reduce la exposición de los usuarios. \\ \hline
+Ley 1273/2009, art.\ 269F & La captura de datos personales es el objetivo habitual del phishing. La propia aplicación solo almacena los datos mínimos de sus usuarios y los protege (hash de contraseñas, acceso restringido). \\ \hline
+Ley 1581/2012, art.\ 4 lit.\ g & PhishGuard aporta una medida \emph{humana} (concientización) y aplica medidas \emph{técnicas} en su diseño (control de acceso, validación, sesiones). \\ \hline
+\end{tabular}
+\end{table}
+
+\apartado{Estándares internacionales: ISO/IEC 27001 e ISO/IEC 27002}
+
+La norma ISO/IEC 27001:2022 especifica los requisitos de un sistema de gestión de seguridad de la información (SGSI) basado en la gestión de riesgos (International Organization for Standardization [ISO] \& International Electrotechnical Commission [IEC], 2022a). La norma ISO/IEC 27002:2022 es la guía de controles asociada: reúne 93 controles agrupados en cuatro temas (organizacionales, de personas, físicos y tecnológicos) (ISO \& IEC, 2022b). En este proyecto no se plantea implantar un SGSI completo, sino usar ISO/IEC 27002 como referente para evaluar qué controles aplica la herramienta y cuáles quedan pendientes (análisis de brechas, sección~\ref{sec:gap}). Los controles más relevantes son:
+
+\begin{table}[htbp]
+\centering
+\caption{Controles de ISO/IEC 27002:2022 relevantes para el proyecto}\label{tab:iso}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.10\textwidth}|p{0.34\textwidth}|p{0.44\textwidth}|}
+\hline
+\textbf{Control} & \textbf{Nombre} & \textbf{Aplicación en el proyecto} \\ \hline
+5.15 & Control de acceso & Acceso por usuario y por rol; historial aislado. \\ \hline
+5.17 & Información de autenticación & Contraseñas almacenadas con hash y sal. \\ \hline
+5.34 & Privacidad y protección de información de identificación personal & Datos mínimos de los usuarios; limitación de quién ve el historial. \\ \hline
+6.3 & Concienciación, educación y formación en seguridad de la información & Es el propósito de PhishGuard: enseñar a reconocer indicadores. \\ \hline
+8.5 & Autenticación segura & Límite de intentos, sesiones con caducidad. \\ \hline
+8.15 & Registro de eventos & Brecha identificada (no implementado). \\ \hline
+8.28 & Codificación segura & Consultas parametrizadas, escape de salida, validación de entradas. \\ \hline
+8.29 & Pruebas de seguridad en el desarrollo y la aceptación & Pruebas de control de acceso y de exportación, y revisión de seguridad del código. \\ \hline
+\end{tabular}
+\end{table}
+
+\noindent\footnotesize\textit{Nota.} Los nombres de los controles fueron traducidos por el grupo a partir del texto original en inglés de ISO/IEC 27002:2022.\normalsize
+
+\apartado{Cómo se articulan los referentes}
+
+\begin{table}[htbp]
+\centering
+\caption{Articulación de los referentes normativos y metodológicos}\label{tab:referentes}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.22\textwidth}|p{0.68\textwidth}|}
+\hline
+\textbf{Referente} & \textbf{Uso en el proyecto} \\ \hline
+Leyes 1273 y 1581 & Justifican por qué importa el problema y qué obligaciones de seguridad existen. \\ \hline
+MAGERIT 3 & Estructura el análisis de riesgos (activos, amenazas, salvaguardas). \\ \hline
+ISO/IEC 27002 & Sirve como lista de controles para el análisis de brechas. \\ \hline
+OWASP Top 10 & Orienta las pruebas y medidas de seguridad de la aplicación. \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Metodología}
+
+\subsection{Metodología de desarrollo}\label{sec:metodologia}
+
+El proyecto se desarrolló con un enfoque iterativo e incremental, organizado en sprints e inspirado en Scrum, un marco de trabajo en el que el producto se construye en ciclos cortos que terminan en un incremento utilizable (Schwaber y Sutherland, 2020). Por el tamaño del equipo, de dos integrantes, no se aplicaron todos los roles y eventos de Scrum; se tomó su idea central: cada sprint terminaba con una parte funcional de la aplicación, probada antes de avanzar. Los sprints realizados fueron:
+
+\begin{enumerate}
+  \item \textbf{Arquitectura y base de datos:} estructura del proyecto en módulos, entorno de desarrollo y modelo de datos.
+  \item \textbf{Autenticación:} registro, inicio y cierre de sesión, y contraseñas almacenadas con hash.
+  \item \textbf{Motor de reglas:} análisis de URL y de mensajes, cálculo del puntaje y clasificación del riesgo.
+  \item \textbf{Historial:} consulta del historial propio y detalle de cada análisis.
+  \item \textbf{Estadísticas y roles:} panel de inicio con estadísticas y rol de administrador.
+  \item \textbf{Seguridad y mejoras:} cabeceras de seguridad, límite de intentos, gestión de sesiones, panel de pesos, ejemplos rápidos y exportación a CSV.
+\end{enumerate}
+
+Después de los sprints se realizaron una revisión de seguridad del código y un rediseño de la interfaz, que corresponden a la etapa de correcciones y mejoras del cronograma.
+
+\subsection{Metodología de análisis de riesgos}\label{sec:metriesgos}
+
+Se aplica una versión simplificada y cualitativa del método MAGERIT: identificación de activos, identificación de amenazas, estimación de probabilidad e impacto, cálculo del riesgo, definición de salvaguardas y estimación del riesgo residual. Los códigos de amenaza entre corchetes ([A.5], [A.30], etc.) provienen del catálogo de amenazas de MAGERIT.
+
+Se analizan dos planos: (a) los riesgos del caso de estudio, es decir, de la institución frente al phishing, y (b) los riesgos de la propia aplicación PhishGuard.
+
+\begin{table}[htbp]
+\centering
+\caption{Escalas de probabilidad e impacto}\label{tab:escalas}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.14\textwidth}|p{0.36\textwidth}|p{0.36\textwidth}|}
+\hline
+\textbf{Nivel} & \textbf{Probabilidad (P)} & \textbf{Impacto (I)} \\ \hline
+1 & Baja: poco probable en el entorno descrito & Bajo: efecto menor y recuperable \\ \hline
+2 & Media: puede ocurrir ocasionalmente & Medio: afecta a un usuario o a datos de uso interno \\ \hline
+3 & Alta: ocurre con frecuencia & Alto: afecta credenciales, datos personales o dinero \\ \hline
+\end{tabular}
+\end{table}
+
+El \textbf{riesgo} se calcula como $P \times I$ y se clasifica así: \textbf{Bajo} (1 a 2), \textbf{Medio} (3 a 4) y \textbf{Alto} (6 a 9). El valor calculado es el riesgo \emph{potencial}, es decir, sin considerar las salvaguardas; la última columna de cada matriz indica la salvaguarda aplicada y el riesgo \emph{residual}.
+
+\subsection{Técnicas de recolección de información}
+
+\begin{itemize}
+  \item \textbf{Revisión documental:} consulta de leyes colombianas, normas ISO/IEC, la metodología MAGERIT, informes de tendencias de phishing y artículos científicos obtenidos de las bases de datos de la biblioteca digital de la universidad.
+  \item \textbf{Análisis de ejemplos:} estudio de mensajes y URL de phishing típicos, a partir de los cuales se definieron los indicadores y se prepararon los casos de prueba, como los ejemplos rápidos de la aplicación.
+  \item \textbf{Pruebas sobre el prototipo:} análisis de casos conocidos y pruebas de seguridad (acceso a datos ajenos, acceso a funciones de administración, límite de intentos y exportación CSV), cuyas evidencias se presentan en los anexos.
+\end{itemize}
+
+\subsection{Cronograma de actividades}
+
+El desarrollo de PhishGuard se organizará en diferentes etapas, permitiendo avanzar de manera progresiva desde la definición del proyecto hasta su implementación y validación.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.09\textwidth}|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\raggedright\arraybackslash}p{0.54\textwidth}|}
+\caption{Cronograma de trabajo}\label{tab:cronograma}\\
+\hline
+\textbf{Semana} & \textbf{Actividad} & \textbf{Descripción} \\ \hline
+\endfirsthead
+\hline
+\textbf{Semana} & \textbf{Actividad} & \textbf{Descripción} \\ \hline
+\endhead
+1 & Definición del proyecto & Selección del tema, definición del problema, objetivos y alcance de PhishGuard. \\ \hline
+2 & Análisis y diseño & Definición de requisitos funcionales y no funcionales, diseño general del sistema y estructura de la base de datos. \\ \hline
+3 & Diseño de la aplicación & Diseño de las interfaces y definición del funcionamiento del análisis de URLs, mensajes y cálculo del riesgo. \\ \hline
+4 & Desarrollo del sistema & Implementación de la aplicación web, registro de usuarios, inicio de sesión y estructura principal del sistema. \\ \hline
+5 & Implementación del análisis & Desarrollo de las reglas para identificar indicadores de phishing en URLs y mensajes y asignación del puntaje de riesgo. \\ \hline
+6 & Historial y estadísticas & Implementación del almacenamiento de análisis, consulta del historial y visualización de estadísticas. \\ \hline
+7 & Seguridad y validaciones & Implementación y revisión de medidas de seguridad, validación de entradas, consultas parametrizadas y gestión de sesiones. \\ \hline
+8 & Pruebas & Realización de pruebas funcionales y de seguridad para verificar el cumplimiento de los requisitos establecidos. \\ \hline
+9 & Correcciones y mejoras & Solución de errores encontrados durante las pruebas y ajustes en la aplicación. \\ \hline
+10 & Documentación y presentación & Organización de la documentación final, preparación de evidencias y presentación del proyecto. \\ \hline
+\end{longtable}
+\endgroup
+
+\subsection{Estado de avance y ajustes}\label{sec:avance}
+
+A la fecha de este documento de avance (octubre de 2026), la aplicación está implementada y en etapa de pruebas y correcciones. La tabla muestra el estado de cada etapa del cronograma.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.12\textwidth}|>{\raggedright\arraybackslash}p{0.44\textwidth}|}
+\caption{Estado de avance del cronograma}\label{tab:avance}\\
+\hline
+\textbf{Semana} & \textbf{Actividad} & \textbf{Estado} & \textbf{Observaciones} \\ \hline
+\endfirsthead
+\hline
+\textbf{Semana} & \textbf{Actividad} & \textbf{Estado} & \textbf{Observaciones} \\ \hline
+\endhead
+1 & Definición del proyecto & Completada & --- \\ \hline
+2 & Análisis y diseño & Completada & Requisitos y estructura de la base de datos definidos. \\ \hline
+3 & Diseño de la aplicación & Completada & La interfaz se rediseñó después, en la etapa de mejoras. \\ \hline
+4 & Desarrollo del sistema & Completada & Registro, inicio de sesión, cierre de sesión y roles. \\ \hline
+5 & Implementación del análisis & Completada & 17 indicadores con pesos almacenados en la base de datos. \\ \hline
+6 & Historial y estadísticas & Completada & Incluye la exportación del historial a CSV. \\ \hline
+7 & Seguridad y validaciones & Completada & Token CSRF, cabeceras de seguridad, límite de intentos y gestión de sesiones. \\ \hline
+8 & Pruebas & En curso & Pruebas manuales de seguridad realizadas (respuestas 403, 404 y 429; exportación CSV antes y después de la corrección). Faltan las pruebas funcionales formales de cada requisito. \\ \hline
+9 & Correcciones y mejoras & En curso & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz. \\ \hline
+10 & Documentación y presentación & En curso & Este documento de avance y la presentación del Momento 2. \\ \hline
+\end{longtable}
+\endgroup
+
+\textbf{Ajustes respecto al plan inicial:}
+
+\begin{itemize}
+  \item Se incorporaron funciones no previstas: rol de administrador, panel para ajustar los pesos de los indicadores (RF-09) y exportación del historial (RF-10).
+  \item Se agregó una revisión de seguridad del código, que encontró y permitió corregir la inyección de fórmulas en la exportación CSV.
+  \item Quedan para la entrega final: el registro de eventos de seguridad (brecha del control 8.15), el aviso de privacidad con la opción de eliminar análisis, las pruebas funcionales formales de cada requisito y la presentación de las fechas en la zona horaria de Colombia.
+\end{itemize}
+
+\section{Resultados}
+
+\subsection{Descripción de requisitos}
+
+\subsubsection{Requisitos funcionales}
+
+Los requisitos funcionales describen las funciones que deberá realizar el sistema PhishGuard.
+
+\par\medskip\noindent\textbf{RF-01 --- Análisis de URL.} El sistema deberá permitir al usuario ingresar una URL y ejecutar un análisis para identificar indicadores asociados a posibles intentos de phishing. \textbf{Criterio de verificación:} al ingresar una URL válida, el sistema deberá generar un resultado de análisis.
+
+\par\medskip\noindent\textbf{RF-02 --- Análisis de mensajes.} El sistema deberá permitir al usuario ingresar un mensaje o texto para identificar indicadores asociados a posibles intentos de phishing o ingeniería social. \textbf{Criterio de verificación:} al ingresar un mensaje, el sistema deberá mostrar los indicadores identificados.
+
+\par\medskip\noindent\textbf{RF-03 --- Cálculo del nivel de riesgo.} El sistema deberá calcular un puntaje de riesgo entre 0 y 100 a partir de los indicadores identificados durante el análisis. \textbf{Criterio de verificación:} cada análisis deberá generar un valor numérico comprendido entre 0 y 100.
+
+\par\medskip\noindent\textbf{RF-04 --- Clasificación del riesgo.} El sistema deberá clasificar el resultado del análisis en tres niveles: bajo, medio o alto. \textbf{Criterio de verificación:} cada análisis deberá mostrar uno de los tres niveles de riesgo establecidos.
+
+\par\medskip\noindent\textbf{RF-05 --- Detalle del análisis.} El sistema deberá mostrar los indicadores identificados durante el análisis y su relación con el nivel de riesgo obtenido. \textbf{Criterio de verificación:} después de ejecutar un análisis deberá presentarse una lista de los indicadores detectados.
+
+\par\medskip\noindent\textbf{RF-06 --- Registro y autenticación de usuarios.} El sistema deberá permitir el registro de usuarios y su posterior autenticación mediante credenciales para controlar el acceso a las funciones que requieran identificación. \textbf{Criterio de verificación:} un usuario registrado deberá poder iniciar sesión utilizando credenciales válidas.
+
+\par\medskip\noindent\textbf{RF-07 --- Historial de análisis.} El sistema deberá almacenar los análisis realizados y permitir que cada usuario consulte su propio historial. \textbf{Criterio de verificación:} después de realizar un análisis, este deberá aparecer en el historial correspondiente al usuario que lo ejecutó.
+
+\par\medskip\noindent\textbf{RF-08 --- Estadísticas.} El sistema deberá presentar estadísticas generales relacionadas con los análisis realizados y la distribución de los niveles de riesgo. \textbf{Criterio de verificación:} el sistema deberá mostrar como mínimo el total de análisis realizados y la distribución de los resultados según su nivel de riesgo.
+
+\par\medskip\noindent\textbf{RF-09 --- Administración de indicadores.} El sistema deberá permitir que un usuario con rol de administrador consulte y modifique el peso de cada indicador utilizado en el análisis, sin modificar el código fuente. \textbf{Criterio de verificación:} al cambiar el peso de un indicador, un análisis posterior que lo active deberá reflejar el nuevo valor en el puntaje.
+
+\par\medskip\noindent\textbf{RF-10 --- Exportación del historial.} El sistema deberá permitir exportar el historial de análisis a un archivo CSV, limitado a los análisis a los que el usuario tiene acceso. \textbf{Criterio de verificación:} un usuario normal obtiene únicamente sus registros, y el contenido que comienza con caracteres de fórmula se neutraliza en el archivo.
+
+\subsubsection{Requisitos no funcionales}
+
+Los requisitos no funcionales establecen condiciones relacionadas con la seguridad, rendimiento, usabilidad y funcionamiento general de PhishGuard.
+
+\par\medskip\noindent\textbf{RNF-01 --- Rendimiento.} El sistema deberá generar el resultado del análisis de una URL o mensaje en un tiempo máximo de 3 segundos bajo condiciones normales de funcionamiento en el entorno de prueba. \textbf{Criterio de verificación:} realizar diferentes análisis y comprobar que el tiempo de respuesta no supere los 3 segundos en la mayoría de las pruebas.
+
+\par\medskip\noindent\textbf{RNF-02 --- Seguridad de contraseñas.} El sistema deberá almacenar las contraseñas de los usuarios utilizando un mecanismo de hash seguro, evitando que sean almacenadas directamente en texto plano. \textbf{Criterio de verificación:} revisar la información almacenada en la base de datos y comprobar que las contraseñas no sean visibles en texto plano.
+
+\par\medskip\noindent\textbf{RNF-03 --- Protección contra inyección SQL.} El sistema deberá utilizar consultas parametrizadas para evitar que los datos ingresados por el usuario sean interpretados como instrucciones SQL. \textbf{Criterio de verificación:} realizar pruebas con entradas diseñadas para comprobar posibles vulnerabilidades de inyección SQL y verificar que no se modifique ni se acceda de forma no autorizada a la información.
+
+\par\medskip\noindent\textbf{RNF-04 --- Protección de entradas.} El sistema deberá validar y controlar los datos ingresados por los usuarios antes de procesarlos, con el fin de reducir riesgos asociados a entradas incorrectas o potencialmente maliciosas. \textbf{Criterio de verificación:} ingresar datos vacíos, excesivamente largos, caracteres especiales y contenido potencialmente malicioso, comprobando que el sistema los gestione correctamente.
+
+\par\medskip\noindent\textbf{RNF-05 --- Usabilidad.} El sistema deberá permitir que un usuario sin conocimientos especializados en seguridad informática pueda realizar un análisis de URL o mensaje y comprender el resultado presentado. \textbf{Criterio de verificación:} un usuario deberá poder ingresar la información, ejecutar el análisis y visualizar el resultado sin requerir conocimientos técnicos especializados.
+
+\par\medskip\noindent\textbf{RNF-06 --- Compatibilidad.} La aplicación deberá funcionar correctamente en navegadores web modernos utilizados habitualmente para acceder a aplicaciones web. \textbf{Criterio de verificación:} comprobar las funciones principales de PhishGuard en Google Chrome y Mozilla Firefox.
+
+\par\medskip\noindent\textbf{RNF-07 --- Gestión de sesiones.} El sistema deberá controlar las sesiones de los usuarios autenticados y restringir el acceso a las funciones que requieran identificación. \textbf{Criterio de verificación:} comprobar que un usuario no autenticado no pueda acceder directamente a las funciones protegidas y que, después de cerrar sesión, la sesión anterior deje de permitir el acceso.
+
+\par\medskip\noindent\textbf{RNF-08 --- Integridad del historial.} La información correspondiente a los análisis realizados deberá asociarse correctamente al usuario que los ejecutó, evitando que un usuario pueda consultar el historial perteneciente a otro usuario. \textbf{Criterio de verificación:} realizar análisis con diferentes cuentas y comprobar que cada usuario solamente pueda consultar sus propios registros.
+
+\par\medskip\noindent\textbf{RNF-09 --- Protección de formularios y cabeceras de seguridad.} Los formularios deberán incluir un token contra CSRF y las respuestas deberán incluir cabeceras de seguridad, entre ellas una política de seguridad de contenido restrictiva. \textbf{Criterio de verificación:} un envío sin token válido es rechazado, y las cabeceras aparecen en las respuestas del servidor.
+
+\par\medskip\noindent\textbf{RNF-10 --- Control de intentos de autenticación.} El sistema deberá limitar los intentos de inicio de sesión (5 por minuto) y de registro (10 por hora). \textbf{Criterio de verificación:} al superar el límite de inicio de sesión en un minuto, el sistema responde con el código 429.
+
+\par\medskip\noindent\textbf{RNF-11 --- Control de acceso por rol.} Las funciones de administración deberán estar disponibles únicamente para usuarios con rol de administrador, y esta verificación deberá hacerse en el servidor. \textbf{Criterio de verificación:} un usuario normal que accede directamente a la dirección de una función de administración recibe el código 403.
+
+\subsection{Modelado}
+
+\subsubsection{Diagrama de casos de uso}
+
+El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores del sistema. El usuario puede registrarse, iniciar y cerrar sesión, analizar URL y mensajes, consultar su historial y el detalle de cada análisis, exportarlo a CSV y ver sus estadísticas. El administrador hereda todos los casos de uso del usuario y, además, consulta el historial global y edita los pesos de los indicadores.
+
+\begin{figure}[htbp]
+\centering
+\caption{Diagrama de casos de uso de PhishGuard}\label{fig:casosuso}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{tikzpicture}[
+  font=\footnotesize,
+  uc/.style={ellipse, draw, fill=azulclaro, minimum width=3.9cm, minimum height=0.75cm, align=center, inner sep=1pt},
+  actor/.pic={\draw (0,0.6) circle (0.18); \draw (0,0.42)--(0,-0.15); \draw (-0.32,0.2)--(0.32,0.2); \draw (0,-0.15)--(-0.26,-0.6); \draw (0,-0.15)--(0.26,-0.6);}
+]
+\foreach \n/\t [count=\i] in {u1/Registrarse, u2/Iniciar sesión, u3/Cerrar sesión, u4/Analizar URL, u5/Analizar mensaje, u6/Consultar historial propio, u7/Ver detalle de un análisis, u8/Exportar historial a CSV, u9/Ver estadísticas} {
+  \node[uc] (\n) at (4.4, {-(\i-1)*0.95}) {\t};
+}
+\node[uc] (a1) at (9.6,-2.4) {Consultar historial global};
+\node[uc] (a2) at (9.6,-4.6) {Editar pesos de\\los indicadores};
+\pic at (-0.9,-3.8) {actor};
+\node[below] at (-0.9,-4.45) {Usuario};
+\pic at (13.4,-3.5) {actor};
+\node[below] at (13.4,-4.15) {Administrador};
+\foreach \n in {u1,u2,u3,u4,u5,u6,u7,u8,u9} {\draw (-0.55,-3.6) -- (\n.west);}
+\draw (13.0,-3.3) -- (a1.east);
+\draw (13.0,-3.3) -- (a2.east);
+\begin{pgfonlayer}{background}
+  \node[fit=(u1)(u9)(a1)(a2), draw, rounded corners=3pt, inner sep=8pt] (sis) {};
+\end{pgfonlayer}
+\node[anchor=south west, font=\scriptsize\bfseries] at (sis.north west) {PhishGuard};
+\draw[-{Triangle[open,length=3mm,width=2.5mm]}] (13.4,-4.75) -- (13.4,-8.7) -| (-0.9,-4.95);
+\node[font=\scriptsize, fill=white, inner sep=1pt] at (6.7,-8.7) {el administrador hereda los casos de uso del usuario};
+\end{tikzpicture}
+\end{figure}
+
+\subsubsection{Modelo de datos}\label{sec:modelodatos}
+
+La figura~\ref{fig:clases} muestra el modelo de datos, implementado con cuatro tablas. Un usuario realiza cero o más análisis, y cada análisis contiene cero o más indicadores detectados. La tabla \texttt{IndicadorConfig} guarda los pesos que lee el motor de análisis; los indicadores detectados guardan una copia del nombre y del peso en el momento del análisis, de modo que editar un peso no cambia los análisis anteriores.
+
+\begin{figure}[htbp]
+\centering
+\caption{Diagrama de clases del modelo de datos}\label{fig:clases}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{tikzpicture}[
+  font=\footnotesize,
+  clase/.style={rectangle split, rectangle split parts=2, draw, text width=5.2cm, align=left, inner sep=3pt,
+                rectangle split part fill={azulclaro,white}}
+]
+\node[clase] (u) at (0,0) {\textbf{Usuario}\nodepart{two}id: entero (PK)\\username: texto(50), único\\email: texto(120), único\\password\_hash: texto(255)\\es\_admin: booleano\\fecha\_registro: fecha y hora};
+\node[clase] (a) at (8,0) {\textbf{Analisis}\nodepart{two}id: entero (PK)\\usuario\_id: entero (FK)\\tipo: texto(10)\\contenido: texto\\puntaje: entero (0 a 100)\\nivel: texto(10)\\fecha: fecha y hora};
+\node[clase] (c) at (0,-5.4) {\textbf{IndicadorConfig}\nodepart{two}id: entero (PK)\\nombre: texto(100), único\\descripcion: texto(255)\\peso: entero\\activo: booleano};
+\node[clase] (d) at (8,-5.4) {\textbf{IndicadorDetectado}\nodepart{two}id: entero (PK)\\analisis\_id: entero (FK)\\nombre: texto(100)\\peso: entero\\explicacion: texto(255)};
+\draw (u.east) -- node[above] {realiza} node[pos=0.07, above] {1} node[pos=0.9, above] {0..*} (a.west);
+\draw (a.south) -- node[right] {contiene} node[pos=0.1, right] {1} node[pos=0.88, right] {0..*} (d.north);
+\draw[dashed, -{Stealth[length=2.2mm]}] (d.west) -- node[above, align=center] {copia nombre\\y peso} (c.east);
+\end{tikzpicture}
+\end{figure}
+
+\subsubsection{Inventario y clasificación de activos}\label{sec:activos}
+
+El inventario reúne los activos de la institución que pueden verse afectados por el phishing (prefijo AC) y los activos de la propia aplicación PhishGuard (prefijo AP). Cada activo se clasifica con los tipos de activo de MAGERIT, según la sensibilidad de la información que contiene y según la dimensión de seguridad más crítica: [C] confidencialidad, [I] integridad, [D] disponibilidad y [A] autenticidad. La clasificación de la información usa tres niveles:
+
+\begin{table}[htbp]
+\centering
+\caption{Niveles de clasificación de la información}\label{tab:clasificacion}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.18\textwidth}|p{0.70\textwidth}|}
+\hline
+\textbf{Nivel} & \textbf{Criterio} \\ \hline
+Pública & Puede divulgarse sin causar daño. \\ \hline
+Uso interno & Solo para la comunidad universitaria o el equipo del proyecto; su divulgación causa un daño menor. \\ \hline
+Confidencial & Incluye credenciales, datos personales o información financiera; su divulgación causa daño a personas o a la institución y su acceso debe restringirse (Ley 1581 de 2012). \\ \hline
+\end{tabular}
+\end{table}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.07\textwidth}|>{\raggedright\arraybackslash}p{0.29\textwidth}|>{\raggedright\arraybackslash}p{0.15\textwidth}|>{\raggedright\arraybackslash}p{0.14\textwidth}|>{\raggedright\arraybackslash}p{0.12\textwidth}|>{\raggedright\arraybackslash}p{0.08\textwidth}|}
+\caption{Inventario y clasificación de activos}\label{tab:inventario}\\
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Tipo (MAGERIT)} & \textbf{Clasificación} & \textbf{Dimensión crítica} & \textbf{Valor} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Tipo (MAGERIT)} & \textbf{Clasificación} & \textbf{Dimensión crítica} & \textbf{Valor} \\ \hline
+\endhead
+\multicolumn{6}{|l|}{\textbf{Activos de la institución (CUHL)}} \\ \hline
+AC-01 & Credenciales institucionales & [D] Datos & Confidencial & [C], [A] & Alto \\ \hline
+AC-02 & Correo institucional & [S] Servicios & Uso interno & [A], [D] & Alto \\ \hline
+AC-03 & Datos personales de estudiantes y docentes & [D] Datos & Confidencial & [C] & Alto \\ \hline
+AC-04 & Información académica (matrícula, notas) & [D] Datos & Confidencial & [I], [C] & Alto \\ \hline
+AC-05 & Portal de pagos de matrícula & [S] Servicios & Confidencial & [I], [A] & Alto \\ \hline
+AC-06 & Plataforma de aprendizaje y sistema de información académica & [SW] Aplicaciones & Uso interno & [I], [D] & Medio \\ \hline
+AC-07 & Comunidad universitaria (usuarios) & [P] Personal & No aplica & Factor humano & Medio \\ \hline
+\multicolumn{6}{|l|}{\textbf{Activos de la aplicación PhishGuard}} \\ \hline
+AP-01 & Código fuente de la aplicación & [SW] Aplicaciones & Uso interno & [I] & Medio \\ \hline
+AP-02 & Base de datos MySQL (usuarios, análisis e indicadores) & [D] Datos & Confidencial & [C], [I] & Alto \\ \hline
+AP-03 & Credenciales de los usuarios (contraseñas con hash) & [D] Datos & Confidencial & [C], [A] & Alto \\ \hline
+AP-04 & Historial y contenido analizado & [D] Datos & Confidencial & [C] & Alto \\ \hline
+AP-05 & Configuración de los pesos de los indicadores & [D] Datos & Uso interno & [I] & Medio \\ \hline
+AP-06 & Secretos de configuración (clave secreta y cadena de conexión) & [D] Datos & Confidencial & [C] & Alto \\ \hline
+AP-07 & Servicio web PhishGuard (servidor local) & [S] Servicios & Uso interno & [D] & Medio \\ \hline
+AP-08 & Equipo donde se ejecuta la aplicación & [HW] Equipos & Uso interno & [D], [C] & Medio \\ \hline
+\end{longtable}
+\endgroup
+
+\subsubsection{Vectores de ataque y metodología de análisis}\label{sec:vectores}
+
+Un vector de ataque es el medio por el que una amenaza llega a su víctima. En el caso de la CUHL, el phishing llega por los siguientes vectores; la tabla indica qué parte de cada uno puede analizar PhishGuard y con qué riesgos de la sección~\ref{sec:riesgos} se relaciona.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|}
+\caption{Vectores de ataque relevantes}\label{tab:vectores}\\
+\hline
+\textbf{Vector} & \textbf{Cómo llega en la CUHL} & \textbf{Qué analiza PhishGuard} & \textbf{Riesgos} \\ \hline
+\endfirsthead
+\hline
+\textbf{Vector} & \textbf{Cómo llega en la CUHL} & \textbf{Qué analiza PhishGuard} & \textbf{Riesgos} \\ \hline
+\endhead
+Correo electrónico (phishing) & Correos que imitan al portal de pagos, a bienestar universitario o a la mesa de ayuda. & El texto del mensaje y los enlaces que contiene. & A1, A2, A4 \\ \hline
+SMS (smishing) & Mensajes cortos con urgencia y un enlace, a menudo acortado. & El texto del mensaje y el enlace. & A1, A4 \\ \hline
+Mensajería instantánea y redes sociales & Mensajes reenviados en grupos de estudiantes o publicaciones con enlaces. & El texto del mensaje y el enlace. & A1, A3 \\ \hline
+Llamadas (vishing) & Llamadas que piden datos y luego envían un enlace o un mensaje de seguimiento. & Solo el mensaje o el enlace de seguimiento; la llamada queda fuera del alcance. & A3 \\ \hline
+Sitios web falsos & Páginas que copian el inicio de sesión institucional o el portal de pagos. & La URL: protocolo, dominio, puerto y estructura. & A1, A4 \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Metodología de análisis de la herramienta}
+
+PhishGuard analiza cada URL o mensaje con un motor de reglas, en seis pasos:
+
+\begin{enumerate}
+  \item \textbf{Validación de la entrada:} el campo no puede ir vacío ni superar la longitud máxima (500 caracteres para una URL y 2.000 para un mensaje), y una URL debe empezar por \texttt{http://} o \texttt{https://}.
+  \item \textbf{Preparación:} la URL se descompone en protocolo, dominio, puerto y ruta; el mensaje se pasa a minúsculas y se le quitan las tildes, para que, por ejemplo, ``código'' y ``codigo'' se detecten igual.
+  \item \textbf{Evaluación de indicadores:} se revisan 10 indicadores para URL o 7 para mensajes. Cada indicador que se cumple suma su peso, que se lee de la base de datos.
+  \item \textbf{Puntaje:} la suma de los pesos se limita a 100.
+  \item \textbf{Clasificación:} riesgo bajo (0 a 30), medio (31 a 60) o alto (61 a 100).
+  \item \textbf{Explicación:} se muestra cada indicador detectado, con su peso y por qué es sospechoso; en los mensajes también se muestran las palabras que lo activaron.
+\end{enumerate}
+
+Los indicadores retoman características usadas en la literatura: características léxicas de la URL (Hong et al., 2020; Jeeva y Rajsingh, 2016) y palabras típicas de los mensajes fraudulentos (Yeboah-Boateng y Amanor, 2014). Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09).
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.52\textwidth}|>{\raggedright\arraybackslash}p{0.07\textwidth}|}
+\caption{Indicadores de URL y pesos iniciales}\label{tab:indurl}\\
+\hline
+\textbf{Indicador de URL} & \textbf{Criterio} & \textbf{Peso} \\ \hline
+\endfirsthead
+\hline
+\textbf{Indicador de URL} & \textbf{Criterio} & \textbf{Peso} \\ \hline
+\endhead
+IP en lugar de dominio & El dominio es una dirección IP. & 25 \\ \hline
+Contiene el símbolo @ & La URL incluye el símbolo \texttt{@}, que puede ocultar el dominio real. & 20 \\ \hline
+Posible typosquatting & El dominio contiene el nombre de una entidad conocida, pero no es su dominio oficial. & 20 \\ \hline
+No usa HTTPS & El protocolo no es \texttt{https}. & 15 \\ \hline
+Palabras de urgencia o verificación & Contiene palabras como ``verificar'', ``login'' o ``cuenta''. & 10 \\ \hline
+URL demasiado larga & Tiene más de 75 caracteres. & 10 \\ \hline
+Demasiados subdominios & El dominio tiene más de tres puntos. & 10 \\ \hline
+Usa un acortador de URL & El dominio es un acortador conocido (por ejemplo, bit.ly o tinyurl.com). & 10 \\ \hline
+Dominio de nivel superior inusual & Termina en .tk, .ml, .ga, .xyz o .top. & 10 \\ \hline
+Puerto inusual & Usa un puerto distinto de 80 y 443. & 10 \\ \hline
+\end{longtable}
+\endgroup
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.52\textwidth}|>{\raggedright\arraybackslash}p{0.07\textwidth}|}
+\caption{Indicadores de mensaje y pesos iniciales}\label{tab:indmsg}\\
+\hline
+\textbf{Indicador de mensaje} & \textbf{Criterio (ejemplos de palabras)} & \textbf{Peso} \\ \hline
+\endfirsthead
+\hline
+\textbf{Indicador de mensaje} & \textbf{Criterio (ejemplos de palabras)} & \textbf{Peso} \\ \hline
+\endhead
+Solicitud de datos sensibles & ``clave'', ``contraseña'', ``PIN'', ``CVV'', ``verifique sus datos''. & 25 \\ \hline
+Amenaza de bloqueo o suspensión & ``bloqueada'', ``suspendida'', ``cancelada'', ``desactivada''. & 20 \\ \hline
+Lenguaje de urgencia & ``urgente'', ``inmediatamente'', ``24 horas'', ``hoy mismo''. & 15 \\ \hline
+Invitación a ingresar a un enlace & ``http://'', ``www.'', ``haga clic'', ``siguiente enlace''. & 15 \\ \hline
+Premio u oferta engañosa & ``ganaste'', ``premio'', ``sorteo'', ``gratis''. & 15 \\ \hline
+Mención de una entidad conocida & Nombres como Bancolombia, Nequi o la DIAN. & 10 \\ \hline
+Mayúsculas o exclamaciones en exceso & Tres o más palabras en mayúsculas, o tres o más signos de exclamación. & 5 \\ \hline
+\end{longtable}
+\endgroup
+
+\textbf{Ejemplo.} El mensaje ``URGENTE!!! Felicitaciones, ganaste un premio de Bancolombia. Ingrese su clave en www.premios-bancolombia.xyz hoy mismo'' activa seis indicadores: solicitud de datos sensibles (25), lenguaje de urgencia (15), invitación a un enlace (15), premio u oferta (15), mención de una entidad conocida (10) y exclamaciones en exceso (5). Suman 85, que corresponde a riesgo alto. Si el mensaje trae un enlace, el usuario puede analizarlo además por separado en el análisis de URL.
+
+\subsubsection{Amenazas y vulnerabilidades}\label{sec:amenazas}
+
+Las amenazas se clasifican por su origen, siguiendo el catálogo de MAGERIT ([A] ataques intencionados y [E] errores no intencionados), y se completan con las amenazas propias de las aplicaciones web descritas en el OWASP Top 10:2025. Cada amenaza se asocia con los activos del inventario (sección~\ref{sec:activos}) y con los riesgos de las matrices siguientes.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.10\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.15\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.14\textwidth}|}
+\caption{Amenazas identificadas y su clasificación}\label{tab:amenazas}\\
+\hline
+\textbf{Código} & \textbf{Amenaza} & \textbf{Origen} & \textbf{Activos afectados} & \textbf{Riesgos} \\ \hline
+\endfirsthead
+\hline
+\textbf{Código} & \textbf{Amenaza} & \textbf{Origen} & \textbf{Activos afectados} & \textbf{Riesgos} \\ \hline
+\endhead
+[A.30] & Ingeniería social: phishing por correo, smishing y vishing & Ataque intencionado & AC-01, AC-02, AC-07 & A1, A2 \\ \hline
+[A.5] & Suplantación de la identidad del usuario & Ataque intencionado & AC-01, AP-03 & A1, A2, B1 \\ \hline
+--- & Suplantación de sitios web para capturar datos (Ley 1273, art.\ 269G) & Ataque intencionado & AC-05 & A4 \\ \hline
+[A.11] & Acceso no autorizado & Ataque intencionado & AC-06, AP-02, AP-04 & A5, B2, B3 \\ \hline
+[A.15] & Modificación deliberada de la información & Ataque intencionado & AC-04, AP-05 & A5, B3, B7 \\ \hline
+[A.19] & Divulgación de información & Ataque intencionado & AC-03, AP-04, AP-06 & A3, B8, B10 \\ \hline
+[A.6] & Abuso de privilegios de acceso & Ataque intencionado & AP-05 & B7 \\ \hline
+[A.24] & Denegación de servicio & Ataque intencionado & AP-07 & B9 \\ \hline
+OWASP A05 & Inyección: SQL, código en la página (XSS) y fórmulas en archivos CSV & Ataque a la aplicación web & AP-02, AP-03, AP-04 & B3, B4, B6 \\ \hline
+--- & Falsificación de peticiones (CSRF) y secuestro de sesión & Ataque a la aplicación web & AP-03 & B5 \\ \hline
+[E.1] & Errores de los usuarios & Error no intencionado & AC-07 & A6 \\ \hline
+\end{longtable}
+\endgroup
+
+Las vulnerabilidades se clasifican en humanas, técnicas y organizativas. El estado indica si ya se mitigó, si está mitigada en parte o si sigue abierta.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.06\textwidth}|>{\raggedright\arraybackslash}p{0.38\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.11\textwidth}|>{\raggedright\arraybackslash}p{0.18\textwidth}|}
+\caption{Vulnerabilidades identificadas y su clasificación}\label{tab:vulnerabilidades}\\
+\hline
+\textbf{ID} & \textbf{Vulnerabilidad} & \textbf{Tipo} & \textbf{Riesgos} & \textbf{Estado} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Vulnerabilidad} & \textbf{Tipo} & \textbf{Riesgos} & \textbf{Estado} \\ \hline
+\endhead
+V-01 & Usuarios sin el hábito de verificar enlaces y remitentes & Humana & A1, A2, A6 & Parcial (PhishGuard educa) \\ \hline
+V-02 & Reutilización de contraseñas entre servicios & Humana & A3, B1 & Parcial (límite de intentos) \\ \hline
+V-03 & Falta de formación continua en seguridad & Organizativa & A6 & Parcial \\ \hline
+V-04 & Ausencia de autenticación multifactor & Técnica & A1, A5, B1 & Abierta \\ \hline
+V-05 & La institución no tiene oficial de seguridad ni centro de operaciones de seguridad & Organizativa & A1 a A6 & Abierta \\ \hline
+V-06 & Identificadores consecutivos en las direcciones del historial & Técnica & B2 & Mitigada (consulta filtrada por usuario) \\ \hline
+V-07 & Entradas del usuario que podrían interpretarse como código u órdenes & Técnica & B3, B4, B6 & Mitigada (consultas parametrizadas, escape, CSV neutralizado) \\ \hline
+V-08 & Formularios y cookies sin protecciones adicionales & Técnica & B5 & Mitigada (token CSRF, cookie HttpOnly y SameSite) \\ \hline
+V-09 & Ausencia de registro de eventos de seguridad & Técnica & B1, B7 & Abierta \\ \hline
+V-10 & Rutas de análisis sin límite de envíos & Técnica & B9 & Abierta (aceptada en pruebas) \\ \hline
+V-11 & Contenido analizado sin aviso de privacidad ni opción de eliminarlo & Organizativa & B10 & Abierta \\ \hline
+V-12 & Posible exposición de los secretos de configuración & Técnica & B8 & Mitigada (excluidos del repositorio) \\ \hline
+\end{longtable}
+\endgroup
+
+\subsubsection{Matrices de riesgo y mapa de calor}\label{sec:riesgos}
+
+\apartado{Riesgos del caso de estudio}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.05\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|}
+\caption{Matriz de riesgos del caso de estudio}\label{tab:riesgoscaso}\\
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
+\endhead
+A1 & Credenciales institucionales & [A.30] Ingeniería social; [A.5] Suplantación de la identidad del usuario & Usuarios sin el hábito de verificar enlaces; sitios falsos que imitan el inicio de sesión & 3 & 3 & 9 Alto & PhishGuard (RF-01 a RF-05) y control 6.3 de ISO/IEC 27002. Residual: Medio (sin autenticación multifactor institucional). \\ \hline
+A2 & Correo institucional & [A.30]; [A.5] & Mensajes que aparentan ser de la institución; el usuario decide con poca información & 3 & 2 & 6 Alto & Análisis de mensajes (RF-02, RF-03). Residual: Medio. \\ \hline
+A3 & Datos personales de estudiantes y docentes & [A.19] Divulgación de información; Ley 1273, art.\ 269F & Credenciales capturadas dan acceso a datos personales; reutilización de contraseñas & 2 & 3 & 6 Alto & Concientización y medidas de seguridad (Ley 1581, art.\ 4 lit.\ g). Residual: Medio. \\ \hline
+A4 & Portal de pagos & Suplantación de sitios web (Ley 1273, art.\ 269G); transferencia no consentida de activos (art.\ 269J) & Enlaces a portales falsos en época de matrícula & 2 & 3 & 6 Alto & Análisis de URL: HTTPS, dominios que imitan marcas, acortadores (RF-01). Residual: Medio. \\ \hline
+A5 & Plataforma e información académica & [A.11] Acceso no autorizado; [A.15] Modificación deliberada de la información & Credenciales de docentes sin segundo factor & 1 & 3 & 3 Medio & Prevención del robo de credenciales (A1); recomendación de autenticación multifactor. Residual: Medio. \\ \hline
+A6 & Comunidad universitaria & [E.1] Errores de los usuarios & Falta de formación continua en seguridad & 3 & 2 & 6 Alto & PhishGuard como herramienta educativa (control 6.3). Residual: Medio. \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Riesgos de la aplicación PhishGuard}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.05\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|}
+\caption{Matriz de riesgos de la aplicación PhishGuard}\label{tab:riesgosapp}\\
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
+\endhead
+B1 & Credenciales de usuarios de PhishGuard & [A.5] Suplantación de la identidad del usuario (fuerza bruta) & Contraseñas débiles o reutilizadas & 2 & 2 & 4 Medio & Hash con sal (RNF-02); límite de 5 intentos por minuto (RNF-10); mínimo de 8 caracteres. Residual: Bajo. \\ \hline
+B2 & Historial de análisis & [A.11] Acceso no autorizado (referencia directa a objetos) & Identificadores consecutivos en la URL (\texttt{/historial/N}) & 2 & 3 & 6 Alto & Consulta filtrada por usuario; respuesta 404 ante identificadores ajenos (RNF-08). Prueba documentada. Residual: Bajo. \\ \hline
+B3 & Base de datos & [A.11]; [A.15] Inyección SQL & Entradas del usuario concatenadas en consultas & 2 & 3 & 6 Alto & ORM con consultas parametrizadas (RNF-03) y validación de formularios (RNF-04). Residual: Bajo. \\ \hline
+B4 & Sesión y navegador del usuario & XSS: contenido analizado que incluye código & Mostrar texto del usuario sin escapar & 2 & 3 & 6 Alto & Escape automático de Jinja2; política CSP restrictiva; cookie HttpOnly (RNF-04, RNF-09). Residual: Bajo. \\ \hline
+B5 & Sesión del usuario & CSRF y secuestro de sesión & Formularios sin token; cookie sin atributos de protección & 2 & 2 & 4 Medio & Token CSRF; SameSite=Lax; HttpOnly; caducidad de 30 minutos (RNF-07, RNF-09). Residual: Bajo (cookie sin atributo Secure por usar HTTP local). \\ \hline
+B6 & Exportación CSV (cuenta de administrador) & Inyección de fórmulas: un usuario planta una fórmula que se ejecuta al abrir el CSV & El contenido del usuario se escribía tal cual en el archivo & 2 & 2 & 4 Medio & Hallazgo de la revisión de seguridad, corregido: el texto que empieza por =, +, -, @ o tabulador se neutraliza (RF-10). Evidencia antes y después. Residual: Bajo. \\ \hline
+B7 & Pesos de los indicadores & [A.6] Abuso de privilegios de acceso; [A.15] Modificación deliberada de la información & Cuenta de administrador comprometida; cambios sin registro & 1 & 2 & 2 Bajo & Acceso solo con rol de administrador, respuesta 403 a los demás (RF-09, RNF-11). Residual: Bajo (sin auditoría de cambios, ver sección~\ref{sec:gap}). \\ \hline
+B8 & Secretos y configuración & [A.19] Divulgación de información & Subir el archivo de configuración al repositorio o mostrarlo & 1 & 3 & 3 Medio & Archivo excluido del repositorio y comprobado que no está rastreado. Residual: Bajo. \\ \hline
+B9 & Disponibilidad del servicio & [A.24] Denegación de servicio & Envíos masivos de análisis; solo el inicio de sesión y el registro tienen límite & 2 & 1 & 2 Bajo & Riesgo aceptado en el entorno de pruebas. Residual: Bajo. \\ \hline
+B10 & Contenido analizado (puede incluir datos personales de terceros) & [A.19] Divulgación de información & Un usuario pega mensajes reales con datos personales; no hay opción de eliminarlos; el administrador ve todos los análisis & 2 & 2 & 4 Medio & Historial visible solo para su dueño y el administrador. Pendiente: aviso de privacidad y eliminación de análisis. Residual: Medio (aceptado en pruebas). \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Mapa de calor}
+
+La tabla~\ref{tab:mapa} ubica los 16 riesgos de las matrices anteriores según su probabilidad (filas) e impacto (columnas), antes de aplicar salvaguardas. El color indica el nivel de riesgo potencial ($P \times I$): verde es bajo, amarillo es medio y rojo es alto.
+
+\begin{table}[htbp]
+\centering
+\caption{Mapa de calor de los riesgos potenciales}\label{tab:mapa}
+\small
+\renewcommand{\arraystretch}{1.4}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|>{\centering\arraybackslash}p{0.17\textwidth}|>{\centering\arraybackslash}p{0.21\textwidth}|>{\centering\arraybackslash}p{0.21\textwidth}|>{\centering\arraybackslash}p{0.21\textwidth}|}
+\hline
+ & \textbf{Impacto 1 (Bajo)} & \textbf{Impacto 2 (Medio)} & \textbf{Impacto 3 (Alto)} \\ \hline
+\textbf{Probabilidad 3 (Alta)} & \cellcolor{riesgomedio}--- & \cellcolor{riesgoalto}A2, A6 & \cellcolor{riesgoalto}A1 \\ \hline
+\textbf{Probabilidad 2 (Media)} & \cellcolor{riesgobajo}B9 & \cellcolor{riesgomedio}B1, B5, B6, B10 & \cellcolor{riesgoalto}A3, A4, B2, B3, B4 \\ \hline
+\textbf{Probabilidad 1 (Baja)} & \cellcolor{riesgobajo}--- & \cellcolor{riesgobajo}B7 & \cellcolor{riesgomedio}A5, B8 \\ \hline
+\end{tabular}
+\end{table}
+
+\noindent De los 16 riesgos, \textbf{8 son altos} (A1, A2, A3, A4, A6, B2, B3 y B4), \textbf{6 son medios} (A5, B1, B5, B6, B8 y B10) y \textbf{2 son bajos} (B7 y B9). Los riesgos del caso de estudio (A) se concentran en la zona alta porque dependen del factor humano, que PhishGuard busca reducir mediante la educación del usuario. Los riesgos altos de la aplicación (B2, B3 y B4) bajan a residual bajo gracias a las salvaguardas implementadas, y el único residual medio de la aplicación es B10, relacionado con el contenido analizado (datos personales de terceros).
+
+\subsubsection{Análisis de brechas y riesgos residuales}\label{sec:gap}
+
+La siguiente tabla compara los controles relevantes con lo que implementa PhishGuard. Se incluyen las brechas encontradas de forma explícita.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.085\textwidth}|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.27\textwidth}|>{\raggedright\arraybackslash}p{0.24\textwidth}|}
+\caption{Análisis de brechas frente a ISO/IEC 27002:2022}\label{tab:gap}\\
+\hline
+\textbf{Control} & \textbf{Nombre} & \textbf{Estado} & \textbf{Evidencia en PhishGuard} & \textbf{Brecha o acción} \\ \hline
+\endfirsthead
+\hline
+\textbf{Control} & \textbf{Nombre} & \textbf{Estado} & \textbf{Evidencia en PhishGuard} & \textbf{Brecha o acción} \\ \hline
+\endhead
+5.15 & Control de acceso & Implementado & Rutas protegidas; rol de administrador verificado en el servidor (403); consultas filtradas por usuario (404). & Sin brechas relevantes para el alcance. \\ \hline
+5.17 & Información de autenticación & Parcial & Contraseñas con hash y sal; mínimo de 8 caracteres. & Sin política de complejidad. \\ \hline
+8.5 & Autenticación segura & Parcial & Límite de 5 intentos por minuto por IP; sesión de 30 minutos; protección de sesión reforzada. & Sin autenticación multifactor; sin bloqueo por cuenta. \\ \hline
+8.15 & Registro de eventos & No implementado & --- & No se registran intentos fallidos ni cambios de pesos. Acción: agregar registro de eventos de seguridad. \\ \hline
+8.28 & Codificación segura & Implementado & Consultas parametrizadas; escape de salida; validación de formularios; CSV neutralizado. & Versiones de dependencias sin fijar. \\ \hline
+8.29 & Pruebas de seguridad & Implementado (manual) & Pruebas de 403, 404 y 429; prueba del CSV antes y después; revisión de seguridad del código. & Sin pruebas automatizadas. \\ \hline
+5.34 & Privacidad y protección de información personal & Parcial & Datos mínimos (usuario, correo, hash); historial restringido a su dueño. & Sin aviso de privacidad ni eliminación de análisis. \\ \hline
+6.3 & Concienciación y formación & Implementado & Cada indicador detectado se explica al usuario. & Ninguna: es el objetivo del proyecto. \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Riesgos residuales aceptados}
+
+Tras las salvaguardas implementadas, se aceptan los siguientes riesgos residuales, porque el sistema se desarrolla y prueba en un entorno local, sin datos reales ni exposición a Internet. Para un despliegue real habría que tratarlos:
+
+\begin{itemize}
+  \item Ausencia de autenticación multifactor.
+  \item Cookie de sesión sin el atributo \emph{Secure}, por usar HTTP local; con HTTPS debe activarse.
+  \item Ausencia de registro de eventos de seguridad (brecha del control 8.15).
+  \item Limitador de intentos almacenado en memoria y por dirección IP, que se reinicia con el servidor.
+  \item Cierre de sesión mediante una petición GET.
+  \item Mensaje de registro que revela si un usuario ya existe, mitigado por el límite de 10 registros por hora.
+  \item Dependencias sin versión fija y sin auditoría automatizada.
+  \item Ausencia de aviso de privacidad y de opción para eliminar análisis (Ley 1581 de 2012).
+\end{itemize}
+
+
+\subsubsection{Diseño lógico de los controles de seguridad}\label{sec:controles}
+
+Este apartado presenta el diseño lógico preliminar de los controles de seguridad de PhishGuard, organizado según el modelo AAA (autenticación, autorización y contabilidad) y la tríada CID (confidencialidad, integridad y disponibilidad). Cada control indica su estado, que puede ser \emph{implementado}, \emph{parcial} o \emph{propuesto}, y los riesgos de la sección~\ref{sec:riesgos} que mitiga.
+
+\apartado{Modelo AAA}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.43\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|}
+\caption{Controles según el modelo AAA}\label{tab:aaa}\\
+\hline
+\textbf{Componente} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
+\endfirsthead
+\hline
+\textbf{Componente} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
+\endhead
+Autenticación & Registro con usuario y correo únicos; contraseña de al menos 8 caracteres almacenada con hash y sal; límite de 5 intentos de inicio de sesión por minuto; sesión con caducidad de 30 minutos y protección reforzada; mensaje genérico ante credenciales inválidas. & Implementado & B1, B5 \\ \hline
+Autenticación (mejoras) & Autenticación multifactor; política de complejidad de contraseñas; bloqueo temporal por cuenta. & Propuesto & A5, B1 \\ \hline
+Autorización & Dos roles: usuario y administrador. Rutas protegidas verificadas en el servidor (403 si no hay rol de administrador). Cada consulta se filtra por el propietario del dato (404 ante identificadores ajenos). Principio de mínimo privilegio. & Implementado & B2, B7 \\ \hline
+Contabilidad (trazabilidad de análisis) & Cada análisis queda asociado a su usuario, con fecha, contenido, puntaje e indicadores detectados. Esos registros son una instantánea: no cambian si después se editan los pesos. & Parcial & B2, B7 \\ \hline
+Contabilidad (registro de eventos) & Tabla de eventos de seguridad con usuario, evento, detalle, dirección IP y fecha. Eventos a registrar: inicios de sesión exitosos y fallidos, cierres de sesión, exportaciones a CSV, cambios de pesos (con valor anterior y nuevo) y accesos denegados. & Propuesto (brecha del control 8.15) & B1, B7, B10 \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Tríada CID}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.43\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.10\textwidth}|}
+\caption{Controles según la tríada CID}\label{tab:cid}\\
+\hline
+\textbf{Propiedad} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
+\endfirsthead
+\hline
+\textbf{Propiedad} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
+\endhead
+Confidencialidad & Contraseñas con hash y sal; historial aislado por usuario; escape de salida y política de seguridad de contenido (CSP); cookie de sesión HttpOnly; secretos de configuración fuera del repositorio. & Implementado & B1, B2, B4, B8 \\ \hline
+Confidencialidad (pendiente) & HTTPS con cookie Secure en un despliegue real; aviso de privacidad y opción de eliminar análisis. & Propuesto & B5, B10 \\ \hline
+Integridad & Validación de entradas en el servidor; consultas parametrizadas; token CSRF en formularios; pesos editables solo por el administrador y dentro del rango de 0 a 100; neutralización de fórmulas en el CSV. & Implementado & B3, B5, B6, B7 \\ \hline
+Disponibilidad & Límite de intentos en inicio de sesión y registro. & Parcial & B9 \\ \hline
+Disponibilidad (pendiente) & Límite de envíos en las rutas de análisis; copias de seguridad periódicas de la base de datos. & Propuesto & B9 \\ \hline
+\end{longtable}
+\endgroup
+
+\apartado{Flujo lógico de una petición}
+
+El flujo que sigue una petición dentro de PhishGuard muestra en qué punto actúa cada control:
+
+\begin{enumerate}
+  \item El navegador envía la petición al servidor.
+  \item En el inicio de sesión y el registro, el limitador de intentos decide si la procesa (control de disponibilidad y autenticación).
+  \item Para las rutas protegidas se verifica la sesión; si no hay usuario autenticado, se redirige al inicio de sesión (autenticación).
+  \item Se verifica el rol o la propiedad del dato: las funciones de administración responden 403 a usuarios sin rol, y los datos ajenos responden 404 (autorización).
+  \item Se valida el formulario: token CSRF, longitud y formato de los campos (integridad).
+  \item El motor de análisis lee los pesos de la base de datos y calcula el puntaje, el nivel y la explicación de cada indicador.
+  \item El resultado se guarda con consultas parametrizadas, asociado al usuario y con su fecha (contabilidad).
+  \item La respuesta se genera con escape automático y se envía con las cabeceras de seguridad (confidencialidad).
+\end{enumerate}
+
+\subsection{Diseño de interfaz}
+
+La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks externos, y con una barra lateral que agrupa las funciones por sección: análisis, registro y administración. Las pantallas principales del prototipo son:
+
+\begin{itemize}
+  \item \textbf{Inicio de sesión y registro:} formulario de acceso con un panel que muestra un ejemplo de análisis (figura~\ref{fig:login}).
+  \item \textbf{Panel de inicio:} cifras de análisis, distribución del riesgo, accesos rápidos y últimos análisis (figura~\ref{fig:inicio}).
+  \item \textbf{Análisis de URL y de mensaje:} campo de entrada y ejemplos rápidos; al analizar, se muestran la escala de riesgo y la tabla de indicadores detectados (figura~\ref{fig:analisis}).
+  \item \textbf{Historial:} tabla con fecha, tipo, contenido, puntaje y nivel de cada análisis, con acceso al detalle y exportación a CSV (figura~\ref{fig:historial}).
+  \item \textbf{Administración de indicadores:} tabla de los 17 indicadores con su peso editable, solo para el administrador (figura~\ref{fig:indicadores}).
+\end{itemize}
+
+\captura{capturas}{login.png}{Pantalla de inicio de sesión}{fig:login}
+\captura{capturas}{inicio.png}{Panel de inicio con estadísticas}{fig:inicio}
+\captura{capturas}{analisis-mensaje.png}{Formulario de análisis de un mensaje}{fig:analisis}
+\captura{capturas}{historial.png}{Historial de análisis}{fig:historial}
+\captura{capturas}{indicadores.png}{Administración de indicadores}{fig:indicadores}
+
+\subsection{Descripción técnica del sistema}
+
+\apartado{Arquitectura}
+
+PhishGuard se plantea como una aplicación web usada desde un navegador. Para el desarrollo y las pruebas se utiliza un entorno local, sin publicación en Internet ni despliegue en la nube. La estructura general es:
+
+\begin{center}
+Usuario $\rightarrow$ Navegador web $\rightarrow$ PhishGuard $\rightarrow$ Motor de análisis $\rightarrow$ Base de datos
+\end{center}
+
+La aplicación está desarrollada en Python con el framework Flask, almacena los datos en MySQL mediante el ORM SQLAlchemy, y genera sus páginas con plantillas Jinja2, HTML y CSS propios. El motor de análisis consulta los pesos de los indicadores en la base de datos y devuelve el puntaje, el nivel y la explicación de cada indicador detectado.
+
+La figura~\ref{fig:conceptual} muestra los actores, los componentes principales de PhishGuard y la relación entre ellos. El mensaje o enlace sospechoso llega al usuario por un canal externo (correo, SMS o mensajería); el usuario lo ingresa en la interfaz web, el motor de análisis lo evalúa con los pesos guardados en la base de datos y el sistema devuelve el puntaje, el nivel de riesgo y la explicación de los indicadores detectados. El administrador gestiona los pesos de los indicadores.
+
+\begin{figure}[htbp]
+\centering
+\caption{Arquitectura conceptual de PhishGuard.}
+\label{fig:conceptual}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{tikzpicture}[
+  font=\footnotesize,
+  caja/.style={draw, rounded corners=2pt, fill=azulclaro, align=center, minimum height=0.9cm, inner sep=4pt},
+  ext/.style={draw, rounded corners=2pt, fill=grisclaro, align=center, minimum height=0.9cm, inner sep=4pt},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick},
+  etq/.style={font=\scriptsize, fill=white, inner sep=1.5pt}
+]
+% Actores y origen
+\node[ext, text width=4.2cm] (vec) {Mensaje o enlace sospechoso\\(correo, SMS, mensajería)};
+\node[ext, text width=3.6cm, right=1.3cm of vec] (usr) {Usuario\\(comunidad universitaria)};
+\node[ext, text width=3.2cm, right=1.2cm of usr] (adm) {Administrador};
+\draw[flecha] (vec) -- node[etq, above] {lo recibe} (usr);
+
+% Interfaz
+\node[caja, text width=11.6cm, below=1.9cm of usr] (web) {\textbf{Interfaz web} (navegador)};
+\draw[flecha] ([xshift=-0.7cm]usr.south) -- node[etq, left, pos=0.3] {URL o mensaje} ([xshift=-0.7cm]usr.south |- web.north);
+\draw[flecha, dashed] ([xshift=0.7cm]usr.south |- web.north) -- node[etq, right, pos=0.7] {resultado} ([xshift=0.7cm]usr.south);
+\draw[flecha] (adm.south) -- node[etq, right, pos=0.3] {administra pesos} (adm.south |- web.north);
+
+% Modulos
+\node[caja, text width=2.55cm, below=1.2cm of web.south west, anchor=north west] (m1) {Autenticación\\(registro e inicio de sesión)};
+\node[caja, text width=2.55cm, right=0.25cm of m1] (m2) {Análisis de URL y de mensajes};
+\node[caja, text width=2.55cm, right=0.25cm of m2] (m3) {Historial y estadísticas};
+\node[caja, text width=2.55cm, right=0.25cm of m3] (m4) {Administración\\(indicadores e historial global)};
+\foreach \m in {m1,m2,m3,m4} {\draw[flecha] (\m.north |- web.south) -- (\m.north);}
+
+% Motor y base de datos
+\node[caja, text width=4.8cm, below=1.5cm of m1.south west, anchor=north west] (mot) {\textbf{Motor de análisis por reglas}\\17 indicadores con peso\\(10 de URL y 7 de mensajes)};
+\node[caja, text width=4.8cm, right=2.0cm of mot] (bd) {\textbf{Base de datos MySQL}\\usuarios, análisis, indicadores detectados y configuración de pesos};
+\draw[flecha] (m2.south) -- (m2.south |- mot.north);
+\draw[{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick] (mot) -- node[etq, above, align=center] {pesos y\\resultados} (bd);
+\draw[flecha] ([xshift=0.6cm]m3.south) -- ([xshift=0.6cm]m3.south |- bd.north);
+\draw[flecha] (m4.south) -- (m4.south |- bd.north);
+
+% Frontera del sistema
+\begin{pgfonlayer}{background}
+  \node[fit=(web)(m1)(m4)(mot)(bd), draw, dashed, rounded corners=3pt, inner sep=10pt] (frontera) {};
+\end{pgfonlayer}
+\node[anchor=north west, font=\scriptsize\bfseries] at (frontera.south west) {PhishGuard (entorno local de desarrollo y pruebas)};
+\end{tikzpicture}
+\end{figure}
+
+La figura~\ref{fig:logica} detalla el recorrido de una petición dentro de la aplicación. A la izquierda se indica la propiedad de seguridad que protege cada paso (modelo AAA y tríada CID) y los riesgos de la sección~\ref{sec:riesgos} que mitiga. La respuesta, generada después de consultar la base de datos, regresa al navegador con escape automático y cabeceras de seguridad.
+
+\begin{figure}[htbp]
+\centering
+\caption{Arquitectura lógica de PhishGuard con sus puntos de control.}
+\label{fig:logica}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{tikzpicture}[
+  font=\footnotesize,
+  caja/.style={draw, rounded corners=2pt, fill=azulclaro, minimum width=5.6cm, minimum height=0.85cm, align=center, inner sep=3pt},
+  ext/.style={draw, rounded corners=2pt, fill=grisclaro, minimum width=5.6cm, minimum height=0.85cm, align=center, inner sep=3pt},
+  nota/.style={font=\scriptsize, text width=4.7cm, align=right, anchor=east},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick},
+  node distance=0.55cm
+]
+\node[ext] (cli) {Navegador del usuario o del administrador};
+\node[caja, below=of cli] (n1) {1. Limitador de intentos\\(inicio de sesión y registro)};
+\node[caja, below=of n1] (n2) {2. Verificación de sesión\\(usuario autenticado)};
+\node[caja, below=of n2] (n3) {3. Autorización\\(rol o propietario del dato)};
+\node[caja, below=of n3] (n4) {4. Validación del formulario\\y token CSRF};
+\node[caja, below=of n4] (n5) {5. Motor de análisis\\(lee los pesos de la base de datos)};
+\node[caja, below=of n5] (n6) {6. Acceso a datos con ORM\\(consultas parametrizadas)};
+\node[ext, below=of n6] (bd) {Base de datos MySQL};
+\foreach \a/\b in {cli/n1, n1/n2, n2/n3, n3/n4, n4/n5, n5/n6, n6/bd} {\draw[flecha] (\a) -- (\b);}
+
+% Respuesta (camino de regreso)
+\node[caja, minimum width=3.6cm, right=0.9cm of cli] (resp) {7. Respuesta con\\escape y cabeceras};
+\draw[flecha] (bd.east) -| node[pos=0.25, font=\scriptsize, fill=white, inner sep=1pt] {resultado} (resp.south);
+\draw[flecha] (resp.west) -- (cli.east);
+
+% Notas de control (izquierda)
+\node[nota, left=0.4cm of n1] {\textbf{Disponibilidad y autenticación}\\B1, B9};
+\node[nota, left=0.4cm of n2] {\textbf{Autenticación}\\B1, B5};
+\node[nota, left=0.4cm of n3] {\textbf{Autorización}\\B2, B7};
+\node[nota, left=0.4cm of n4] {\textbf{Integridad}\\B3, B5};
+\node[nota, left=0.4cm of n5] {\textbf{Integridad}\\B7 (pesos editables solo por el administrador)};
+\node[nota, left=0.4cm of n6] {\textbf{Integridad y contabilidad}\\B3; cada análisis queda con usuario y fecha};
+\node[nota, left=0.4cm of bd] {\textbf{Confidencialidad}\\B1, B8 (hash de contraseñas; secretos fuera del repositorio)};
+\node[font=\scriptsize, text width=3.6cm, align=center, above=0.1cm of resp] {\textbf{Confidencialidad}\\B4};
+
+% Frontera de la aplicacion
+\begin{pgfonlayer}{background}
+  \node[fit=(n1)(n6), draw, dashed, rounded corners=3pt, inner sep=8pt] (app) {};
+\end{pgfonlayer}
+\node[anchor=west, font=\scriptsize\bfseries, align=left] at ([xshift=0.15cm]app.east) {Aplicación\\Flask};
+\end{tikzpicture}
+\end{figure}
+
+\apartado{Herramientas de desarrollo}
+
+\begin{table}[htbp]
+\centering
+\caption{Herramientas de desarrollo}\label{tab:herramientas}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.32\textwidth}|p{0.58\textwidth}|}
+\hline
+\textbf{Herramienta} & \textbf{Uso en el proyecto} \\ \hline
+Python 3.12 & Lenguaje de programación del servidor. \\ \hline
+Flask 3.1 & Framework web; la aplicación se divide en módulos (blueprints). \\ \hline
+SQLAlchemy y Flask-SQLAlchemy & ORM; todas las consultas son parametrizadas. \\ \hline
+MySQL y PyMySQL & Base de datos y conector desde Python. \\ \hline
+Flask-Login & Inicio de sesión y gestión de sesiones. \\ \hline
+Flask-WTF y WTForms & Formularios, validación de entradas y token CSRF. \\ \hline
+Flask-Limiter & Límite de intentos de inicio de sesión y registro. \\ \hline
+Werkzeug & Cálculo y verificación del hash de las contraseñas. \\ \hline
+Jinja2, HTML, CSS y JavaScript & Plantillas e interfaz, con escape automático de la salida. \\ \hline
+Git & Control de versiones. \\ \hline
+Visual Studio Code y MySQL Workbench & Entorno de desarrollo y administración de la base de datos. \\ \hline
+\end{tabular}
+\end{table}
+
+\apartado{Estructura de la aplicación}
+
+La aplicación sigue el patrón de fábrica de aplicaciones de Flask y se divide en tres módulos: autenticación (registro, inicio y cierre de sesión), análisis (análisis de URL y mensajes, historial, exportación y administración de indicadores) y panel de inicio (estadísticas). El motor de reglas está en un módulo aparte, sin dependencias de la interfaz, lo que facilita probarlo y explicarlo. La base de datos tiene las cuatro tablas descritas en el modelo de datos (sección~\ref{sec:modelodatos}). Los secretos de configuración, es decir, la clave secreta y la cadena de conexión, se leen de un archivo de entorno que no se incluye en el repositorio.
+
+\section{Análisis y discusión}
+
+\apartado{Dificultades y cómo se resolvieron}
+
+\begin{itemize}
+  \item \textbf{Configuración del entorno.} Al comienzo, las librerías quedaron instaladas fuera del entorno virtual y la aplicación no encontraba Flask. Se resolvió instalándolas dentro del entorno virtual y registrándolas en el archivo de dependencias.
+  \item \textbf{Validación del correo.} El validador de formato de correo necesitaba una librería adicional, que se agregó a las dependencias.
+  \item \textbf{Política de seguridad de contenido.} Al implementar los ejemplos rápidos, el navegador bloqueó el código JavaScript escrito dentro del HTML. Se trasladó a un archivo propio, lo que confirmó en la práctica que la política CSP estaba funcionando.
+  \item \textbf{Hallazgo en la exportación.} La revisión de seguridad del código encontró que un usuario podía escribir una fórmula que se ejecutaba al abrir el CSV en una hoja de cálculo. Se reprodujo con un caso inofensivo, se corrigió y se verificó (anexo A).
+  \item \textbf{Falsos positivos.} Se identificó que el indicador de typosquatting marca como sospechosos algunos dominios oficiales, por ejemplo cuando llevan ``www''. Su ajuste queda como corrección pendiente.
+\end{itemize}
+
+\apartado{Efectividad de las herramientas}
+
+Las herramientas elegidas aportaron protección desde el diseño: el ORM genera consultas parametrizadas, Flask-WTF agrega el token CSRF a cada formulario y Jinja2 escapa la salida de forma automática. Flask-Limiter permitió implementar el límite de intentos con pocas líneas, y Git permitió volver a una versión estable cuando un cambio de la interfaz no funcionaba como se esperaba.
+
+\apartado{Lo que aún no se logró}
+
+Quedan pendientes el registro de eventos de seguridad, la autenticación multifactor, el aviso de privacidad con la opción de eliminar análisis, las pruebas automatizadas y la presentación de las fechas en la zona horaria de Colombia. Estas brechas están documentadas en el análisis de riesgos (sección~\ref{sec:gap}).
+
+\apartado{Logros adicionales}
+
+Se incorporaron funciones que no estaban en el plan inicial: el rol de administrador con historial global, el panel para ajustar los pesos de los indicadores, la exportación del historial a CSV, los ejemplos rápidos para demostrar la herramienta, el rediseño de la interfaz y la revisión de seguridad del código.
+
+\apartado{Discusión del enfoque}
+
+El enfoque basado en reglas cumplió el objetivo de explicar cada resultado: en el ejemplo del mensaje de la sección~\ref{sec:vectores}, cada uno de los 85 puntos se atribuye a un indicador. Su límite es que solo detecta lo que las reglas describen: un mensaje fraudulento bien redactado, sin palabras de urgencia ni enlaces evidentes, puede obtener un puntaje bajo, y una palabra común puede activar un indicador en un mensaje legítimo. Por eso el resultado se presenta como un nivel de riesgo y los pesos se pueden ajustar. Los trabajos basados en aprendizaje automático (Jain y Gupta, 2019; Jalil y Usman, 2020) buscan mayor cobertura, a costa de que el resultado sea más difícil de explicar.
+
+\section{Conclusiones}
+
+Por tratarse de un documento de avance, las conclusiones son preliminares.
+
+\begin{itemize}
+  \item Es posible identificar indicadores de phishing en URL y mensajes con reglas explícitas y presentar un nivel de riesgo que se puede explicar, lo que responde a los dos primeros objetivos específicos.
+  \item El análisis de riesgos con MAGERIT mostró que los riesgos más altos del caso de estudio dependen del factor humano: 8 de los 16 riesgos son altos y el mayor es el robo de credenciales. Esto respalda el enfoque educativo de la herramienta.
+  \item Aplicar los controles desde el diseño (hash de contraseñas, consultas parametrizadas, token CSRF, control de acceso por usuario y por rol, y política CSP) redujo a nivel bajo los riesgos altos de la propia aplicación.
+  \item Las pruebas de seguridad y la revisión del código permitieron encontrar y corregir una vulnerabilidad real, la inyección de fórmulas en el CSV, lo que muestra el valor de probar la aplicación más allá de su funcionamiento.
+  \item En el proyecto se aplicaron los temas del curso: los fundamentos de la seguridad de la información, las amenazas y vulnerabilidades, y los vectores de ataque, junto con el marco legal colombiano y las normas ISO/IEC 27001 y 27002.
+  \item Para la entrega final queda cerrar las brechas identificadas, en especial el registro de eventos de seguridad.
+\end{itemize}
+
+\section{Referencias}\label{sec:referencias}
+
+% REQUISITO DE LA GUIA UCC: al menos 2 libros de la biblioteca fisica de la universidad.
+% Agregarlos aqui (formato APA) y citarlos en el texto cuando se consulten.
+
+% Permite que las URL largas se partan en los guiones:
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\-}
+\makeatother
+
+\begin{list}{}{\setlength{\leftmargin}{1.27cm}\setlength{\itemindent}{-1.27cm}\setlength{\itemsep}{0.5em}\setlength{\parsep}{0pt}}
+\raggedright
+\item Anti-Phishing Working Group. (2026a). \emph{Phishing activity trends report, 1st quarter 2026}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q1_2026.pdf}
+\item Anti-Phishing Working Group. (2026b). \emph{Phishing activity trends report, 2nd quarter 2026}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q2_2026.pdf}
+\item Anti-Phishing Working Group. (2026c). \emph{Phishing activity trends report, 4th quarter 2025}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q4_2025.pdf}
+\item Candanedo-Yau, R. M. (2026). Ciberseguridad como gestión sostenible: Defensa crítica ante la ingeniería social y ataques informáticos en la educación superior. \emph{Investigación y Ciencia de la Universidad Autónoma de Aguascalientes}, (98), e8640. \url{https://doi.org/10.33064/iycuaa2026988640}
+\item Congreso de la República de Colombia. (2009). \emph{Ley 1273 de 2009, por medio de la cual se modifica el Código Penal, se crea un nuevo bien jurídico tutelado --- denominado ``de la protección de la información y de los datos'' --- y se preservan integralmente los sistemas que utilicen las tecnologías de la información y las comunicaciones, entre otras disposiciones}. Diario Oficial No. 47.223. \url{https://www.anm.gov.co/sites/default/files/ley_1273_2009.pdf}
+\item Congreso de la República de Colombia. (2012). \emph{Ley Estatutaria 1581 de 2012, por la cual se dictan disposiciones generales para la protección de datos personales}. \url{https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=49981}
+\item Google. (s.f.). \emph{Google Safe Browsing}. Recuperado el 7 de octubre de 2026, de \url{https://safebrowsing.google.com/}
+\item Hong, J., Kim, T., Liu, J., Park, N., \& Kim, S.-W. (2020). Phishing URL detection with lexical features and blacklisted domains. En S. Jajodia, G. Cybenko, V. S. Subrahmanian, V. Swarup, C. Wang y M. Wellman (Eds.), \emph{Adaptive autonomous secure cyber systems} (pp. 253--267). Springer. \url{https://doi.org/10.1007/978-3-030-33432-1_12}
+\item International Organization for Standardization \& International Electrotechnical Commission. (2022a). \emph{ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection --- Information security management systems --- Requirements}. ISO. \url{https://www.iso.org/standard/27001}
+\item International Organization for Standardization \& International Electrotechnical Commission. (2022b). \emph{ISO/IEC 27002:2022. Information security, cybersecurity and privacy protection --- Information security controls}. ISO. \url{https://www.iso.org/obp/ui/#iso:std:iso-iec:27002:ed-3:v2:en}
+\item Jain, A. K., \& Gupta, B. B. (2019). A machine learning based approach for phishing detection using hyperlinks information. \emph{Journal of Ambient Intelligence and Humanized Computing}, \emph{10}(5), 2015--2028. \url{https://doi.org/10.1007/s12652-018-0798-z}
+\item Jalil, S., \& Usman, M. (2020). A review of phishing URL detection using machine learning classifiers. En \emph{Intelligent systems and applications: Proceedings of the 2020 Intelligent Systems Conference (IntelliSys)} (Advances in Intelligent Systems and Computing, Vol. 1251, pp. 646--665). Springer. \url{https://doi.org/10.1007/978-3-030-55187-2_47}
+\item Jeeva, S. C., \& Rajsingh, E. B. (2016). Intelligent phishing url detection using association rule mining. \emph{Human-centric Computing and Information Sciences}, \emph{6}, Artículo 10. \url{https://doi.org/10.1186/s13673-016-0064-3}
+\item Ministerio de Hacienda y Administraciones Públicas. (2012). \emph{MAGERIT --- versión 3.0. Metodología de análisis y gestión de riesgos de los sistemas de información} (Libros I, II y III). Gobierno de España. \url{https://administracionelectronica.gob.es/pae_Home/pae_Documentacion/pae_Metodolog/pae_Magerit.html}
+\item Moghimi, M., \& Varjani, A. Y. (2016). New rule-based phishing detection method. \emph{Expert Systems with Applications}, \emph{53}, 231--242. \url{https://doi.org/10.1016/j.eswa.2016.01.028}
+\item OWASP Foundation. (2025). \emph{OWASP Top 10:2025}. \url{https://owasp.org/Top10/2025/}
+\item PhishTank. (s.f.). \emph{PhishTank}. Recuperado el 7 de octubre de 2026, de \url{https://phishtank.org/}
+\item Presidencia de la República de Colombia. (2013). \emph{Decreto 1377 de 2013, por el cual se reglamenta parcialmente la Ley 1581 de 2012}.
+\item Schwaber, K., \& Sutherland, J. (2020). \emph{The Scrum Guide}. \url{https://scrumguides.org/scrum-guide.html}
+\item Semana. (2024, 2 de abril). \emph{Cuidado, estos son los 5 delitos informáticos dejan más víctimas en Colombia}. \url{https://www.semana.com/nacion/articulo/cuidado-estos-son-los-5-delitos-informaticos-de-dejan-mas-victimas-en-colombia/202424/}
+\item Telesemana. (2025, 24 de abril). \emph{Crecen los ciberataques en Colombia y diversos sectores piden retomar con urgencia la creación de una estrategia país}. \url{https://www.telesemana.com/blog/2025/04/24/crecen-las-ciberamenazas-en-colombia-y-diversos-sectores-piden-retomar-con-urgencia-la-creacion-de-una-estrategia-pais/}
+\item VirusTotal. (s.f.). \emph{VirusTotal}. Recuperado el 7 de octubre de 2026, de \url{https://www.virustotal.com/}
+\item Yeboah-Boateng, E. O., \& Amanor, P. M. (2014). Phishing, SMiShing \& Vishing: An assessment of threats against mobile devices. \emph{Journal of Emerging Trends in Computing and Information Sciences}, \emph{5}(4), 297--307.
+\item Zwilling, M., Klien, G., Lesjak, D., Wiechetek, Ł., Cetin, F., \& Basim, H. N. (2022). Cyber security awareness, knowledge and behavior: A comparative study. \emph{Journal of Computer Information Systems}, \emph{62}(1), 82--97. \url{https://doi.org/10.1080/08874417.2020.1712269}
+\end{list}
+
+\section{Anexos}
+
+\subsection*{Anexo A. Evidencias de las pruebas de seguridad}
+\addcontentsline{toc}{subsection}{Anexo A. Evidencias de las pruebas de seguridad}
+
+Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el prototipo.
+
+\captura{evidencias}{csv-antes.png}{Exportación CSV antes de la corrección: la fórmula =1+1 escrita por un usuario se ejecuta y muestra 2}{fig:csvantes}
+\captura{evidencias}{csv-despues.png}{Exportación CSV después de la corrección: el contenido que empieza por = se muestra como texto}{fig:csv}
+\captura{evidencias}{idor-404.png}{Un usuario normal recibe ``Not Found'' (``Extraviado'' en el navegador traducido) al pedir el análisis de otro usuario}{fig:idor404}
+\captura{evidencias}{prohibido-403.png}{Un usuario normal recibe ``Forbidden'' (``Prohibido'' en el navegador traducido) al entrar a una función de administración}{fig:prohibido}
+
+\end{document}
