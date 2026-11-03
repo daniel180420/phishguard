@@ -169,7 +169,7 @@ def analizar_url(url, pesos, amenazas=frozenset()):
     if any(host.endswith(tld) for tld in TLDS_SOSPECHOSOS):
         peso = pesos.get('Dominio de nivel superior inusual', 10)
         puntaje += peso
-        indicadores.append(('Dominio de nivel superior inusual', peso, 'Este TLD es gratuito y frecuentemente asociado a abuso.'))
+        indicadores.append(('Dominio de nivel superior inusual', peso, 'Esta terminación de dominio es barata o gratuita y se usa mucho en estafas; no todas son gratuitas.'))
 
     # hostname es el host real: descarta usuario:clave@ y el puerto, y viene en minúsculas.
     host_real = (parsed.hostname or '').rstrip('.')
