@@ -96,6 +96,10 @@ for frase in ('proyecto académico', 'Corporación Universitaria Horizonte del L
               'la nota que escribas', 'la fecha del reporte', 'los reportes (con la nota, la fecha y quién los hizo)',
               'se borran junto con el análisis reportado', 'sus indicadores y su reporte, con la nota'):
     assert frase in html, f'Falta en el aviso: {frase!r}'
+for frase in ('Si usas el bot de Telegram', 'no guarda tus mensajes', 'pasa por los servidores de Telegram',
+              'políticas de esa empresa', 'no envíes datos personales ni claves',
+              'La única excepción es el bot de Telegram'):
+    assert frase in html, f'Falta en el apartado del bot: {frase!r}'
 assert '@' not in html, 'El aviso no debe traer correos inventados'
 assert 'lateral-nav' not in html  # sin sesión: página completa, sin menú lateral
 con_sesion = cliente('ana').get('/privacidad')

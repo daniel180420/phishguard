@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PhishGuard: a Flask web app (Spanish UI, Colombian context) that scores URLs and text messages for phishing risk using rule-based heuristics. Stack: Flask, Flask-SQLAlchemy (MySQL via PyMySQL), Flask-Login, Flask-WTF, Flask-Limiter. Tests live in `tests/` (`probar_*.py`, one standalone `unittest` file per area); the project is in git. No linter is configured.
+PhishGuard: a Flask web app (Spanish UI, Colombian context) that scores URLs and text messages for phishing risk using rule-based heuristics. Stack: Flask, Flask-SQLAlchemy (MySQL via PyMySQL), Flask-Login, Flask-WTF, Flask-Limiter. `requests` (fijada en `requirements.txt`) la usa solo `bot.py`, el bot de Telegram. Tests live in `tests/` (`probar_*.py`, one standalone `unittest` file per area); the project is in git. No linter is configured.
 
 ## Commands
 
@@ -34,6 +34,10 @@ App factory in `app/__init__.py` (`create_app`) registers three blueprints with 
 Message analysis normalizes text (lowercase, accents stripped) before keyword matching, so keyword lists in `analyzer.py` must be unaccented lowercase.
 
 **Typosquatting y enlaces del mensaje** (`analyzer.py`). El indicador "Posible typosquatting" se activa por dos vías, con el mismo nombre y peso: la marca aparece dentro del host (`nequi-premios.top`) o alguna etiqueta del host (separada por `.` o `-`) difiere de una marca en **una sola edición** (`_imita_marca`, `_distancia`: letra cambiada, sobrante, faltante o dos vecinas intercambiadas; `nequl.com.co`). La vía aproximada solo aplica a marcas de 5 letras o más (`MIN_LARGO_MARCA_PARECIDA`; `bbva` solo por coincidencia exacta) y nunca marca un dominio oficial. `_revisar_enlaces` cuenta un enlace del mensaje como "Enlace sospechoso" si es de riesgo medio o alto **o** trae "Posible typosquatting", aunque use HTTPS y quede en riesgo bajo (el candado no lo hace legítimo). Un acortador solo (25 puntos, riesgo bajo) no cuenta, por decisión. `extraer_enlaces` (`PATRON_ENLACE`) reconoce enlaces con `http(s)://`, con `www.`, y sin esquema solo si son `dominio/ruta` de un acortador de `ACORTADORES` o de un dominio con TLD de `TLDS_ENLACE`; nada pegado a una `@`, un punto o una letra, para no confundirlos con correos ni con texto normal (`hola.como`, `Sr.Pérez`, `$500.000`). `_con_esquema` antepone `http://` a cualquier enlace sin esquema. Los pesos no se tocaron. Pruebas en `tests/probar_typosquatting.py` y `tests/probar_enlaces_mensaje.py`.
+
+### Lectura de códigos QR
+
+En `/analisis/url`, el botón "Leer QR desde una imagen" decodifica la imagen **en el navegador** con jsQR (`app/static/js/vendor/jsQR.js`, copia local por la CSP; su licencia y SHA-256 están en `jsQR.LICENSE.txt`) desde `app/static/js/qr.js`. La imagen nunca se envía al servidor: solo el texto del QR se pone en el campo, y solo si es un enlace web (`http(s)://` o `www.`); cualquier otro contenido (otro esquema, texto) se rechaza y se avisa. Límites: 10 MB de archivo, 50 megapíxeles (se revisa antes de crear el canvas, para no agotar la memoria) y fotos reducidas a 1280 px de lado antes de leerlas. El texto del QR se muestra siempre con `textContent`, nunca como HTML. El navegador envía `origen=qr` (`normalizar_origen`, se guarda en `Analisis.origen`): es informativo y se puede falsificar. Las librerías externas conservan sus saltos de línea (`.gitattributes`) para que no cambie su hash.
 
 ### Auth and roles
 
@@ -139,7 +143,7 @@ Riesgos conocidos y aceptados:
 - El 404 de un análisis ajeno hace un INSERT la primera vez por minuto (el evento `analisis_ajeno`) y el de uno inexistente no, así que en teoría el tiempo de respuesta permite distinguirlos. Es de bajo alcance: la ventana de `espera=60` limita la diferencia a una vez por minuto y por usuario.
 - Con `FLASK_HOST=0.0.0.0` (para probar desde el celular en la misma WiFi) la app se sirve por HTTP sin cifrar a toda la red: la sesión y la contraseña viajan sin protección. Usarlo solo en una red de confianza. Es el servidor de desarrollo de Flask, no para producción.
 - `run.py` desactiva el modo debug si `FLASK_HOST` no es `127.0.0.1`, `localhost` o `::1`, aunque `FLASK_DEBUG=1`, para no exponer el depurador en la red. `FLASK_HOST` se agrega a mano en el `.env` (Claude no lo lee ni lo edita).
-- Bot de Telegram: el contenido de cada mensaje pasa por Telegram (que lo guarda según sus propias políticas) y el aviso de privacidad de la web no lo cubre todavía. El límite de 10 mensajes por minuto por chat está en memoria (se pierde al reiniciar y se salta cambiando de cuenta), y no hay límite global. Solo se analiza el texto del mensaje: no se descargan fotos ni se abren enlaces, así que un enlace que Telegram muestra con otro texto no se ve. El token que se pegue o seleccione en una conversación queda expuesto: si pasa, revocarlo en @BotFather.
+- Bot de Telegram: el contenido de cada mensaje pasa por Telegram (que lo guarda según sus propias políticas). El límite de 10 mensajes por minuto por chat está en memoria (se pierde al reiniciar y se salta cambiando de cuenta), y no hay límite global. Solo se analiza el texto del mensaje: no se descargan fotos ni se abren enlaces, así que un enlace que Telegram muestra con otro texto no se ve. El token que se pegue o seleccione en una conversación queda expuesto: si pasa, revocarlo en @BotFather.
 - Typosquatting aproximado: solo detecta **una** edición de diferencia respecto a la marca. Un dominio con dos errores (`nequiii.com`, `neqquii.com`) no se marca, y una palabra común a una sola edición de una marca sí se marcaría (hoy no hay ninguna conocida). Los dominios sin esquema y sin ruta (`premios-bancolombia.xyz`) no se reconocen como enlace, para evitar falsos positivos con texto normal; los TLD fuera de `TLDS_ENLACE` tampoco, salvo los acortadores de `ACORTADORES`.
 - Typosquatting aproximado, falsos positivos: cualquier etiqueta de host a una edición de una marca de 5 letras o más se marca (+20), así que un sitio legítimo ajeno como `nequim.com` saldría como "Posible typosquatting", y en un mensaje contaría como enlace sospechoso aunque tenga HTTPS. Se acepta a propósito: en una herramienta de alerta un falso positivo cuesta menos que un falso negativo, y subir el mínimo a 6 letras dejaría de detectar `nequl.com.co`.
 - Enlaces sin esquema (`bit.ly/abc`, `nequl.com.co/premio`) reciben el indicador "No usa HTTPS" (+15), aunque el usuario nunca escribió `http`: `_con_esquema` les antepone `http://` para analizarlos, igual que ya pasaba con `www.`. Se acepta: es la suposición prudente, porque no se sabe qué esquema abrirá el navegador, y el puntaje puede quedar algo por encima de lo que el texto justifica.
@@ -154,7 +158,7 @@ Riesgos conocidos y aceptados:
 - "Eliminar mi cuenta" y "Cambiar correo" (derechos de supresión y actualización, Ley 1581).
 - Definir cuánto tiempo se conservan los eventos de seguridad.
 - Probar en MySQL el borrado de análisis con reporte (las pruebas usan SQLite) y que `init_db.py` cree `reportes` y `amenazas_confirmadas` (índice UNIQUE de `dominio`, VARCHAR(255)).
-- Rediseño de la interfaz.
+- Rediseño de la interfaz: falta solo `indicadores.html` y `editar_indicador.html` (pantallas de administrador que aún usan el marcado simple, sin `encabezado` ni `tarjeta`). El resto de las páginas ya usa el diseño nuevo.
 - [x] CSV sin saltos de línea en el contenido.
 - README.
-- Hora en zona horaria de Colombia.
+- [x] Hora en zona horaria de Colombia (se muestra con `zoneinfo` y `tzdata`; las tendencias agrupan por día de Colombia).
