@@ -144,7 +144,7 @@ def analizar_url(url, pesos, amenazas=frozenset()):
     if any(palabra in url_lower for palabra in PALABRAS_SOSPECHOSAS):
         peso = pesos.get('Palabras de urgencia/verificación', 10)
         puntaje += peso
-        indicadores.append(('Palabras de urgencia/verificación', peso, 'Contiene palabras típicas de páginas falsas de login o verificación.'))
+        indicadores.append(('Palabras de urgencia/verificación', peso, 'Contiene palabras que suelen aparecer en páginas falsas de login o verificación, aunque también están en sitios legítimos.'))
 
     if len(url) > 75:
         peso = pesos.get('URL demasiado larga', 10)

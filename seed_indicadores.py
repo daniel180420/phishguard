@@ -7,7 +7,7 @@ from app.models import IndicadorConfig
 INDICADORES = [
     ('IP en lugar de dominio', 25, 'Aplica a URLs. Los sitios legítimos casi nunca usan una IP directa en la URL.'),
     ('No usa HTTPS', 15, 'Aplica a URLs. Los sitios serios casi siempre usan conexión segura HTTPS.'),
-    ('Palabras de urgencia/verificación', 10, 'Aplica a URLs, no a mensajes. Busca en la dirección palabras como login, verificar o cuenta, típicas de páginas falsas de acceso o verificación. Para el texto de un mensaje se usa "Lenguaje de urgencia".'),
+    ('Palabras de urgencia/verificación', 10, 'Aplica a URLs, no a mensajes. Busca en la dirección palabras como login, verificar o cuenta, que suelen aparecer en páginas falsas de acceso o verificación pero también en sitios legítimos. Para el texto de un mensaje se usa "Lenguaje de urgencia".'),
     ('URL demasiado larga', 10, 'Aplica a URLs. Las URLs muy largas (más de 75 caracteres) se usan para ocultar la dirección real.'),
     ('Demasiados subdominios', 10, 'Aplica a URLs. Un exceso de subdominios (más de 3 puntos en el host) puede simular un dominio confiable.'),
     ('Contiene el símbolo @', 20, 'Aplica a URLs. Se usa para ocultar el dominio real detrás de un texto engañoso.'),
