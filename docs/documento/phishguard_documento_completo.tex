@@ -73,20 +73,20 @@ Universidad Cooperativa de Colombia\par
 Carlos I. Torres L.\par
 \vspace{0.8cm}
 Villavicencio\par
-Octubre de 2026\par
+Noviembre de 2026\par
 \end{titlepage}
 
 
 \section*{Resumen}
 
-PhishGuard es una aplicación web que ayuda a la comunidad de una institución de educación superior a identificar posibles intentos de phishing en enlaces (URL) y mensajes de texto. El sistema analiza la información que ingresa el usuario con un motor de reglas de 17 indicadores (10 para URL y 7 para mensajes), calcula un puntaje de riesgo de 0 a 100, lo clasifica como bajo, medio o alto y explica qué indicadores influyeron en el resultado. No utiliza inteligencia artificial, para que cada resultado se pueda explicar. El caso de estudio es una institución ficticia, la Corporación Universitaria Horizonte del Llano, en Villavicencio. El documento presenta el marco legal y normativo (Ley 1273 de 2009, Ley 1581 de 2012 e ISO/IEC 27001 y 27002), un análisis de riesgos basado en MAGERIT con 16 riesgos, de los cuales 8 son altos, un análisis de brechas frente a ISO/IEC 27002 y el diseño de los controles según los modelos AAA y CID. La aplicación se desarrolló en Python con Flask y MySQL, e incorpora contraseñas con hash, consultas parametrizadas, protección contra CSRF, control de acceso por rol y límite de intentos de inicio de sesión.
+PhishGuard es una aplicación web que ayuda a la comunidad de una institución de educación superior a identificar posibles intentos de phishing en enlaces (URL) y mensajes de texto. El sistema analiza la información que ingresa el usuario con un motor de reglas de 18 indicadores (10 para URL y 8 para mensajes) y una alerta fija para los dominios que la institución confirma como phishing, calcula un puntaje de riesgo de 0 a 100, lo clasifica como bajo, medio o alto y explica qué indicadores influyeron en el resultado. No utiliza inteligencia artificial, para que cada resultado se pueda explicar. El caso de estudio es una institución ficticia, la Corporación Universitaria Horizonte del Llano, en Villavicencio. El documento presenta el marco legal y normativo (Ley 1273 de 2009, Ley 1581 de 2012 e ISO/IEC 27001 y 27002), un análisis de riesgos basado en MAGERIT con 16 riesgos, de los cuales 8 son altos, un análisis de brechas frente a ISO/IEC 27002 y el diseño de los controles según los modelos AAA y CID. La aplicación se desarrolló en Python con Flask y MySQL, e incorpora contraseñas con hash, consultas parametrizadas, protección contra CSRF, control de acceso por rol y límite de intentos de inicio de sesión. En esta versión se agregaron la lectura de códigos QR, el análisis de los enlaces dentro de los mensajes, el registro de eventos de seguridad, el aviso de privacidad con borrado de análisis, los reportes al área de tecnología con la lista de amenazas confirmadas, las tendencias, la hora de Colombia y un bot de Telegram. Las pruebas automatizadas (16 archivos) comprueban estas funciones y las correcciones de seguridad.
 
 \textbf{Palabras clave:} phishing, ingeniería social, análisis de riesgos, MAGERIT, seguridad de aplicaciones web.
 
 \newpage
 \section*{Abstract}
 
-PhishGuard is a web application that helps the community of a higher education institution identify possible phishing attempts in links (URLs) and text messages. The system analyzes the information entered by the user with a rule engine of 17 indicators (10 for URLs and 7 for messages), calculates a risk score from 0 to 100, classifies it as low, medium or high, and explains which indicators influenced the result. It does not use artificial intelligence, so that every result can be explained. The case study is a fictitious institution, Corporación Universitaria Horizonte del Llano, in Villavicencio, Colombia. The document presents the legal and regulatory framework (Law 1273 of 2009, Law 1581 of 2012, and ISO/IEC 27001 and 27002), a risk analysis based on MAGERIT with 16 risks, 8 of which are high, a gap analysis against ISO/IEC 27002, and the design of controls according to the AAA and CIA models. The application was developed in Python with Flask and MySQL, and includes hashed passwords, parameterized queries, CSRF protection, role-based access control and a login attempt limit.
+PhishGuard is a web application that helps the community of a higher education institution identify possible phishing attempts in links (URLs) and text messages. The system analyzes the information entered by the user with a rule engine of 18 indicators (10 for URLs and 8 for messages) and a fixed alert for the domains that the institution confirms as phishing, calculates a risk score from 0 to 100, classifies it as low, medium or high, and explains which indicators influenced the result. It does not use artificial intelligence, so that every result can be explained. The case study is a fictitious institution, Corporación Universitaria Horizonte del Llano, in Villavicencio, Colombia. The document presents the legal and regulatory framework (Law 1273 of 2009, Law 1581 of 2012, and ISO/IEC 27001 and 27002), a risk analysis based on MAGERIT with 16 risks, 8 of which are high, a gap analysis against ISO/IEC 27002, and the design of controls according to the AAA and CIA models. The application was developed in Python with Flask and MySQL, and includes hashed passwords, parameterized queries, CSRF protection, role-based access control and a login attempt limit. This version adds QR code reading, analysis of the links inside messages, a security event log, a privacy notice with deletion of analyses, reports to the technology area with a list of confirmed threats, trends, Colombian time and a Telegram bot. The automated tests (16 files) check these functions and the security fixes.
 
 \textbf{Keywords:} phishing, social engineering, risk analysis, MAGERIT, web application security.
 
@@ -102,18 +102,22 @@ PhishGuard is a web application that helps the community of a higher education i
   \item[AAA:] modelo de control de acceso compuesto por autenticación, autorización y contabilidad (registro de las acciones).
   \item[Activo:] recurso de valor que debe protegerse: información, servicios, aplicaciones, equipos o personas.
   \item[Amenaza:] evento que puede causar daño a un activo.
+  \item[Bot:] programa que responde mensajes de forma automática; el de PhishGuard funciona en Telegram.
   \item[CID:] confidencialidad, integridad y disponibilidad de la información.
   \item[CSP (política de seguridad de contenido):] cabecera que indica al navegador desde dónde puede cargar recursos una página.
   \item[CSRF:] ataque que hace que el navegador de un usuario envíe una petición que este no autorizó.
+  \item[Defanging:] modificar un enlace o una dirección para que deje de ser tocable o activa, por ejemplo escribir \texttt{hxxp} en lugar de \texttt{http} y \texttt{[.]} en lugar del punto.
   \item[Hash:] transformación de un dato, como una contraseña, en un valor del que no se puede recuperar el original.
   \item[IDOR:] acceso a datos ajenos cambiando el identificador de un objeto en la dirección de una página.
   \item[Ingeniería social:] manipulación de las personas para que revelen información o actúen en contra de su propia seguridad.
   \item[Inyección SQL:] ataque que introduce instrucciones de base de datos a través de los datos que escribe el usuario.
   \item[ORM:] herramienta que permite trabajar con la base de datos mediante objetos, sin escribir consultas SQL a mano.
   \item[Phishing:] engaño que suplanta a una entidad de confianza para obtener credenciales o datos personales.
+  \item[Quishing:] phishing que usa códigos QR para llevar a la víctima a una página falsa.
   \item[Riesgo:] estimación del daño posible, a partir de la probabilidad de que una amenaza ocurra y de su impacto.
   \item[Smishing:] phishing por mensajes de texto (SMS).
   \item[Typosquatting:] uso de dominios parecidos a los de una entidad legítima para engañar al usuario.
+  \item[UTC:] hora universal coordinada, una referencia de hora que no cambia con la zona horaria; Colombia está en UTC$-5$.
   \item[Vishing:] phishing por llamadas telefónicas.
   \item[Vulnerabilidad:] debilidad que permite que una amenaza se materialice.
   \item[XSS:] ataque que introduce código en una página web para que se ejecute en el navegador de otro usuario.
@@ -126,7 +130,7 @@ El phishing es una de las técnicas de ingeniería social utilizadas para engañ
 
 Como caso de estudio se plantea la Corporación Universitaria Horizonte del Llano (CUHL), una institución ficticia de educación superior ubicada en Villavicencio (Meta), con unos 3.800 estudiantes, 210 docentes y 140 integrantes del personal administrativo. La CUHL usa correo institucional, una plataforma de aprendizaje virtual, un sistema de información académica y un portal de pagos de matrícula, servicios que la exponen a mensajes y sitios fraudulentos.
 
-El documento se organiza así: el capítulo 2 plantea el problema y justifica la propuesta; el capítulo 3 presenta los objetivos; el capítulo 4 reúne el marco referencial (estado del arte, marco teórico y marco legal); el capítulo 5 describe la metodología y el cronograma; el capítulo 6 presenta los resultados, es decir, los requisitos, el modelado del sistema y de su seguridad, el diseño de la interfaz y la descripción técnica; el capítulo 7 analiza el proceso de desarrollo; el capítulo 8 recoge las conclusiones preliminares, y el capítulo 9, las referencias. Los anexos incluyen evidencias de las pruebas de seguridad.
+El documento se organiza así: el capítulo 2 plantea el problema y justifica la propuesta; el capítulo 3 presenta los objetivos; el capítulo 4 reúne el marco referencial (estado del arte, marco teórico y marco legal); el capítulo 5 describe la metodología y el cronograma; el capítulo 6 presenta los resultados, es decir, los requisitos, el modelado del sistema y de su seguridad, el diseño de la interfaz y la descripción técnica con las pruebas automatizadas; el capítulo 7 analiza el proceso de desarrollo y las vulnerabilidades encontradas y corregidas; el capítulo 8 recoge las conclusiones preliminares y las mejoras futuras, y el capítulo 9, las referencias. Los anexos incluyen las evidencias de las pruebas de seguridad y de las correcciones.
 
 \section{Planteamiento del problema}
 
@@ -199,6 +203,11 @@ PhishGuard será desarrollado como una aplicación web orientada al análisis de
   \item Almacenar el historial de análisis.
   \item Consultar el historial de cada usuario.
   \item Presentar estadísticas generales de los análisis realizados.
+  \item Leer el enlace de un código QR desde una imagen y analizar los enlaces que vienen dentro de los mensajes.
+  \item Permitir que cada usuario borre sus análisis y reporte al área de tecnología los que considere sospechosos.
+  \item Mantener una lista de dominios confirmados como phishing y avisar cuando alguien analiza un enlace de esa lista.
+  \item Registrar los eventos de seguridad y mostrar tendencias generales a los administradores.
+  \item Ofrecer el mismo análisis de mensajes desde un bot de Telegram.
   \item Aplicar medidas básicas de seguridad durante el desarrollo de la aplicación.
 \end{itemize}
 
@@ -229,10 +238,11 @@ El proyecto tendrá las siguientes limitaciones:
 \begin{itemize}
   \item PhishGuard no utilizará inteligencia artificial ni modelos de aprendizaje automático para determinar el nivel de riesgo.
   \item El análisis se realizará mediante reglas e indicadores previamente definidos para el proyecto.
-  \item El sistema analizará únicamente la información proporcionada por el usuario, principalmente URLs y mensajes de texto.
+  \item El sistema analizará únicamente la información proporcionada por el usuario, principalmente URLs y mensajes de texto. De un código QR solo se lee el enlace, en el navegador y sin enviar la imagen al servidor, y el sistema nunca abre los enlaces que analiza: los revisa como texto.
   \item PhishGuard no realizará análisis de archivos, malware, documentos adjuntos ni dispositivos.
   \item El sistema no realizará ataques, pruebas de penetración ni escaneos sobre sistemas externos.
   \item El proyecto no dependerá de servicios externos de inteligencia de amenazas para determinar el resultado.
+  \item La aplicación web no usa servicios externos. La única excepción es el bot de Telegram, que se comunica con los servidores de Telegram para recibir y responder mensajes; por eso el texto que se le escribe pasa por esa plataforma, aunque el bot no lo guarde.
   \item El desarrollo y las pruebas se realizarán en un entorno de desarrollo o pruebas, sin establecer como requisito la publicación del sistema en Internet o su despliegue en la nube.
 \end{itemize}
 
@@ -286,7 +296,7 @@ La ingeniería social consiste en manipular a las personas para que revelen info
 
 \subsubsection{Seguridad en aplicaciones web}
 
-Para el plano de la aplicación web se toma como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025). Las categorías más relacionadas con las medidas del proyecto son: control de acceso roto (A01), configuración de seguridad incorrecta (A02), inyección (A05), fallos de autenticación (A07), y fallos en el registro y alerta de seguridad (A09), esta última identificada como brecha.
+Para el plano de la aplicación web se toma como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025). Las categorías más relacionadas con las medidas del proyecto son: control de acceso roto (A01), configuración de seguridad incorrecta (A02), fallos en la cadena de suministro de software (A03), inyección (A05), fallos de autenticación (A07), fallos en el registro y alerta de seguridad (A09) y manejo incorrecto de condiciones excepcionales (A10). La tabla~\ref{tab:owasp} relaciona cada una con los controles de la aplicación.
 
 \subsubsection{Análisis y gestión de riesgos}
 
@@ -304,7 +314,7 @@ En este proyecto se adopta MAGERIT de forma \textbf{simplificada y cualitativa} 
   \item \textbf{Artículo 269I, hurto por medios informáticos y semejantes} y \textbf{artículo 269J, transferencia no consentida de activos:} cubren el uso de credenciales o datos capturados para sustraer dinero.
 \end{itemize}
 
-\textbf{Ley Estatutaria 1581 de 2012.} Establece el régimen general de protección de datos personales (Congreso de la República de Colombia, 2012). Su artículo 4, literal g, consagra el \emph{principio de seguridad}: la información sujeta a tratamiento debe manejarse con las medidas técnicas, humanas y administrativas necesarias para evitar su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento. El Decreto 1377 de 2013 desarrolla el deber de los responsables de poder demostrar, ante la Superintendencia de Industria y Comercio, que han implementado medidas apropiadas y efectivas (Presidencia de la República de Colombia, 2013).
+\textbf{Ley Estatutaria 1581 de 2012.} Establece el régimen general de protección de datos personales (Congreso de la República de Colombia, 2012). Su artículo 4, literal g, consagra el \emph{principio de seguridad}: la información sujeta a tratamiento debe manejarse con las medidas técnicas, humanas y administrativas necesarias para evitar su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento. El Decreto 1377 de 2013 desarrolla el deber de los responsables de poder demostrar, ante la Superintendencia de Industria y Comercio, que han implementado medidas apropiadas y efectivas (Presidencia de la República de Colombia, 2013). Además, la ley reconoce al titular los derechos de conocer, actualizar, rectificar y suprimir sus datos (artículo 8) y exige su autorización para tratarlos (artículo 9) (Congreso de la República de Colombia, 2012).
 
 \begin{table}[htbp]
 \centering
@@ -317,6 +327,7 @@ En este proyecto se adopta MAGERIT de forma \textbf{simplificada y cualitativa} 
 Ley 1273/2009, art.\ 269G & PhishGuard analiza URL y mensajes que pueden dirigir a sitios que suplantan a una entidad; al explicar los indicadores reduce la exposición de los usuarios. \\ \hline
 Ley 1273/2009, art.\ 269F & La captura de datos personales es el objetivo habitual del phishing. La propia aplicación solo almacena los datos mínimos de sus usuarios y los protege (hash de contraseñas, acceso restringido). \\ \hline
 Ley 1581/2012, art.\ 4 lit.\ g & PhishGuard aporta una medida \emph{humana} (concientización) y aplica medidas \emph{técnicas} en su diseño (control de acceso, validación, sesiones). \\ \hline
+Ley 1581/2012, arts.\ 8 y 9 & PhishGuard pide aceptar el aviso de privacidad al registrarse, permite que cada usuario borre sus análisis (supresión) y explica qué se guarda y quién lo ve. Faltan eliminar la cuenta y cambiar el correo. \\ \hline
 \end{tabular}
 \end{table}
 
@@ -334,12 +345,12 @@ La norma ISO/IEC 27001:2022 especifica los requisitos de un sistema de gestión 
 \textbf{Control} & \textbf{Nombre} & \textbf{Aplicación en el proyecto} \\ \hline
 5.15 & Control de acceso & Acceso por usuario y por rol; historial aislado. \\ \hline
 5.17 & Información de autenticación & Contraseñas almacenadas con hash y sal. \\ \hline
-5.34 & Privacidad y protección de información de identificación personal & Datos mínimos de los usuarios; limitación de quién ve el historial. \\ \hline
+5.34 & Privacidad y protección de información de identificación personal & Datos mínimos de los usuarios; aviso de privacidad aceptado al registrarse; el usuario puede borrar sus análisis; limitación de quién ve el historial. \\ \hline
 6.3 & Concienciación, educación y formación en seguridad de la información & Es el propósito de PhishGuard: enseñar a reconocer indicadores. \\ \hline
-8.5 & Autenticación segura & Límite de intentos, sesiones con caducidad. \\ \hline
-8.15 & Registro de eventos & Brecha identificada (no implementado). \\ \hline
+8.5 & Autenticación segura & Límite de intentos, sesiones con caducidad, cierre de sesión por POST. \\ \hline
+8.15 & Registro de eventos & Registro de eventos de seguridad con usuario, IP y fecha, visible solo para el administrador. \\ \hline
 8.28 & Codificación segura & Consultas parametrizadas, escape de salida, validación de entradas. \\ \hline
-8.29 & Pruebas de seguridad en el desarrollo y la aceptación & Pruebas de control de acceso y de exportación, y revisión de seguridad del código. \\ \hline
+8.29 & Pruebas de seguridad en el desarrollo y la aceptación & Pruebas automatizadas de control de acceso, CSRF, eventos, errores y exportación, y revisión de seguridad del código. \\ \hline
 \end{tabular}
 \end{table}
 
@@ -375,9 +386,12 @@ El proyecto se desarrolló con un enfoque iterativo e incremental, organizado en
   \item \textbf{Historial:} consulta del historial propio y detalle de cada análisis.
   \item \textbf{Estadísticas y roles:} panel de inicio con estadísticas y rol de administrador.
   \item \textbf{Seguridad y mejoras:} cabeceras de seguridad, límite de intentos, gestión de sesiones, panel de pesos, ejemplos rápidos y exportación a CSV.
+  \item \textbf{Enlaces, QR y hora de Colombia:} análisis de los enlaces dentro de los mensajes, lectura de códigos QR desde una imagen y fechas en hora de Colombia.
+  \item \textbf{Seguridad y privacidad:} registro de eventos de seguridad, aviso de privacidad con borrado de análisis, páginas de error, cierre de sesión por POST y respuestas sin caché.
+  \item \textbf{Reportes, amenazas y bot:} reportes al área de tecnología, tendencias, amenazas confirmadas, typosquatting aproximado y bot de Telegram.
 \end{enumerate}
 
-Después de los sprints se realizaron una revisión de seguridad del código y un rediseño de la interfaz, que corresponden a la etapa de correcciones y mejoras del cronograma.
+Los sprints 7 a 9 reúnen el trabajo posterior, incluidas las sugerencias recibidas para el Momento 3 (sección~\ref{sec:avance}). Además, se realizaron una revisión de seguridad del código y un rediseño de la interfaz, que corresponden a la etapa de correcciones y mejoras del cronograma.
 
 \subsection{Metodología de análisis de riesgos}\label{sec:metriesgos}
 
@@ -406,7 +420,7 @@ El \textbf{riesgo} se calcula como $P \times I$ y se clasifica así: \textbf{Baj
 \begin{itemize}
   \item \textbf{Revisión documental:} consulta de leyes colombianas, normas ISO/IEC, la metodología MAGERIT, informes de tendencias de phishing y artículos científicos obtenidos de las bases de datos de la biblioteca digital de la universidad.
   \item \textbf{Análisis de ejemplos:} estudio de mensajes y URL de phishing típicos, a partir de los cuales se definieron los indicadores y se prepararon los casos de prueba, como los ejemplos rápidos de la aplicación.
-  \item \textbf{Pruebas sobre el prototipo:} análisis de casos conocidos y pruebas de seguridad (acceso a datos ajenos, acceso a funciones de administración, límite de intentos y exportación CSV), cuyas evidencias se presentan en los anexos.
+  \item \textbf{Pruebas sobre el prototipo:} análisis de casos conocidos, pruebas manuales de seguridad (acceso a datos ajenos, acceso a funciones de administración, límite de intentos y exportación CSV), cuyas evidencias se presentan en los anexos, y 16 archivos de pruebas automatizadas en la carpeta \texttt{tests/}, descritos en la sección~\ref{sec:tecnica}.
 \end{itemize}
 
 \subsection{Cronograma de actividades}
@@ -439,7 +453,7 @@ El desarrollo de PhishGuard se organizará en diferentes etapas, permitiendo ava
 
 \subsection{Estado de avance y ajustes}\label{sec:avance}
 
-A la fecha de este documento de avance (octubre de 2026), la aplicación está implementada y en etapa de pruebas y correcciones. La tabla muestra el estado de cada etapa del cronograma.
+A la fecha de este documento (noviembre de 2026, Momento 3), la aplicación está implementada, incluye las mejoras de esta etapa y sigue en pruebas y correcciones. La tabla muestra el estado de cada etapa del cronograma.
 
 \begingroup
 \footnotesize
@@ -454,23 +468,32 @@ A la fecha de este documento de avance (octubre de 2026), la aplicación está i
 \endhead
 1 & Definición del proyecto & Completada & --- \\ \hline
 2 & Análisis y diseño & Completada & Requisitos y estructura de la base de datos definidos. \\ \hline
-3 & Diseño de la aplicación & Completada & La interfaz se rediseñó después, en la etapa de mejoras. \\ \hline
-4 & Desarrollo del sistema & Completada & Registro, inicio de sesión, cierre de sesión y roles. \\ \hline
-5 & Implementación del análisis & Completada & 17 indicadores con pesos almacenados en la base de datos. \\ \hline
-6 & Historial y estadísticas & Completada & Incluye la exportación del historial a CSV. \\ \hline
-7 & Seguridad y validaciones & Completada & Token CSRF, cabeceras de seguridad, límite de intentos y gestión de sesiones. \\ \hline
-8 & Pruebas & En curso & Pruebas manuales de seguridad realizadas (respuestas 403, 404 y 429; exportación CSV antes y después de la corrección). Faltan las pruebas funcionales formales de cada requisito. \\ \hline
-9 & Correcciones y mejoras & En curso & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz. \\ \hline
-10 & Documentación y presentación & En curso & Este documento de avance y la presentación del Momento 2. \\ \hline
+3 & Diseño de la aplicación & Completada & La interfaz se rediseñó después, en la etapa de mejoras, y ya se adapta al celular. \\ \hline
+4 & Desarrollo del sistema & Completada & Registro (con aceptación del aviso de privacidad), inicio de sesión, cierre de sesión por POST y roles. \\ \hline
+5 & Implementación del análisis & Completada & 18 indicadores (10 de URL y 8 de mensaje) con pesos almacenados en la base de datos, más la alerta fija de amenaza confirmada. Incluye el análisis de los enlaces dentro de los mensajes y la lectura de códigos QR. \\ \hline
+6 & Historial y estadísticas & Completada & Incluye la exportación del historial a CSV, el borrado de análisis y las tendencias para el administrador. \\ \hline
+7 & Seguridad y validaciones & Completada & Token CSRF, cabeceras de seguridad, límite de intentos, gestión de sesiones, registro de eventos de seguridad, páginas de error sin detalles y respuestas sin caché con sesión iniciada. \\ \hline
+8 & Pruebas & En curso & 16 archivos de pruebas automatizadas (sección~\ref{sec:tecnica}) y pruebas manuales de seguridad con evidencia en el anexo A. Faltan comprobar el rendimiento (RNF-01), los navegadores (RNF-06) y el borrado de análisis en MySQL, porque las pruebas usan SQLite. \\ \hline
+9 & Correcciones y mejoras & En curso & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz; y las correcciones de la tabla~\ref{tab:hallazgos} (typosquatting, host de la URL, URL mal formada, enlaces sin \texttt{http://}, peso 0 y enlace del bot). \\ \hline
+10 & Documentación y presentación & En curso & Este documento y la presentación del Momento 3. \\ \hline
 \end{longtable}
 \endgroup
 
 \textbf{Ajustes respecto al plan inicial:}
 
 \begin{itemize}
-  \item Se incorporaron funciones no previstas: rol de administrador, panel para ajustar los pesos de los indicadores (RF-09) y exportación del historial (RF-10).
-  \item Se agregó una revisión de seguridad del código, que encontró y permitió corregir la inyección de fórmulas en la exportación CSV.
-  \item Quedan para la entrega final: el registro de eventos de seguridad (brecha del control 8.15), el aviso de privacidad con la opción de eliminar análisis, las pruebas funcionales formales de cada requisito y la presentación de las fechas en la zona horaria de Colombia.
+  \item Se incorporaron funciones no previstas: rol de administrador, panel para ajustar los pesos de los indicadores (RF-09), exportación del historial (RF-10), lectura de códigos QR, borrado de análisis, reportes, amenazas confirmadas, tendencias y un bot de Telegram (RF-11 a RF-16).
+  \item Se agregó una revisión de seguridad del código, que encontró y permitió corregir la inyección de fórmulas en la exportación CSV. Las demás correcciones de esta etapa están en la tabla~\ref{tab:hallazgos}.
+  \item Quedan pendientes: eliminar la cuenta y cambiar el correo, definir cuánto tiempo se guardan los eventos de seguridad, probar el borrado en MySQL y comprobar el rendimiento y los navegadores (RNF-01 y RNF-06).
+\end{itemize}
+
+\textbf{Sugerencias recibidas en el Momento 2 y cómo se atendieron:}
+
+\begin{itemize}
+  \item \textbf{Capturas de pantalla de la interfaz.} El capítulo de diseño de interfaz (sección~\ref{sec:interfaz}) tiene ahora un lugar para la captura de cada pantalla nueva, y las cinco capturas anteriores se vuelven a tomar con el diseño actual. Las imágenes se guardan en la carpeta \texttt{capturas/}; si alguna falta, el documento muestra un recuadro que dice cuál es.
+  \item \textbf{Registro de eventos de seguridad.} Se cerró la brecha del control 8.15: hay una tabla de eventos con usuario, IP y fecha, una vista solo para el administrador y pruebas automatizadas (apartado ``Registro de eventos de seguridad'' de la sección~\ref{sec:tecnica}).
+  \item \textbf{Aviso de privacidad y borrado del historial.} Se publicó el aviso (Ley 1581), el registro exige aceptarlo y cada usuario puede borrar uno de sus análisis o todos (apartado ``Privacidad y borrado de datos'' de la sección~\ref{sec:tecnica}).
+  \item \textbf{Zona horaria de Colombia.} Las fechas se guardan en la base de datos en UTC y se muestran en hora de Colombia (UTC$-5$). Es la práctica recomendada: guardar en UTC evita errores por cambios de zona horaria o de servidor, y la conversión se hace solo al mostrar la fecha.
 \end{itemize}
 
 \section{Resultados}
@@ -483,7 +506,7 @@ Los requisitos funcionales describen las funciones que deberá realizar el siste
 
 \par\medskip\noindent\textbf{RF-01 --- Análisis de URL.} El sistema deberá permitir al usuario ingresar una URL y ejecutar un análisis para identificar indicadores asociados a posibles intentos de phishing. \textbf{Criterio de verificación:} al ingresar una URL válida, el sistema deberá generar un resultado de análisis.
 
-\par\medskip\noindent\textbf{RF-02 --- Análisis de mensajes.} El sistema deberá permitir al usuario ingresar un mensaje o texto para identificar indicadores asociados a posibles intentos de phishing o ingeniería social. \textbf{Criterio de verificación:} al ingresar un mensaje, el sistema deberá mostrar los indicadores identificados.
+\par\medskip\noindent\textbf{RF-02 --- Análisis de mensajes.} El sistema deberá permitir al usuario ingresar un mensaje o texto para identificar indicadores asociados a posibles intentos de phishing o ingeniería social. \textbf{Criterio de verificación:} al ingresar un mensaje, el sistema deberá mostrar los indicadores identificados. Si el mensaje trae enlaces (hasta tres), el sistema los analiza como URL y lo indica en el indicador ``Enlace sospechoso en el mensaje''.
 
 \par\medskip\noindent\textbf{RF-03 --- Cálculo del nivel de riesgo.} El sistema deberá calcular un puntaje de riesgo entre 0 y 100 a partir de los indicadores identificados durante el análisis. \textbf{Criterio de verificación:} cada análisis deberá generar un valor numérico comprendido entre 0 y 100.
 
@@ -497,9 +520,21 @@ Los requisitos funcionales describen las funciones que deberá realizar el siste
 
 \par\medskip\noindent\textbf{RF-08 --- Estadísticas.} El sistema deberá presentar estadísticas generales relacionadas con los análisis realizados y la distribución de los niveles de riesgo. \textbf{Criterio de verificación:} el sistema deberá mostrar como mínimo el total de análisis realizados y la distribución de los resultados según su nivel de riesgo.
 
-\par\medskip\noindent\textbf{RF-09 --- Administración de indicadores.} El sistema deberá permitir que un usuario con rol de administrador consulte y modifique el peso de cada indicador utilizado en el análisis, sin modificar el código fuente. \textbf{Criterio de verificación:} al cambiar el peso de un indicador, un análisis posterior que lo active deberá reflejar el nuevo valor en el puntaje.
+\par\medskip\noindent\textbf{RF-09 --- Administración de indicadores.} El sistema deberá permitir que un usuario con rol de administrador consulte y modifique el peso de cada indicador utilizado en el análisis, sin modificar el código fuente. \textbf{Criterio de verificación:} al cambiar el peso de un indicador, un análisis posterior que lo active deberá reflejar el nuevo valor en el puntaje. Se aceptan pesos de 0 a 100 y se rechazan los valores vacíos o que no sean números enteros.
 
-\par\medskip\noindent\textbf{RF-10 --- Exportación del historial.} El sistema deberá permitir exportar el historial de análisis a un archivo CSV, limitado a los análisis a los que el usuario tiene acceso. \textbf{Criterio de verificación:} un usuario normal obtiene únicamente sus registros, y el contenido que comienza con caracteres de fórmula se neutraliza en el archivo.
+\par\medskip\noindent\textbf{RF-10 --- Exportación del historial.} El sistema deberá permitir exportar el historial de análisis a un archivo CSV, limitado a los análisis a los que el usuario tiene acceso. \textbf{Criterio de verificación:} un usuario normal obtiene únicamente sus registros, y el contenido que comienza con caracteres de fórmula se neutraliza en el archivo, también cuando lleva espacios o saltos de línea antes.
+
+\par\medskip\noindent\textbf{RF-11 --- Lectura de códigos QR.} El sistema deberá permitir que el usuario elija una imagen con un código QR y que el enlace que contiene pase al campo de análisis de URL, sin enviar la imagen al servidor. \textbf{Criterio de verificación:} al elegir una imagen cuyo QR contiene un enlace web, el enlace aparece en el campo; si el QR trae texto u otro tipo de enlace, el sistema lo avisa y no lo pone. Esta lectura se comprueba a mano en el navegador; las pruebas automatizadas verifican solo que el formulario conserve el campo de origen (\texttt{probar\_origen.py}, \texttt{probar\_csrf.py}).
+
+\par\medskip\noindent\textbf{RF-12 --- Borrado de análisis.} El sistema deberá permitir que cada usuario borre uno de sus análisis, o todos, junto con sus indicadores y, si lo tiene, su reporte. \textbf{Criterio de verificación:} al borrar, el análisis deja de aparecer; un análisis ajeno responde 404 y no se borra, tampoco para el administrador (\texttt{probar\_privacidad.py}).
+
+\par\medskip\noindent\textbf{RF-13 --- Reportes al área de tecnología.} El sistema deberá permitir que el usuario reporte uno de sus análisis de riesgo medio o alto, con una nota opcional de hasta 200 caracteres, y que el administrador vea los reportes y los marque como revisados. \textbf{Criterio de verificación:} un análisis de riesgo bajo o ajeno no se puede reportar, no se reporta dos veces, y la lista de reportes solo la ve el administrador (\texttt{probar\_reportes.py}).
+
+\par\medskip\noindent\textbf{RF-14 --- Amenazas confirmadas.} El sistema deberá permitir que el administrador confirme como phishing los dominios de un reporte y que, desde ese momento, un enlace de esos dominios se marque con puntaje 100 y una alerta. \textbf{Criterio de verificación:} no se confirman dominios oficiales, acortadores ni dominios inválidos; el administrador puede quitar un dominio de la lista (\texttt{probar\_amenazas.py}).
+
+\par\medskip\noindent\textbf{RF-15 --- Tendencias.} El sistema deberá mostrar al administrador cifras generales: análisis por día de los últimos 30 días, distribución por nivel y por tipo, y los 10 indicadores más detectados, sin mostrar contenidos. \textbf{Criterio de verificación:} solo el administrador entra a la página; un usuario normal recibe 403 (\texttt{probar\_tendencias.py}).
+
+\par\medskip\noindent\textbf{RF-16 --- Bot de Telegram.} El sistema deberá permitir analizar un mensaje de texto enviado a un bot de Telegram con el mismo motor de la aplicación web, sin guardar el mensaje. \textbf{Criterio de verificación:} el bot responde con el puntaje, el nivel y las tres señales de más peso; rechaza textos de más de 2.000 caracteres; limita a 10 mensajes por minuto por chat, y no deja tocables los enlaces de su respuesta (\texttt{probar\_bot.py}).
 
 \subsubsection{Requisitos no funcionales}
 
@@ -523,15 +558,25 @@ Los requisitos no funcionales establecen condiciones relacionadas con la segurid
 
 \par\medskip\noindent\textbf{RNF-09 --- Protección de formularios y cabeceras de seguridad.} Los formularios deberán incluir un token contra CSRF y las respuestas deberán incluir cabeceras de seguridad, entre ellas una política de seguridad de contenido restrictiva. \textbf{Criterio de verificación:} un envío sin token válido es rechazado, y las cabeceras aparecen en las respuestas del servidor.
 
-\par\medskip\noindent\textbf{RNF-10 --- Control de intentos de autenticación.} El sistema deberá limitar los intentos de inicio de sesión (5 por minuto) y de registro (10 por hora). \textbf{Criterio de verificación:} al superar el límite de inicio de sesión en un minuto, el sistema responde con el código 429.
+\par\medskip\noindent\textbf{RNF-10 --- Control de intentos.} El sistema deberá limitar los intentos de inicio de sesión (5 por minuto), de registro (10 por hora) y de reportes (10 por minuto). \textbf{Criterio de verificación:} al superar el límite de inicio de sesión en un minuto, el sistema responde con el código 429.
 
 \par\medskip\noindent\textbf{RNF-11 --- Control de acceso por rol.} Las funciones de administración deberán estar disponibles únicamente para usuarios con rol de administrador, y esta verificación deberá hacerse en el servidor. \textbf{Criterio de verificación:} un usuario normal que accede directamente a la dirección de una función de administración recibe el código 403.
+
+\par\medskip\noindent\textbf{RNF-12 --- Privacidad y protección de datos personales.} El sistema deberá publicar un aviso de privacidad, pedir su aceptación al registrarse y guardar la fecha de aceptación. El aviso deberá explicar qué datos se guardan, quién los ve y que el texto enviado al bot de Telegram pasa por los servidores de Telegram. \textbf{Criterio de verificación:} el registro sin la casilla de aceptación se rechaza en el servidor, y el aviso es público y trae el apartado del bot (\texttt{probar\_privacidad.py}).
+
+\par\medskip\noindent\textbf{RNF-13 --- Registro de eventos de seguridad.} El sistema deberá registrar los eventos de seguridad (inicios y cierres de sesión, intentos fallidos, registros, exportaciones, cambios de peso, borrados, reportes, amenazas, accesos denegados, límites superados y tokens CSRF inválidos) con usuario, IP y fecha, sin guardar contraseñas ni contenidos, y evitar que una ráfaga de eventos repetidos llene la tabla. \textbf{Criterio de verificación:} cada evento queda registrado; los repetidos dentro de un minuto se cuentan en la misma fila, y si el registro falla, la petición no se rompe (\texttt{probar\_eventos.py}).
+
+\par\medskip\noindent\textbf{RNF-14 --- Diseño adaptable al celular.} Las páginas deberán poder usarse desde un celular. \textbf{Criterio de verificación:} las páginas incluyen la configuración de pantalla para celular y reglas de estilo para pantallas angostas; esto se comprueba de forma automática en las tendencias y las páginas de error (\texttt{probar\_tendencias.py}, \texttt{probar\_errores.py}), y en el resto de las pantallas se comprueba a mano, viendo la aplicación desde el celular.
+
+\par\medskip\noindent\textbf{RNF-15 --- Hora de Colombia.} Las fechas deberán guardarse en UTC y mostrarse en hora de Colombia (UTC$-5$). \textbf{Criterio de verificación:} una fecha guardada en UTC se muestra con cinco horas menos (\texttt{probar\_hora\_colombia.py}), y las tendencias agrupan los análisis por día de Colombia (\texttt{probar\_tendencias.py}).
+
+\par\medskip\noindent\textbf{RNF-16 --- Errores y sesión sin filtraciones.} Las páginas de error (400, 403, 404, 405, 429 y 500) deberán estar en español, conservar el código HTTP y no mostrar detalles del error. El cierre de sesión deberá ser solo por POST con token, y con la sesión iniciada las respuestas deberán llevar \texttt{Cache-Control: no-store}. \textbf{Criterio de verificación:} el 404 de un análisis ajeno es idéntico al de uno inexistente; un GET a \texttt{/logout} responde 405, y después de cerrar sesión el botón ``Atrás'' no muestra páginas del usuario anterior (\texttt{probar\_errores.py}, \texttt{probar\_csrf.py}, \texttt{probar\_cache.py}).
 
 \subsection{Modelado}
 
 \subsubsection{Diagrama de casos de uso}
 
-El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores del sistema. El usuario puede registrarse, iniciar y cerrar sesión, analizar URL y mensajes, consultar su historial y el detalle de cada análisis, exportarlo a CSV y ver sus estadísticas. El administrador hereda todos los casos de uso del usuario y, además, consulta el historial global y edita los pesos de los indicadores.
+El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores del sistema. El usuario puede registrarse (aceptando el aviso de privacidad), iniciar y cerrar sesión, analizar URL y mensajes, leer un código QR, consultar su historial y el detalle de cada análisis, exportarlo a CSV, ver sus estadísticas, borrar sus análisis, reportar un análisis al área de tecnología y usar el bot de Telegram. El administrador hereda todos los casos de uso del usuario y, además, consulta el historial global, edita los pesos de los indicadores, revisa los reportes, gestiona las amenazas confirmadas y consulta las tendencias y los eventos de seguridad.
 
 \begin{figure}[htbp]
 \centering
@@ -542,30 +587,34 @@ El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores 
   uc/.style={ellipse, draw, fill=azulclaro, minimum width=3.9cm, minimum height=0.75cm, align=center, inner sep=1pt},
   actor/.pic={\draw (0,0.6) circle (0.18); \draw (0,0.42)--(0,-0.15); \draw (-0.32,0.2)--(0.32,0.2); \draw (0,-0.15)--(-0.26,-0.6); \draw (0,-0.15)--(0.26,-0.6);}
 ]
-\foreach \n/\t [count=\i] in {u1/Registrarse, u2/Iniciar sesión, u3/Cerrar sesión, u4/Analizar URL, u5/Analizar mensaje, u6/Consultar historial propio, u7/Ver detalle de un análisis, u8/Exportar historial a CSV, u9/Ver estadísticas} {
+\foreach \n/\t [count=\i] in {u1/Registrarse, u2/Iniciar sesión, u3/Cerrar sesión, u4/Analizar URL, u5/Analizar mensaje, u6/Consultar historial propio, u7/Ver detalle de un análisis, u8/Exportar historial a CSV, u9/Ver estadísticas, u10/Leer QR desde una imagen, u11/Borrar análisis, u12/Reportar un análisis, u13/Usar el bot de Telegram} {
   \node[uc] (\n) at (4.4, {-(\i-1)*0.95}) {\t};
 }
 \node[uc] (a1) at (9.6,-2.4) {Consultar historial global};
 \node[uc] (a2) at (9.6,-4.6) {Editar pesos de\\los indicadores};
+\node[uc] (a3) at (9.6,-6.8) {Revisar reportes y\\gestionar amenazas};
+\node[uc] (a4) at (9.6,-9.0) {Ver tendencias y\\eventos de seguridad};
 \pic at (-0.9,-3.8) {actor};
 \node[below] at (-0.9,-4.45) {Usuario};
 \pic at (13.4,-3.5) {actor};
 \node[below] at (13.4,-4.15) {Administrador};
-\foreach \n in {u1,u2,u3,u4,u5,u6,u7,u8,u9} {\draw (-0.55,-3.6) -- (\n.west);}
+\foreach \n in {u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13} {\draw (-0.55,-3.6) -- (\n.west);}
 \draw (13.0,-3.3) -- (a1.east);
 \draw (13.0,-3.3) -- (a2.east);
+\draw (13.0,-3.3) -- (a3.east);
+\draw (13.0,-3.3) -- (a4.east);
 \begin{pgfonlayer}{background}
-  \node[fit=(u1)(u9)(a1)(a2), draw, rounded corners=3pt, inner sep=8pt] (sis) {};
+  \node[fit=(u1)(u13)(a1)(a2)(a3)(a4), draw, rounded corners=3pt, inner sep=8pt] (sis) {};
 \end{pgfonlayer}
 \node[anchor=south west, font=\scriptsize\bfseries] at (sis.north west) {PhishGuard};
-\draw[-{Triangle[open,length=3mm,width=2.5mm]}] (13.4,-4.75) -- (13.4,-8.7) -| (-0.9,-4.95);
-\node[font=\scriptsize, fill=white, inner sep=1pt] at (6.7,-8.7) {el administrador hereda los casos de uso del usuario};
+\draw[-{Triangle[open,length=3mm,width=2.5mm]}] (13.4,-4.75) -- (13.4,-12.9) -| (-0.9,-4.95);
+\node[font=\scriptsize, fill=white, inner sep=1pt] at (6.7,-12.9) {el administrador hereda los casos de uso del usuario};
 \end{tikzpicture}
 \end{figure}
 
 \subsubsection{Modelo de datos}\label{sec:modelodatos}
 
-La figura~\ref{fig:clases} muestra el modelo de datos, implementado con cuatro tablas. Un usuario realiza cero o más análisis, y cada análisis contiene cero o más indicadores detectados. La tabla \texttt{IndicadorConfig} guarda los pesos que lee el motor de análisis; los indicadores detectados guardan una copia del nombre y del peso en el momento del análisis, de modo que editar un peso no cambia los análisis anteriores.
+La figura~\ref{fig:clases} muestra las cuatro tablas principales del modelo de datos, que en total tiene siete; las otras tres se describen en la tabla~\ref{tab:tablasnuevas}. Un usuario realiza cero o más análisis, y cada análisis contiene cero o más indicadores detectados. La tabla \texttt{IndicadorConfig} guarda los pesos que lee el motor de análisis; los indicadores detectados guardan una copia del nombre, del peso y de la explicación en el momento del análisis, de modo que editar un peso no cambia los análisis anteriores. El campo \texttt{origen} indica si la URL salió de un código QR, y \texttt{fecha\_aceptacion\_privacidad} guarda cuándo el usuario aceptó el aviso de privacidad (queda vacío en los usuarios anteriores al aviso).
 
 \begin{figure}[htbp]
 \centering
@@ -576,15 +625,29 @@ La figura~\ref{fig:clases} muestra el modelo de datos, implementado con cuatro t
   clase/.style={rectangle split, rectangle split parts=2, draw, text width=5.2cm, align=left, inner sep=3pt,
                 rectangle split part fill={azulclaro,white}}
 ]
-\node[clase] (u) at (0,0) {\textbf{Usuario}\nodepart{two}id: entero (PK)\\username: texto(50), único\\email: texto(120), único\\password\_hash: texto(255)\\es\_admin: booleano\\fecha\_registro: fecha y hora};
-\node[clase] (a) at (8,0) {\textbf{Analisis}\nodepart{two}id: entero (PK)\\usuario\_id: entero (FK)\\tipo: texto(10)\\contenido: texto\\puntaje: entero (0 a 100)\\nivel: texto(10)\\fecha: fecha y hora};
+\node[clase] (u) at (0,0) {\textbf{Usuario}\nodepart{two}id: entero (PK)\\username: texto(50), único\\email: texto(120), único\\password\_hash: texto(255)\\es\_admin: booleano\\fecha\_registro: fecha y hora\\fecha\_aceptacion\_privacidad: fecha y hora (opcional)};
+\node[clase] (a) at (8,0) {\textbf{Analisis}\nodepart{two}id: entero (PK)\\usuario\_id: entero (FK)\\tipo: texto(10)\\contenido: texto\\puntaje: entero (0 a 100)\\nivel: texto(10)\\fecha: fecha y hora\\origen: texto(10), opcional};
 \node[clase] (c) at (0,-5.4) {\textbf{IndicadorConfig}\nodepart{two}id: entero (PK)\\nombre: texto(100), único\\descripcion: texto(255)\\peso: entero\\activo: booleano};
-\node[clase] (d) at (8,-5.4) {\textbf{IndicadorDetectado}\nodepart{two}id: entero (PK)\\analisis\_id: entero (FK)\\nombre: texto(100)\\peso: entero\\explicacion: texto(255)};
+\node[clase] (d) at (8,-5.4) {\textbf{IndicadorDetectado}\nodepart{two}id: entero (PK)\\analisis\_id: entero (FK)\\nombre: texto(100)\\peso: entero\\explicacion: texto};
 \draw (u.east) -- node[above] {realiza} node[pos=0.07, above] {1} node[pos=0.9, above] {0..*} (a.west);
 \draw (a.south) -- node[right] {contiene} node[pos=0.1, right] {1} node[pos=0.88, right] {0..*} (d.north);
 \draw[dashed, -{Stealth[length=2.2mm]}] (d.west) -- node[above, align=center] {copia nombre\\y peso} (c.east);
 \end{tikzpicture}
 \end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Tablas del modelo de datos que no aparecen en la figura}\label{tab:tablasnuevas}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.22\textwidth}|p{0.40\textwidth}|p{0.28\textwidth}|}
+\hline
+\textbf{Tabla} & \textbf{Qué guarda} & \textbf{Relación} \\ \hline
+\texttt{eventos\_seguridad} (EventoSeguridad) & El evento, un detalle en una sola línea (hasta 500 caracteres), la IP y la fecha. No guarda contraseñas ni contenidos. & Usuario opcional: queda vacío si no hay usuario, por ejemplo en un inicio de sesión fallido. \\ \hline
+\texttt{reportes} (Reporte) & El usuario que reporta, una nota opcional (200 caracteres), la fecha, el estado (pendiente o revisado) y quién y cuándo lo revisó. & Uno por análisis (clave única); se borra junto con el análisis. \\ \hline
+\texttt{amenazas\_confirmadas} (AmenazaConfirmada) & El dominio (único), la fecha y el administrador que lo confirmó. & Sin relación con el análisis ni con el reporte, para que sobreviva al borrado y no identifique al usuario. \\ \hline
+\end{tabular}
+\end{table}
 
 \subsubsection{Inventario y clasificación de activos}\label{sec:activos}
 
@@ -625,13 +688,16 @@ AC-06 & Plataforma de aprendizaje y sistema de información académica & [SW] Ap
 AC-07 & Comunidad universitaria (usuarios) & [P] Personal & No aplica & Factor humano & Medio \\ \hline
 \multicolumn{6}{|l|}{\textbf{Activos de la aplicación PhishGuard}} \\ \hline
 AP-01 & Código fuente de la aplicación & [SW] Aplicaciones & Uso interno & [I] & Medio \\ \hline
-AP-02 & Base de datos MySQL (usuarios, análisis e indicadores) & [D] Datos & Confidencial & [C], [I] & Alto \\ \hline
+AP-02 & Base de datos MySQL (usuarios, análisis, indicadores, eventos, reportes y amenazas) & [D] Datos & Confidencial & [C], [I] & Alto \\ \hline
 AP-03 & Credenciales de los usuarios (contraseñas con hash) & [D] Datos & Confidencial & [C], [A] & Alto \\ \hline
 AP-04 & Historial y contenido analizado & [D] Datos & Confidencial & [C] & Alto \\ \hline
 AP-05 & Configuración de los pesos de los indicadores & [D] Datos & Uso interno & [I] & Medio \\ \hline
-AP-06 & Secretos de configuración (clave secreta y cadena de conexión) & [D] Datos & Confidencial & [C] & Alto \\ \hline
+AP-06 & Secretos de configuración (clave secreta, cadena de conexión y token del bot de Telegram) & [D] Datos & Confidencial & [C] & Alto \\ \hline
 AP-07 & Servicio web PhishGuard (servidor local) & [S] Servicios & Uso interno & [D] & Medio \\ \hline
 AP-08 & Equipo donde se ejecuta la aplicación & [HW] Equipos & Uso interno & [D], [C] & Medio \\ \hline
+AP-09 & Registro de eventos de seguridad (usuario, IP y fecha) & [D] Datos & Confidencial & [I], [C] & Medio \\ \hline
+AP-10 & Reportes (con su nota) y lista de amenazas confirmadas & [D] Datos & Confidencial & [I], [C] & Medio \\ \hline
+AP-11 & Bot de Telegram (proceso aparte del servicio web) & [S] Servicios & Uso interno & [D] & Medio \\ \hline
 \end{longtable}
 \endgroup
 
@@ -652,7 +718,8 @@ Un vector de ataque es el medio por el que una amenaza llega a su víctima. En e
 \endhead
 Correo electrónico (phishing) & Correos que imitan al portal de pagos, a bienestar universitario o a la mesa de ayuda. & El texto del mensaje y los enlaces que contiene. & A1, A2, A4 \\ \hline
 SMS (smishing) & Mensajes cortos con urgencia y un enlace, a menudo acortado. & El texto del mensaje y el enlace. & A1, A4 \\ \hline
-Mensajería instantánea y redes sociales & Mensajes reenviados en grupos de estudiantes o publicaciones con enlaces. & El texto del mensaje y el enlace. & A1, A3 \\ \hline
+Mensajería instantánea y redes sociales & Mensajes reenviados en grupos de estudiantes o publicaciones con enlaces. & El texto del mensaje y el enlace, desde la web o desde el bot de Telegram. & A1, A3 \\ \hline
+Código QR (quishing) & Códigos QR en carteles, correos o mensajes que llevan a una página falsa. & El enlace que contiene el código, que se lee en el navegador y se analiza como URL. & A1, A4 \\ \hline
 Llamadas (vishing) & Llamadas que piden datos y luego envían un enlace o un mensaje de seguimiento. & Solo el mensaje o el enlace de seguimiento; la llamada queda fuera del alcance. & A3 \\ \hline
 Sitios web falsos & Páginas que copian el inicio de sesión institucional o el portal de pagos. & La URL: protocolo, dominio, puerto y estructura. & A1, A4 \\ \hline
 \end{longtable}
@@ -663,15 +730,15 @@ Sitios web falsos & Páginas que copian el inicio de sesión institucional o el 
 PhishGuard analiza cada URL o mensaje con un motor de reglas, en seis pasos:
 
 \begin{enumerate}
-  \item \textbf{Validación de la entrada:} el campo no puede ir vacío ni superar la longitud máxima (500 caracteres para una URL y 2.000 para un mensaje), y una URL debe empezar por \texttt{http://} o \texttt{https://}.
-  \item \textbf{Preparación:} la URL se descompone en protocolo, dominio, puerto y ruta; el mensaje se pasa a minúsculas y se le quitan las tildes, para que, por ejemplo, ``código'' y ``codigo'' se detecten igual.
-  \item \textbf{Evaluación de indicadores:} se revisan 10 indicadores para URL o 7 para mensajes. Cada indicador que se cumple suma su peso, que se lee de la base de datos.
+  \item \textbf{Validación de la entrada:} el campo no puede ir vacío ni superar la longitud máxima (500 caracteres para una URL y 2.000 para un mensaje), y una URL debe empezar por \texttt{http://} o \texttt{https://} y estar bien formada (por ejemplo, el puerto debe ser un número). Si no se cumple, el formulario la rechaza con un aviso en lugar de fallar.
+  \item \textbf{Preparación:} la URL se descompone en protocolo, dominio real (sin el usuario que pueda ir antes de la \texttt{@}), puerto y ruta; el mensaje se pasa a minúsculas y se le quitan las tildes, para que, por ejemplo, ``código'' y ``codigo'' se detecten igual. Del mensaje también se sacan hasta tres enlaces, con \texttt{http://}, con \texttt{www.} o sin esquema (como \texttt{bit.ly/abc}); esos enlaces se revisan como texto y nunca se abren.
+  \item \textbf{Evaluación de indicadores:} se revisan 10 indicadores para URL u 8 para mensajes. Cada indicador que se cumple suma su peso, que se lee de la base de datos. Cada enlace del mensaje se analiza como una URL; si alguno es de riesgo medio o alto, o imita a una marca aunque use HTTPS, se suma ``Enlace sospechoso en el mensaje''. Si el dominio está en la lista de amenazas confirmadas, se agrega además un indicador fijo y el puntaje queda en 100.
   \item \textbf{Puntaje:} la suma de los pesos se limita a 100.
   \item \textbf{Clasificación:} riesgo bajo (0 a 30), medio (31 a 60) o alto (61 a 100).
   \item \textbf{Explicación:} se muestra cada indicador detectado, con su peso y por qué es sospechoso; en los mensajes también se muestran las palabras que lo activaron.
 \end{enumerate}
 
-Los indicadores retoman características usadas en la literatura: características léxicas de la URL (Hong et al., 2020; Jeeva y Rajsingh, 2016) y palabras típicas de los mensajes fraudulentos (Yeboah-Boateng y Amanor, 2014). Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09).
+Los indicadores retoman características usadas en la literatura: características léxicas de la URL (Hong et al., 2020; Jeeva y Rajsingh, 2016) y palabras típicas de los mensajes fraudulentos (Yeboah-Boateng y Amanor, 2014). Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09). Los diez indicadores de la primera tabla se aplican a una URL; los ocho de la segunda, al texto de un mensaje. Los enlaces que trae un mensaje también pasan por los indicadores de URL, pero su resultado aparece resumido en ``Enlace sospechoso en el mensaje''. La descripción de cada indicador es la que muestra la aplicación en la página de indicadores.
 
 \begingroup
 \footnotesize
@@ -679,21 +746,21 @@ Los indicadores retoman características usadas en la literatura: característic
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.52\textwidth}|>{\raggedright\arraybackslash}p{0.07\textwidth}|}
 \caption{Indicadores de URL y pesos iniciales}\label{tab:indurl}\\
 \hline
-\textbf{Indicador de URL} & \textbf{Criterio} & \textbf{Peso} \\ \hline
+\textbf{Indicador de URL} & \textbf{Descripción} & \textbf{Peso} \\ \hline
 \endfirsthead
 \hline
-\textbf{Indicador de URL} & \textbf{Criterio} & \textbf{Peso} \\ \hline
+\textbf{Indicador de URL} & \textbf{Descripción} & \textbf{Peso} \\ \hline
 \endhead
-IP en lugar de dominio & El dominio es una dirección IP. & 25 \\ \hline
-Contiene el símbolo @ & La URL incluye el símbolo \texttt{@}, que puede ocultar el dominio real. & 20 \\ \hline
-Posible typosquatting & El dominio contiene el nombre de una entidad conocida, pero no es su dominio oficial. & 20 \\ \hline
-No usa HTTPS & El protocolo no es \texttt{https}. & 15 \\ \hline
-Palabras de urgencia o verificación & Contiene palabras como ``verificar'', ``login'' o ``cuenta''. & 10 \\ \hline
-URL demasiado larga & Tiene más de 75 caracteres. & 10 \\ \hline
-Demasiados subdominios & El dominio tiene más de tres puntos. & 10 \\ \hline
-Usa un acortador de URL & El dominio es un acortador conocido (por ejemplo, bit.ly o tinyurl.com). & 10 \\ \hline
-Dominio de nivel superior inusual & Termina en .tk, .ml, .ga, .xyz o .top. & 10 \\ \hline
-Puerto inusual & Usa un puerto distinto de 80 y 443. & 10 \\ \hline
+IP en lugar de dominio & Los sitios legítimos casi nunca usan una IP directa en la URL. & 25 \\ \hline
+Contiene el símbolo @ & Se usa para ocultar el dominio real detrás de un texto engañoso. & 20 \\ \hline
+Posible typosquatting & El dominio imita a una marca conocida pero no es el oficial. Se activa si la marca aparece dentro del dominio (\texttt{nequi-premios.top}) o si una parte del dominio cambia una sola letra de la marca (\texttt{nequl.com.co}); esto último solo con marcas de cinco letras o más. Nunca marca un dominio oficial. & 20 \\ \hline
+No usa HTTPS & Los sitios serios casi siempre usan conexión segura HTTPS. & 15 \\ \hline
+Palabras de urgencia/verificación & Busca en la dirección palabras como \texttt{login}, \texttt{verificar} o \texttt{cuenta}, que suelen aparecer en páginas falsas de acceso o verificación pero también en sitios legítimos. Es distinto de ``Lenguaje de urgencia'', que se aplica al texto de un mensaje. & 10 \\ \hline
+URL demasiado larga & Las URL muy largas (más de 75 caracteres) se usan para ocultar la dirección real. & 10 \\ \hline
+Demasiados subdominios & Un exceso de subdominios (más de tres puntos en el dominio) puede simular un dominio confiable. & 10 \\ \hline
+Usa un acortador de URL & Los acortadores (por ejemplo, bit.ly o tinyurl.com) ocultan el destino real del enlace. & 10 \\ \hline
+Dominio de nivel superior inusual & Terminaciones baratas o gratuitas (.tk, .ml, .ga, .xyz, .top) muy usadas en estafas; no todas son gratuitas. & 10 \\ \hline
+Puerto inusual en la URL & El uso de puertos distintos de 80 y 443 es común en intentos de ocultar el sitio. & 10 \\ \hline
 \end{longtable}
 \endgroup
 
@@ -703,22 +770,25 @@ Puerto inusual & Usa un puerto distinto de 80 y 443. & 10 \\ \hline
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.52\textwidth}|>{\raggedright\arraybackslash}p{0.07\textwidth}|}
 \caption{Indicadores de mensaje y pesos iniciales}\label{tab:indmsg}\\
 \hline
-\textbf{Indicador de mensaje} & \textbf{Criterio (ejemplos de palabras)} & \textbf{Peso} \\ \hline
+\textbf{Indicador de mensaje} & \textbf{Descripción (y ejemplos de palabras)} & \textbf{Peso} \\ \hline
 \endfirsthead
 \hline
-\textbf{Indicador de mensaje} & \textbf{Criterio (ejemplos de palabras)} & \textbf{Peso} \\ \hline
+\textbf{Indicador de mensaje} & \textbf{Descripción (y ejemplos de palabras)} & \textbf{Peso} \\ \hline
 \endhead
-Solicitud de datos sensibles & ``clave'', ``contraseña'', ``PIN'', ``CVV'', ``verifique sus datos''. & 25 \\ \hline
-Amenaza de bloqueo o suspensión & ``bloqueada'', ``suspendida'', ``cancelada'', ``desactivada''. & 20 \\ \hline
-Lenguaje de urgencia & ``urgente'', ``inmediatamente'', ``24 horas'', ``hoy mismo''. & 15 \\ \hline
-Invitación a ingresar a un enlace & ``http://'', ``www.'', ``haga clic'', ``siguiente enlace''. & 15 \\ \hline
-Premio u oferta engañosa & ``ganaste'', ``premio'', ``sorteo'', ``gratis''. & 15 \\ \hline
-Mención de una entidad conocida & Nombres como Bancolombia, Nequi o la DIAN. & 10 \\ \hline
-Mayúsculas o exclamaciones en exceso & Tres o más palabras en mayúsculas, o tres o más signos de exclamación. & 5 \\ \hline
+Solicitud de datos sensibles & Pide información personal o credenciales, algo que las entidades serias no solicitan por mensaje. Ejemplos: ``clave'', ``contraseña'', ``PIN'', ``CVV'', ``verifique sus datos''. & 25 \\ \hline
+Amenaza de bloqueo o suspensión & Advierte que perderás acceso a algo (cuenta bloqueada, suspendida) para generar miedo. Ejemplos: ``bloqueada'', ``suspendida'', ``cancelada'', ``desactivada''. & 20 \\ \hline
+Enlace sospechoso en el mensaje & Cada enlace del mensaje (hasta tres) se analiza como URL. Cuenta si es de riesgo medio o alto, o si trae ``Posible typosquatting'', aunque use HTTPS y sea de riesgo bajo. Un acortador solo no cuenta. & 20 \\ \hline
+Lenguaje de urgencia & Frases que presionan para que actúes rápido y sin pensar. Es distinto de ``Palabras de urgencia/verificación'', que se busca en la dirección de una URL. Ejemplos: ``urgente'', ``inmediatamente'', ``24 horas'', ``hoy mismo''. & 15 \\ \hline
+Invitación a ingresar a un enlace & Te invita a abrir un enlace. Importa porque el enlace es la vía más común del phishing: casi todo ataque necesita que la persona abra uno. Ejemplos: ``http://'', ``www.'', ``haga clic'', ``siguiente enlace''. & 15 \\ \hline
+Premio u oferta engañosa & Ofrece un beneficio inesperado (premio, sorteo, regalo) para atraer tu atención. Ejemplos: ``ganaste'', ``premio'', ``sorteo'', ``gratis''. & 15 \\ \hline
+Mención de una entidad conocida & Nombra una entidad reconocida (un banco, la DIAN), algo típico al suplantar identidades. Ejemplos: Bancolombia, Nequi o la DIAN. & 10 \\ \hline
+Mayúsculas o exclamaciones en exceso & El tono alarmista busca generar ansiedad: tres o más palabras en mayúsculas, o tres o más signos de exclamación. & 5 \\ \hline
 \end{longtable}
 \endgroup
 
-\textbf{Ejemplo.} El mensaje ``URGENTE!!! Felicitaciones, ganaste un premio de Bancolombia. Ingrese su clave en www.premios-bancolombia.xyz hoy mismo'' activa seis indicadores: solicitud de datos sensibles (25), lenguaje de urgencia (15), invitación a un enlace (15), premio u oferta (15), mención de una entidad conocida (10) y exclamaciones en exceso (5). Suman 85, que corresponde a riesgo alto. Si el mensaje trae un enlace, el usuario puede analizarlo además por separado en el análisis de URL.
+\textbf{Ejemplo.} El mensaje ``URGENTE!!! Felicitaciones, ganaste un premio de Bancolombia. Ingrese su clave en www.premios-bancolombia.xyz hoy mismo'' activa siete indicadores: solicitud de datos sensibles (25), lenguaje de urgencia (15), invitación a un enlace (15), premio u oferta (15), mención de una entidad conocida (10), enlace sospechoso en el mensaje (20) y exclamaciones en exceso (5). Suman 105, pero el puntaje se limita a 100, que corresponde a riesgo alto. El enlace sospechoso se debe a que \texttt{www.premios-bancolombia.xyz}, analizado como URL, suma 45 puntos (riesgo medio): no usa HTTPS (15), termina en \texttt{.xyz} (10) e imita a Bancolombia (20). El usuario también puede analizarlo por separado en el análisis de URL.
+
+\textbf{Indicador fijo.} Además de los 18 indicadores, existe uno que no está en la base de datos ni se puede editar: ``Amenaza confirmada por la institución''. Se agrega cuando el dominio de la URL, o el de un enlace del mensaje, o un subdominio de ellos, está en la lista de amenazas confirmadas por el administrador, y deja el puntaje en 100 sin importar los pesos. Un dominio oficial nunca se marca, aunque estuviera en la lista (apartado ``Reportes, amenazas confirmadas y tendencias'' de la sección~\ref{sec:tecnica}).
 
 \subsubsection{Amenazas y vulnerabilidades}\label{sec:amenazas}
 
@@ -746,6 +816,9 @@ Las amenazas se clasifican por su origen, siguiendo el catálogo de MAGERIT ([A]
 OWASP A05 & Inyección: SQL, código en la página (XSS) y fórmulas en archivos CSV & Ataque a la aplicación web & AP-02, AP-03, AP-04 & B3, B4, B6 \\ \hline
 --- & Falsificación de peticiones (CSRF) y secuestro de sesión & Ataque a la aplicación web & AP-03 & B5 \\ \hline
 [E.1] & Errores de los usuarios & Error no intencionado & AC-07 & A6 \\ \hline
+[A.19] & Divulgación de información: el texto enviado al bot de Telegram pasa por los servidores de Telegram & Servicio externo (Telegram) & AC-03, AP-11 & B10 \\ \hline
+[A.24] & Denegación de servicio: inundación del registro de eventos con intentos repetidos & Ataque intencionado & AP-02, AP-09 & B9 \\ \hline
+[E.2] & Errores del administrador: confirmar por error un dominio compartido como amenaza & Error no intencionado & AP-10 & B7 \\ \hline
 \end{longtable}
 \endgroup
 
@@ -770,10 +843,14 @@ V-05 & La institución no tiene oficial de seguridad ni centro de operaciones de
 V-06 & Identificadores consecutivos en las direcciones del historial & Técnica & B2 & Mitigada (consulta filtrada por usuario) \\ \hline
 V-07 & Entradas del usuario que podrían interpretarse como código u órdenes & Técnica & B3, B4, B6 & Mitigada (consultas parametrizadas, escape, CSV neutralizado) \\ \hline
 V-08 & Formularios y cookies sin protecciones adicionales & Técnica & B5 & Mitigada (token CSRF, cookie HttpOnly y SameSite) \\ \hline
-V-09 & Ausencia de registro de eventos de seguridad & Técnica & B1, B7 & Abierta \\ \hline
-V-10 & Rutas de análisis sin límite de envíos & Técnica & B9 & Abierta (aceptada en pruebas) \\ \hline
-V-11 & Contenido analizado sin aviso de privacidad ni opción de eliminarlo & Organizativa & B10 & Abierta \\ \hline
+V-09 & Ausencia de registro de eventos de seguridad & Técnica & B1, B7 & Mitigada (registro de eventos de seguridad) \\ \hline
+V-10 & Rutas de análisis sin límite de envíos (solo el inicio de sesión, el registro y los reportes lo tienen) & Técnica & B9 & Abierta (aceptada en pruebas) \\ \hline
+V-11 & Contenido analizado que puede incluir datos personales, sin aviso de privacidad ni opción de eliminarlo (hasta la versión anterior) & Organizativa & B10 & Parcial (aviso y borrado de análisis; falta eliminar la cuenta) \\ \hline
 V-12 & Posible exposición de los secretos de configuración & Técnica & B8 & Mitigada (excluidos del repositorio) \\ \hline
+V-13 & Cierre de sesión mediante una petición GET, que una página ajena podía provocar & Técnica & B5 & Mitigada (solo POST con token CSRF) \\ \hline
+V-14 & El texto enviado al bot de Telegram pasa por los servidores de Telegram & Organizativa & B10 & Parcial (aviso de privacidad; el bot no guarda nada) \\ \hline
+V-15 & Enlaces tocables en las respuestas del bot & Técnica & A1, A4 & Mitigada (defanging del texto copiado) \\ \hline
+V-16 & Confirmar un dominio por error (servicio compartido) marca como peligrosos todos sus enlaces & Organizativa & B7 & Parcial (advertencia al confirmar y botón para quitarlo) \\ \hline
 \end{longtable}
 \endgroup
 
@@ -814,16 +891,16 @@ A6 & Comunidad universitaria & [E.1] Errores de los usuarios & Falta de formaci�
 \hline
 \textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
 \endhead
-B1 & Credenciales de usuarios de PhishGuard & [A.5] Suplantación de la identidad del usuario (fuerza bruta) & Contraseñas débiles o reutilizadas & 2 & 2 & 4 Medio & Hash con sal (RNF-02); límite de 5 intentos por minuto (RNF-10); mínimo de 8 caracteres. Residual: Bajo. \\ \hline
+B1 & Credenciales de usuarios de PhishGuard & [A.5] Suplantación de la identidad del usuario (fuerza bruta) & Contraseñas débiles o reutilizadas & 2 & 2 & 4 Medio & Hash con sal (RNF-02); límite de 5 intentos por minuto (RNF-10); mínimo de 8 caracteres; los intentos fallidos quedan en el registro de eventos (RNF-13). Residual: Bajo. \\ \hline
 B2 & Historial de análisis & [A.11] Acceso no autorizado (referencia directa a objetos) & Identificadores consecutivos en la URL (\texttt{/historial/N}) & 2 & 3 & 6 Alto & Consulta filtrada por usuario; respuesta 404 ante identificadores ajenos (RNF-08). Prueba documentada. Residual: Bajo. \\ \hline
 B3 & Base de datos & [A.11]; [A.15] Inyección SQL & Entradas del usuario concatenadas en consultas & 2 & 3 & 6 Alto & ORM con consultas parametrizadas (RNF-03) y validación de formularios (RNF-04). Residual: Bajo. \\ \hline
 B4 & Sesión y navegador del usuario & XSS: contenido analizado que incluye código & Mostrar texto del usuario sin escapar & 2 & 3 & 6 Alto & Escape automático de Jinja2; política CSP restrictiva; cookie HttpOnly (RNF-04, RNF-09). Residual: Bajo. \\ \hline
-B5 & Sesión del usuario & CSRF y secuestro de sesión & Formularios sin token; cookie sin atributos de protección & 2 & 2 & 4 Medio & Token CSRF; SameSite=Lax; HttpOnly; caducidad de 30 minutos (RNF-07, RNF-09). Residual: Bajo (cookie sin atributo Secure por usar HTTP local). \\ \hline
+B5 & Sesión del usuario & CSRF y secuestro de sesión & Formularios sin token; cookie sin atributos de protección & 2 & 2 & 4 Medio & Token CSRF; SameSite=Lax; HttpOnly; caducidad de 30 minutos; cierre de sesión solo por POST con token (RNF-07, RNF-09, RNF-16). Residual: Bajo (cookie sin atributo Secure por usar HTTP local). \\ \hline
 B6 & Exportación CSV (cuenta de administrador) & Inyección de fórmulas: un usuario planta una fórmula que se ejecuta al abrir el CSV & El contenido del usuario se escribía tal cual en el archivo & 2 & 2 & 4 Medio & Hallazgo de la revisión de seguridad, corregido: el texto que empieza por =, +, -, @ o tabulador se neutraliza (RF-10). Evidencia antes y después. Residual: Bajo. \\ \hline
-B7 & Pesos de los indicadores & [A.6] Abuso de privilegios de acceso; [A.15] Modificación deliberada de la información & Cuenta de administrador comprometida; cambios sin registro & 1 & 2 & 2 Bajo & Acceso solo con rol de administrador, respuesta 403 a los demás (RF-09, RNF-11). Residual: Bajo (sin auditoría de cambios, ver sección~\ref{sec:gap}). \\ \hline
+B7 & Pesos de los indicadores & [A.6] Abuso de privilegios de acceso; [A.15] Modificación deliberada de la información & Cuenta de administrador comprometida; error al confirmar un dominio compartido (V-16) & 1 & 2 & 2 Bajo & Acceso solo con rol de administrador, respuesta 403 a los demás (RF-09, RNF-11); cada cambio de peso y cada amenaza confirmada o quitada queda en el registro de eventos (RNF-13); advertencia al confirmar un dominio y botón para quitarlo. Residual: Bajo (ver sección~\ref{sec:gap}). \\ \hline
 B8 & Secretos y configuración & [A.19] Divulgación de información & Subir el archivo de configuración al repositorio o mostrarlo & 1 & 3 & 3 Medio & Archivo excluido del repositorio y comprobado que no está rastreado. Residual: Bajo. \\ \hline
-B9 & Disponibilidad del servicio & [A.24] Denegación de servicio & Envíos masivos de análisis; solo el inicio de sesión y el registro tienen límite & 2 & 1 & 2 Bajo & Riesgo aceptado en el entorno de pruebas. Residual: Bajo. \\ \hline
-B10 & Contenido analizado (puede incluir datos personales de terceros) & [A.19] Divulgación de información & Un usuario pega mensajes reales con datos personales; no hay opción de eliminarlos; el administrador ve todos los análisis & 2 & 2 & 4 Medio & Historial visible solo para su dueño y el administrador. Pendiente: aviso de privacidad y eliminación de análisis. Residual: Medio (aceptado en pruebas). \\ \hline
+B9 & Disponibilidad del servicio & [A.24] Denegación de servicio & Envíos masivos de análisis; solo el inicio de sesión, el registro y los reportes tienen límite & 2 & 1 & 2 Bajo & Riesgo aceptado en el entorno de pruebas. Los eventos repetidos del registro se limitan a una fila por minuto por IP y usuario, y el bot limita a 10 mensajes por minuto por chat. Residual: Bajo. \\ \hline
+B10 & Contenido analizado (puede incluir datos personales de terceros) & [A.19] Divulgación de información & Un usuario pega mensajes reales con datos personales; el administrador ve todos los análisis; el texto enviado al bot pasa por Telegram & 2 & 2 & 4 Medio & Historial visible solo para su dueño y el administrador; aviso de privacidad aceptado al registrarse (incluye lo del bot); el usuario puede borrar sus análisis; el bot no guarda nada; los formularios piden no pegar datos personales. Residual: Bajo. Se acepta que aún no haya eliminación de la cuenta (sección~\ref{sec:gap}). \\ \hline
 \end{longtable}
 \endgroup
 
@@ -846,7 +923,7 @@ La tabla~\ref{tab:mapa} ubica los 16 riesgos de las matrices anteriores según s
 \end{tabular}
 \end{table}
 
-\noindent De los 16 riesgos, \textbf{8 son altos} (A1, A2, A3, A4, A6, B2, B3 y B4), \textbf{6 son medios} (A5, B1, B5, B6, B8 y B10) y \textbf{2 son bajos} (B7 y B9). Los riesgos del caso de estudio (A) se concentran en la zona alta porque dependen del factor humano, que PhishGuard busca reducir mediante la educación del usuario. Los riesgos altos de la aplicación (B2, B3 y B4) bajan a residual bajo gracias a las salvaguardas implementadas, y el único residual medio de la aplicación es B10, relacionado con el contenido analizado (datos personales de terceros).
+\noindent De los 16 riesgos, \textbf{8 son altos} (A1, A2, A3, A4, A6, B2, B3 y B4), \textbf{6 son medios} (A5, B1, B5, B6, B8 y B10) y \textbf{2 son bajos} (B7 y B9). Los riesgos del caso de estudio (A) se concentran en la zona alta porque dependen del factor humano, que PhishGuard busca reducir mediante la educación del usuario. Los riesgos altos de la aplicación (B2, B3 y B4) bajan a residual bajo gracias a las salvaguardas implementadas, y ningún riesgo de la aplicación queda con residual medio: B10, que era el único, pasó a bajo con el aviso de privacidad y el borrado de análisis. La falta de eliminación de la cuenta se acepta como riesgo residual.
 
 \subsubsection{Análisis de brechas y riesgos residuales}\label{sec:gap}
 
@@ -863,13 +940,13 @@ La siguiente tabla compara los controles relevantes con lo que implementa PhishG
 \hline
 \textbf{Control} & \textbf{Nombre} & \textbf{Estado} & \textbf{Evidencia en PhishGuard} & \textbf{Brecha o acción} \\ \hline
 \endhead
-5.15 & Control de acceso & Implementado & Rutas protegidas; rol de administrador verificado en el servidor (403); consultas filtradas por usuario (404). & Sin brechas relevantes para el alcance. \\ \hline
+5.15 & Control de acceso & Implementado & Rutas protegidas; rol de administrador verificado en el servidor (403); consultas filtradas por usuario (404); reportes, amenazas, tendencias y eventos solo para el administrador. & Sin brechas relevantes para el alcance. \\ \hline
 5.17 & Información de autenticación & Parcial & Contraseñas con hash y sal; mínimo de 8 caracteres. & Sin política de complejidad. \\ \hline
-8.5 & Autenticación segura & Parcial & Límite de 5 intentos por minuto por IP; sesión de 30 minutos; protección de sesión reforzada. & Sin autenticación multifactor; sin bloqueo por cuenta. \\ \hline
-8.15 & Registro de eventos & No implementado & --- & No se registran intentos fallidos ni cambios de pesos. Acción: agregar registro de eventos de seguridad. \\ \hline
-8.28 & Codificación segura & Implementado & Consultas parametrizadas; escape de salida; validación de formularios; CSV neutralizado. & Versiones de dependencias sin fijar. \\ \hline
-8.29 & Pruebas de seguridad & Implementado (manual) & Pruebas de 403, 404 y 429; prueba del CSV antes y después; revisión de seguridad del código. & Sin pruebas automatizadas. \\ \hline
-5.34 & Privacidad y protección de información personal & Parcial & Datos mínimos (usuario, correo, hash); historial restringido a su dueño. & Sin aviso de privacidad ni eliminación de análisis. \\ \hline
+8.5 & Autenticación segura & Parcial & Límite de 5 intentos por minuto por IP; sesión de 30 minutos; protección de sesión reforzada; cierre de sesión solo por POST con token. & Sin autenticación multifactor; sin bloqueo por cuenta. \\ \hline
+8.15 & Registro de eventos & Implementado (con límites) & Tabla \texttt{eventos\_seguridad} con usuario, IP y fecha; registra inicios y cierres de sesión, fallos, registros, exportaciones, cambios de peso, borrados, reportes, amenazas, 403, 404 en análisis ajeno, 429 y CSRF inválido; no guarda contraseñas ni contenidos. & Sin plazo de conservación definido y sin garantía de que no se pueda modificar a nivel de MySQL. \\ \hline
+8.28 & Codificación segura & Implementado & Consultas parametrizadas; escape de salida; validación de formularios; CSV neutralizado; URL mal formadas rechazadas; copia local de jsQR con su huella SHA-256 anotada. & Versiones de dependencias sin fijar (solo \texttt{requests} está fijada). \\ \hline
+8.29 & Pruebas de seguridad & Implementado & 16 archivos de pruebas automatizadas (sección~\ref{sec:tecnica}); pruebas manuales de 403, 404 y 429; prueba del CSV antes y después; revisión de seguridad del código. & Las pruebas usan SQLite: falta probar el borrado en MySQL. Sin pruebas de rendimiento ni de navegadores. \\ \hline
+5.34 & Privacidad y protección de información personal & Parcial & Datos mínimos (usuario, correo, hash); historial restringido a su dueño; aviso de privacidad aceptado al registrarse; borrado de análisis; las amenazas guardan solo el dominio. & Faltan eliminar la cuenta y cambiar el correo; los usuarios anteriores al aviso no lo han aceptado. \\ \hline
 6.3 & Concienciación y formación & Implementado & Cada indicador detectado se explica al usuario. & Ninguna: es el objetivo del proyecto. \\ \hline
 \end{longtable}
 \endgroup
@@ -881,12 +958,16 @@ Tras las salvaguardas implementadas, se aceptan los siguientes riesgos residuale
 \begin{itemize}
   \item Ausencia de autenticación multifactor.
   \item Cookie de sesión sin el atributo \emph{Secure}, por usar HTTP local; con HTTPS debe activarse.
-  \item Ausencia de registro de eventos de seguridad (brecha del control 8.15).
+  \item Registro de eventos sin plazo de conservación definido y sin protección contra modificaciones a nivel de la base de datos (la IP y el usuario que guarda son datos personales). Los eventos repetidos se cuentan de forma aproximada y su límite de una fila por minuto está en memoria.
   \item Limitador de intentos almacenado en memoria y por dirección IP, que se reinicia con el servidor.
-  \item Cierre de sesión mediante una petición GET.
+  \item Supresión de datos solo en parte: se pueden borrar los análisis, pero eliminar la cuenta y cambiar el correo se piden al administrador, porque aún no tienen botón (Ley 1581 de 2012). Los usuarios anteriores al aviso de privacidad no lo han aceptado.
   \item Mensaje de registro que revela si un usuario ya existe, mitigado por el límite de 10 registros por hora.
-  \item Dependencias sin versión fija y sin auditoría automatizada.
-  \item Ausencia de aviso de privacidad y de opción para eliminar análisis (Ley 1581 de 2012).
+  \item Dependencias sin versión fija (salvo \texttt{requests}) y sin auditoría automatizada.
+  \item El texto enviado al bot de Telegram pasa por los servidores de Telegram, que lo guarda según sus propias políticas. El bot no guarda nada y el aviso de privacidad lo explica. Su límite de 10 mensajes por minuto por chat está en memoria y se puede saltar cambiando de cuenta, y solo analiza el texto: no abre los enlaces.
+  \item Falsos positivos aceptados a propósito en el typosquatting aproximado: una página legítima con un nombre a una letra de una marca de cinco letras o más (por ejemplo, \texttt{nequim.com}) se marca como posible typosquatting. En una herramienta de alerta, un falso positivo cuesta menos que un falso negativo. A la inversa, un dominio con dos errores no se marca.
+  \item Los enlaces sin \texttt{http://} (como \texttt{bit.ly/abc}) reciben el indicador ``No usa HTTPS'' aunque la persona no haya escrito el esquema, y el puntaje puede quedar algo por encima de lo que el texto justifica.
+  \item Un administrador puede confirmar por error un dominio compartido (como \texttt{docs.google.com}) y marcar como peligrosos todos sus enlaces; la advertencia al confirmar y el botón para quitarlo son la única defensa.
+  \item Sin JavaScript, los botones de borrar eliminan sin pedir confirmación.
 \end{itemize}
 
 
@@ -907,11 +988,11 @@ Este apartado presenta el diseño lógico preliminar de los controles de segurid
 \hline
 \textbf{Componente} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
 \endhead
-Autenticación & Registro con usuario y correo únicos; contraseña de al menos 8 caracteres almacenada con hash y sal; límite de 5 intentos de inicio de sesión por minuto; sesión con caducidad de 30 minutos y protección reforzada; mensaje genérico ante credenciales inválidas. & Implementado & B1, B5 \\ \hline
+Autenticación & Registro con usuario y correo únicos; contraseña de al menos 8 caracteres almacenada con hash y sal; límite de 5 intentos de inicio de sesión por minuto; sesión con caducidad de 30 minutos y protección reforzada; mensaje genérico ante credenciales inválidas; cierre de sesión solo por POST con token CSRF; aceptación del aviso de privacidad al registrarse. & Implementado & B1, B5 \\ \hline
 Autenticación (mejoras) & Autenticación multifactor; política de complejidad de contraseñas; bloqueo temporal por cuenta. & Propuesto & A5, B1 \\ \hline
-Autorización & Dos roles: usuario y administrador. Rutas protegidas verificadas en el servidor (403 si no hay rol de administrador). Cada consulta se filtra por el propietario del dato (404 ante identificadores ajenos). Principio de mínimo privilegio. & Implementado & B2, B7 \\ \hline
-Contabilidad (trazabilidad de análisis) & Cada análisis queda asociado a su usuario, con fecha, contenido, puntaje e indicadores detectados. Esos registros son una instantánea: no cambian si después se editan los pesos. & Parcial & B2, B7 \\ \hline
-Contabilidad (registro de eventos) & Tabla de eventos de seguridad con usuario, evento, detalle, dirección IP y fecha. Eventos a registrar: inicios de sesión exitosos y fallidos, cierres de sesión, exportaciones a CSV, cambios de pesos (con valor anterior y nuevo) y accesos denegados. & Propuesto (brecha del control 8.15) & B1, B7, B10 \\ \hline
+Autorización & Dos roles: usuario y administrador. Rutas protegidas verificadas en el servidor (403 si no hay rol de administrador). Cada consulta se filtra por el propietario del dato (404 ante identificadores ajenos). Principio de mínimo privilegio. Los reportes, las amenazas confirmadas, las tendencias y los eventos de seguridad son solo para el administrador. & Implementado & B2, B7 \\ \hline
+Contabilidad (trazabilidad de análisis) & Cada análisis queda asociado a su usuario, con fecha, contenido, puntaje e indicadores detectados. Esos registros son una instantánea: no cambian si después se editan los pesos. & Implementado & B2, B7 \\ \hline
+Contabilidad (registro de eventos) & Tabla de eventos de seguridad con usuario, evento, detalle, dirección IP y fecha. Registra inicios de sesión exitosos y fallidos, cierres de sesión, registros, exportaciones a CSV, cambios de pesos (con valor anterior y nuevo), borrados de análisis, reportes, amenazas confirmadas o quitadas, accesos denegados (403), accesos a análisis ajenos (404), límites superados (429) y tokens CSRF inválidos. Los eventos repetidos se cuentan en una sola fila por minuto, y el administrador ve los últimos 200. & Implementado (brecha del control 8.15 cerrada) & B1, B7, B10 \\ \hline
 \end{longtable}
 \endgroup
 
@@ -928,10 +1009,10 @@ Contabilidad (registro de eventos) & Tabla de eventos de seguridad con usuario, 
 \hline
 \textbf{Propiedad} & \textbf{Control} & \textbf{Estado} & \textbf{Riesgos} \\ \hline
 \endhead
-Confidencialidad & Contraseñas con hash y sal; historial aislado por usuario; escape de salida y política de seguridad de contenido (CSP); cookie de sesión HttpOnly; secretos de configuración fuera del repositorio. & Implementado & B1, B2, B4, B8 \\ \hline
-Confidencialidad (pendiente) & HTTPS con cookie Secure en un despliegue real; aviso de privacidad y opción de eliminar análisis. & Propuesto & B5, B10 \\ \hline
-Integridad & Validación de entradas en el servidor; consultas parametrizadas; token CSRF en formularios; pesos editables solo por el administrador y dentro del rango de 0 a 100; neutralización de fórmulas en el CSV. & Implementado & B3, B5, B6, B7 \\ \hline
-Disponibilidad & Límite de intentos en inicio de sesión y registro. & Parcial & B9 \\ \hline
+Confidencialidad & Contraseñas con hash y sal; historial aislado por usuario; escape de salida y política de seguridad de contenido (CSP); cookie de sesión HttpOnly; secretos de configuración (incluido el token del bot) fuera del repositorio; respuestas con \texttt{Cache-Control: no-store} cuando hay sesión iniciada; páginas de error sin detalles; aviso de privacidad y borrado de análisis; en el bot, el texto copiado del usuario se neutraliza y no se guarda nada. & Implementado & B1, B2, B4, B8, B10 \\ \hline
+Confidencialidad (pendiente) & HTTPS con cookie Secure en un despliegue real; eliminar la cuenta y cambiar el correo. & Propuesto & B5, B10 \\ \hline
+Integridad & Validación de entradas en el servidor; consultas parametrizadas; token CSRF en formularios; pesos editables solo por el administrador y dentro del rango de 0 a 100; neutralización de fórmulas en el CSV; dominios de amenazas confirmadas validados en el servidor contra los del análisis; URL mal formadas rechazadas. & Implementado & B3, B5, B6, B7 \\ \hline
+Disponibilidad & Límite de intentos en inicio de sesión, registro y reportes; límite de filas por minuto para los eventos repetidos; límite de 10 mensajes por minuto por chat en el bot. & Parcial & B9 \\ \hline
 Disponibilidad (pendiente) & Límite de envíos en las rutas de análisis; copias de seguridad periódicas de la base de datos. & Propuesto & B9 \\ \hline
 \end{longtable}
 \endgroup
@@ -948,19 +1029,55 @@ El flujo que sigue una petición dentro de PhishGuard muestra en qué punto act�
   \item Se valida el formulario: token CSRF, longitud y formato de los campos (integridad).
   \item El motor de análisis lee los pesos de la base de datos y calcula el puntaje, el nivel y la explicación de cada indicador.
   \item El resultado se guarda con consultas parametrizadas, asociado al usuario y con su fecha (contabilidad).
-  \item La respuesta se genera con escape automático y se envía con las cabeceras de seguridad (confidencialidad).
+  \item La respuesta se genera con escape automático y se envía con las cabeceras de seguridad y, si hay sesión, sin caché del navegador (confidencialidad).
+  \item Si la petición se rechaza (403, 404 en un análisis ajeno, 429 o token inválido), se muestra una página de error sin detalles y se registra el evento de seguridad (contabilidad).
 \end{enumerate}
 
-\subsection{Diseño de interfaz}
+\apartado{Controles de la aplicación frente al OWASP Top 10:2025}
 
-La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks externos, y con una barra lateral que agrupa las funciones por sección: análisis, registro y administración. Las pantallas principales del prototipo son:
+La tabla~\ref{tab:owasp} relaciona las categorías del OWASP Top 10:2025 con los controles de seguridad de la propia aplicación. No incluye los indicadores de phishing, porque OWASP trata las fallas de las aplicaciones web y no las señales de un mensaje fraudulento. La columna de pruebas dice qué archivo de \texttt{tests/} comprueba el control; donde no hay prueba automatizada se indica.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.19\textwidth}|>{\raggedright\arraybackslash}p{0.46\textwidth}|>{\raggedright\arraybackslash}p{0.25\textwidth}|}
+\caption{Controles de PhishGuard según el OWASP Top 10:2025}\label{tab:owasp}\\
+\hline
+\textbf{Categoría} & \textbf{Control en PhishGuard} & \textbf{Prueba} \\ \hline
+\endfirsthead
+\hline
+\textbf{Categoría} & \textbf{Control en PhishGuard} & \textbf{Prueba} \\ \hline
+\endhead
+A01 Control de acceso roto & Rutas protegidas con \texttt{login\_required} y \texttt{admin\_required}, verificadas en el servidor; cada consulta se filtra por el dueño del dato y un análisis ajeno da el mismo 404 que uno inexistente; token CSRF en todos los formularios POST (CSRF figura entre los CWE de esta categoría). & \texttt{probar\_csrf.py}, \texttt{probar\_privacidad.py}, \texttt{probar\_reportes.py}, \texttt{probar\_amenazas.py}, \texttt{probar\_errores.py}, \texttt{probar\_indicadores.py} \\ \hline
+A02 Configuración de seguridad incorrecta & Política de seguridad de contenido (\texttt{default-src 'self'} y \texttt{base-uri 'self'}), sin scripts ni estilos en línea; modo de depuración apagado por defecto y forzado a apagado si el servidor no es local; \texttt{Cache-Control: no-store} con sesión iniciada; páginas de error sin detalles. & \texttt{probar\_cache.py} y \texttt{probar\_errores.py} (caché y errores); la ausencia de estilos y scripts en línea se revisa en \texttt{probar\_privacidad.py}, \texttt{probar\_tendencias.py} y \texttt{probar\_indicadores.py}. La cabecera CSP se vio funcionando en el navegador (capítulo 7); el modo de depuración no tiene prueba automatizada. \\ \hline
+A03 Fallos en la cadena de suministro de software & Sin CDN ni fuentes externas (la CSP los bloquea); jsQR se incluye como copia local sin modificar, con su licencia y su huella SHA-256 anotadas; \texttt{requests} tiene versión fija. Las demás dependencias no tienen versión fija. & Revisión manual. \\ \hline
+A05 Inyección & SQLAlchemy con consultas parametrizadas; Jinja2 escapa la salida; el texto del usuario se neutraliza en el CSV y, en el bot, con \emph{defanging}. & \texttt{probar\_csv.py}, \texttt{probar\_bot.py}, \texttt{probar\_eventos.py} (HTML escapado) \\ \hline
+A07 Fallos de autenticación & Contraseñas con hash y sal, mínimo de 8 caracteres; límite de 5 intentos de inicio de sesión por minuto (429) y 10 registros por hora; sesión de 30 minutos; cierre de sesión por POST; mensaje genérico ante credenciales inválidas. & \texttt{probar\_csrf.py}, \texttt{probar\_eventos.py}, \texttt{probar\_errores.py} \\ \hline
+A09 Fallos en el registro y alerta de seguridad & Registro de eventos de seguridad con usuario, IP y fecha, sin contraseñas ni contenidos; los repetidos se cuentan en una fila por minuto. No hay alertas automáticas: el administrador revisa la lista. & \texttt{probar\_eventos.py} \\ \hline
+A10 Manejo incorrecto de condiciones excepcionales & Una URL mal formada se rechaza con un aviso en lugar de provocar un error 500; la página 500 no muestra detalles y tiene respaldo en texto; si falla el registro de eventos, la petición no se rompe. & \texttt{probar\_url.py}, \texttt{probar\_errores.py}, \texttt{probar\_eventos.py} \\ \hline
+\end{longtable}
+\endgroup
+
+\noindent\footnotesize\textit{Nota.} Los nombres de las categorías fueron traducidos por el grupo a partir del texto original en inglés del OWASP Top 10:2025.\normalsize
+
+\subsection{Diseño de interfaz}\label{sec:interfaz}
+
+La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks externos, y con una barra lateral que agrupa las funciones por sección: análisis, registro y administración. Se adapta al celular: en pantallas angostas el menú lateral queda cerrado tras un botón y las tablas se desplazan hacia los lados. Las pantallas principales son:
 
 \begin{itemize}
   \item \textbf{Inicio de sesión y registro:} formulario de acceso con un panel que muestra un ejemplo de análisis (figura~\ref{fig:login}).
   \item \textbf{Panel de inicio:} cifras de análisis, distribución del riesgo, accesos rápidos y últimos análisis (figura~\ref{fig:inicio}).
   \item \textbf{Análisis de URL y de mensaje:} campo de entrada y ejemplos rápidos; al analizar, se muestran la escala de riesgo y la tabla de indicadores detectados (figura~\ref{fig:analisis}).
   \item \textbf{Historial:} tabla con fecha, tipo, contenido, puntaje y nivel de cada análisis, con acceso al detalle y exportación a CSV (figura~\ref{fig:historial}).
-  \item \textbf{Administración de indicadores:} tabla de los 17 indicadores con su peso editable, solo para el administrador (figura~\ref{fig:indicadores}).
+  \item \textbf{Administración de indicadores:} tabla de los 18 indicadores con su descripción y su peso editable, solo para el administrador (figura~\ref{fig:indicadores}).
+  \item \textbf{Lectura de código QR:} en el análisis de URL, el botón ``Leer QR desde una imagen'' pone en el campo el enlace del código (figura~\ref{fig:qr}).
+  \item \textbf{Alerta de amenaza confirmada:} cuando el análisis trae un dominio de la lista de amenazas, el resultado muestra una alerta roja (figura~\ref{fig:amenazares}).
+  \item \textbf{Aviso de privacidad:} página pública enlazada en el pie, el inicio de sesión y el registro (figura~\ref{fig:privacidad}).
+  \item \textbf{Borrado de análisis:} botones para eliminar un análisis o todo el historial, con confirmación (figura~\ref{fig:historialborrar}).
+  \item \textbf{Administración:} lista de reportes, lista de amenazas confirmadas, tendencias y eventos de seguridad, solo para el administrador (figuras~\ref{fig:adminreportes}, \ref{fig:adminamenazas}, \ref{fig:admintendencias} y~\ref{fig:admineventos}).
+  \item \textbf{Páginas de error:} 400, 403, 404, 405, 429 y 500, con el mismo diseño y sin detalles del error (figura~\ref{fig:error404}).
+  \item \textbf{Vista en el celular:} las páginas se adaptan a pantallas angostas (figura~\ref{fig:celular}).
+  \item \textbf{Bot de Telegram:} la respuesta del bot, con los enlaces neutralizados (figura~\ref{fig:bot}).
 \end{itemize}
 
 \captura{capturas}{login.png}{Pantalla de inicio de sesión}{fig:login}
@@ -968,8 +1085,19 @@ La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks ext
 \captura{capturas}{analisis-mensaje.png}{Formulario de análisis de un mensaje}{fig:analisis}
 \captura{capturas}{historial.png}{Historial de análisis}{fig:historial}
 \captura{capturas}{indicadores.png}{Administración de indicadores}{fig:indicadores}
+\captura{capturas}{analisis-url-qr.png}{Análisis de URL con un enlace leído desde un código QR}{fig:qr}
+\captura{capturas}{resultado-amenaza-confirmada.png}{Resultado con la alerta de amenaza confirmada}{fig:amenazares}
+\captura{capturas}{privacidad.png}{Aviso de privacidad, con el apartado del bot de Telegram}{fig:privacidad}
+\captura{capturas}{historial-borrar.png}{Historial con los botones para borrar análisis}{fig:historialborrar}
+\captura{capturas}{admin-reportes.png}{Lista de reportes para el administrador}{fig:adminreportes}
+\captura{capturas}{admin-amenazas.png}{Lista de amenazas confirmadas}{fig:adminamenazas}
+\captura{capturas}{admin-tendencias.png}{Tendencias de los análisis}{fig:admintendencias}
+\captura{capturas}{admin-eventos.png}{Registro de eventos de seguridad}{fig:admineventos}
+\captura{capturas}{error-404.png}{Página de error 404}{fig:error404}
+\captura{capturas}{celular-analisis.png}{Análisis de un mensaje en la pantalla de un celular}{fig:celular}
+\captura{capturas}{bot-analisis.png}{Respuesta del bot de Telegram, con el enlace neutralizado (defanging)}{fig:bot}
 
-\subsection{Descripción técnica del sistema}
+\subsection{Descripción técnica del sistema}\label{sec:tecnica}
 
 \apartado{Arquitectura}
 
@@ -979,9 +1107,9 @@ PhishGuard se plantea como una aplicación web usada desde un navegador. Para el
 Usuario $\rightarrow$ Navegador web $\rightarrow$ PhishGuard $\rightarrow$ Motor de análisis $\rightarrow$ Base de datos
 \end{center}
 
-La aplicación está desarrollada en Python con el framework Flask, almacena los datos en MySQL mediante el ORM SQLAlchemy, y genera sus páginas con plantillas Jinja2, HTML y CSS propios. El motor de análisis consulta los pesos de los indicadores en la base de datos y devuelve el puntaje, el nivel y la explicación de cada indicador detectado.
+La aplicación está desarrollada en Python con el framework Flask, almacena los datos en MySQL mediante el ORM SQLAlchemy, y genera sus páginas con plantillas Jinja2, HTML y CSS propios. Los códigos QR se leen en el navegador con la librería jsQR, que se incluye como archivo local. El motor de análisis consulta los pesos de los indicadores en la base de datos y devuelve el puntaje, el nivel y la explicación de cada indicador detectado.
 
-La figura~\ref{fig:conceptual} muestra los actores, los componentes principales de PhishGuard y la relación entre ellos. El mensaje o enlace sospechoso llega al usuario por un canal externo (correo, SMS o mensajería); el usuario lo ingresa en la interfaz web, el motor de análisis lo evalúa con los pesos guardados en la base de datos y el sistema devuelve el puntaje, el nivel de riesgo y la explicación de los indicadores detectados. El administrador gestiona los pesos de los indicadores.
+La figura~\ref{fig:conceptual} muestra los actores, los componentes principales de PhishGuard y la relación entre ellos. El mensaje o enlace sospechoso llega al usuario por un canal externo (correo, SMS o mensajería); el usuario lo ingresa en la interfaz web, el motor de análisis lo evalúa con los pesos guardados en la base de datos y el sistema devuelve el puntaje, el nivel de riesgo y la explicación de los indicadores detectados. El administrador gestiona los pesos de los indicadores. El bot de Telegram no aparece en la figura: es un proceso aparte que reutiliza el mismo motor de análisis y la misma base de datos (apartado ``Bot de Telegram'' de esta sección).
 
 \begin{figure}[htbp]
 \centering
@@ -1015,7 +1143,7 @@ La figura~\ref{fig:conceptual} muestra los actores, los componentes principales 
 \foreach \m in {m1,m2,m3,m4} {\draw[flecha] (\m.north |- web.south) -- (\m.north);}
 
 % Motor y base de datos
-\node[caja, text width=4.8cm, below=1.5cm of m1.south west, anchor=north west] (mot) {\textbf{Motor de análisis por reglas}\\17 indicadores con peso\\(10 de URL y 7 de mensajes)};
+\node[caja, text width=4.8cm, below=1.5cm of m1.south west, anchor=north west] (mot) {\textbf{Motor de análisis por reglas}\\18 indicadores con peso\\(10 de URL y 8 de mensajes)};
 \node[caja, text width=4.8cm, right=2.0cm of mot] (bd) {\textbf{Base de datos MySQL}\\usuarios, análisis, indicadores detectados y configuración de pesos};
 \draw[flecha] (m2.south) -- (m2.south |- mot.north);
 \draw[{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick] (mot) -- node[etq, above, align=center] {pesos y\\resultados} (bd);
@@ -1097,6 +1225,10 @@ Flask-WTF y WTForms & Formularios, validación de entradas y token CSRF. \\ \hli
 Flask-Limiter & Límite de intentos de inicio de sesión y registro. \\ \hline
 Werkzeug & Cálculo y verificación del hash de las contraseñas. \\ \hline
 Jinja2, HTML, CSS y JavaScript & Plantillas e interfaz, con escape automático de la salida. \\ \hline
+requests & Cliente HTTP que usa solo el bot para hablar con la API de Telegram. \\ \hline
+jsQR & Lectura de códigos QR en el navegador (copia local, licencia Apache-2.0). \\ \hline
+zoneinfo y tzdata & Conversión de las fechas de UTC a hora de Colombia. \\ \hline
+API de bots de Telegram & Servicio con el que se comunica el bot (\texttt{getUpdates}) (Telegram, s.f.). \\ \hline
 Git & Control de versiones. \\ \hline
 Visual Studio Code y MySQL Workbench & Entorno de desarrollo y administración de la base de datos. \\ \hline
 \end{tabular}
@@ -1104,9 +1236,126 @@ Visual Studio Code y MySQL Workbench & Entorno de desarrollo y administración d
 
 \apartado{Estructura de la aplicación}
 
-La aplicación sigue el patrón de fábrica de aplicaciones de Flask y se divide en tres módulos: autenticación (registro, inicio y cierre de sesión), análisis (análisis de URL y mensajes, historial, exportación y administración de indicadores) y panel de inicio (estadísticas). El motor de reglas está en un módulo aparte, sin dependencias de la interfaz, lo que facilita probarlo y explicarlo. La base de datos tiene las cuatro tablas descritas en el modelo de datos (sección~\ref{sec:modelodatos}). Los secretos de configuración, es decir, la clave secreta y la cadena de conexión, se leen de un archivo de entorno que no se incluye en el repositorio.
+La aplicación sigue el patrón de fábrica de aplicaciones de Flask y se divide en tres módulos: autenticación (registro, inicio y cierre de sesión), análisis (análisis de URL y mensajes, historial, exportación y administración de indicadores) y panel de inicio (estadísticas). El motor de reglas está en un módulo aparte, sin dependencias de la interfaz, lo que facilita probarlo y explicarlo. Hay además módulos de apoyo para el registro de eventos de seguridad, los reportes pendientes, las tendencias y la hora de Colombia, y el bot de Telegram está en un archivo aparte. La base de datos tiene las siete tablas descritas en el modelo de datos (sección~\ref{sec:modelodatos}). Los secretos de configuración, es decir, la clave secreta y la cadena de conexión, se leen de un archivo de entorno que no se incluye en el repositorio.
 
-\section{Análisis y discusión}
+\apartado{Lectura de códigos QR}
+
+El código QR se lee dentro del navegador y la imagen nunca llega al servidor. El proceso es:
+
+\begin{enumerate}
+  \item En el análisis de URL, el usuario pulsa ``Leer QR desde una imagen'' y elige una foto o una captura.
+  \item El navegador revisa que la imagen pese hasta 10 MB y que no pase de 50 megapíxeles; si es grande, la reduce antes de leerla.
+  \item La librería jsQR (cozmo, s.f.) lee el código. La imagen no se envía al servidor.
+  \item Si el contenido es un enlace web (\texttt{http://}, \texttt{https://} o \texttt{www.}), se pone en el campo de URL. Si es texto u otro tipo de enlace, el sistema lo avisa y no lo pone.
+  \item El usuario analiza la URL como cualquier otra. El formulario marca el origen ``qr'', que se usa en las tendencias; es solo informativo, porque lo envía el navegador y se podría falsificar.
+\end{enumerate}
+
+\apartado{Typosquatting aproximado y enlaces dentro de los mensajes}
+
+El indicador ``Posible typosquatting'' se activa de dos maneras. La primera, cuando la marca aparece dentro del dominio (\texttt{nequi-premios.top}). La segunda, cuando una parte del dominio, separada por puntos o guiones, difiere de una marca en una sola letra: cambiada, sobrante, faltante o dos letras vecinas intercambiadas (\texttt{nequl.com.co}). La segunda vía solo se aplica a marcas de cinco letras o más y nunca marca un dominio oficial.
+
+En un mensaje, el sistema reconoce un enlace si trae \texttt{http://} o \texttt{https://}, si empieza por \texttt{www.}, o si, sin esquema, es un acortador con ruta (\texttt{bit.ly/abc}) o un dominio con ruta y una terminación conocida (\texttt{nequl.com.co/premio}). Para no confundirlos con texto normal, no cuentan los que van pegados a una \texttt{@}, a un punto o a una letra (\texttt{hola.como}, \texttt{Sr.Pérez}, \texttt{\$500.000}, correos). Se revisan hasta tres enlaces por mensaje y un enlace sin esquema se analiza como si empezara por \texttt{http://}. Los límites que se aceptaron están en los riesgos residuales.
+
+\apartado{Reportes, amenazas confirmadas y tendencias}
+
+Un usuario puede avisar al área de tecnología de un análisis sospechoso, y el administrador puede convertir ese aviso en una alerta para toda la comunidad. El proceso es:
+
+\begin{enumerate}
+  \item Después de analizar, si el riesgo es medio o alto, el usuario puede reportar el análisis, con una nota opcional de hasta 200 caracteres, desde la página de resultado o desde el detalle.
+  \item El servidor comprueba que el análisis sea propio, que sea de riesgo medio o alto y que no esté ya reportado. Si no, lo rechaza.
+  \item Se crea el reporte pendiente y se registra un evento que guarda solo los números de identificación, nunca la nota. El menú y el panel del administrador muestran cuántos reportes hay pendientes.
+  \item El administrador ve la lista (nivel, autor, nota y fecha) sin el contenido del análisis y puede marcar un reporte como revisado.
+  \item Para confirmar una amenaza, el administrador abre el reporte y ve los dominios del enlace o de hasta tres enlaces del mensaje. Marca los que quiere confirmar; el servidor vuelve a calcular los candidatos y descarta los dominios oficiales, los acortadores y los inválidos.
+  \item Se guarda solo el dominio, la fecha y el administrador, y el reporte queda revisado. La página avisa que un dominio marca como peligrosos todos sus enlaces, y que no se deben confirmar servicios compartidos como \texttt{docs.google.com}.
+  \item Desde ese momento, al analizar una URL o un mensaje con un enlace de ese dominio (o de un subdominio), el resultado agrega la alerta ``Amenaza confirmada por la institución'' y el puntaje queda en 100. El administrador puede quitar un dominio de la lista; los análisis ya guardados no cambian.
+\end{enumerate}
+
+La página de tendencias muestra al administrador los análisis por día de los últimos 30 días (en hora de Colombia), su distribución por nivel y por tipo (URL, mensaje y QR) y los 10 indicadores más detectados. Son solo conteos: no se leen los contenidos ni las explicaciones de los análisis.
+
+\apartado{Registro de eventos de seguridad}
+
+El registro guarda el evento, un detalle de una sola línea, la IP, el usuario (si lo hay) y la fecha. No guarda contraseñas, ni el usuario que se escribió en un inicio de sesión fallido, ni los contenidos de los análisis. Para que una ráfaga de eventos repetidos no llene la tabla, los accesos denegados (403), los límites superados (429), los tokens CSRF inválidos y los accesos a análisis ajenos siguen estos pasos:
+
+\begin{enumerate}
+  \item Llega un evento de uno de esos tipos.
+  \item Si ya hay uno igual de la misma IP y el mismo usuario en el último minuto, no se crea una fila nueva.
+  \item La repetición se cuenta en la fila existente (``al menos N repeticiones más''). El contador se actualiza solo al llegar a 1, 2, 4, 8, y así sucesivamente, para hacer pocas escrituras.
+  \item Así una ráfaga no empuja fuera de la vista los eventos importantes y, aun así, queda registrada su magnitud.
+\end{enumerate}
+
+Si el registro falla, la petición no se rompe. El administrador ve los últimos 200 eventos, y el detalle se muestra escapado. Las limitaciones aceptadas están en los riesgos residuales.
+
+\apartado{Privacidad y borrado de datos}
+
+El aviso de privacidad (Ley 1581 de 2012) es una página pública, enlazada en el pie, el inicio de sesión y el registro. Explica qué datos se guardan, para qué, quién los ve, cuánto tiempo se conservan, los derechos del titular y cómo ejercerlos, e incluye el apartado del bot de Telegram. El registro exige marcar ``Acepto el aviso de privacidad'' (se valida en el servidor) y guarda la fecha de aceptación en UTC. Los formularios de análisis piden no pegar datos personales. El borrado de análisis funciona así:
+
+\begin{enumerate}
+  \item El usuario pulsa ``Eliminar'' en un análisis o ``Borrar todo mi historial'', y el navegador pide confirmación.
+  \item El servidor borra solo lo que es del usuario, primero los indicadores y el reporte del análisis, y después el análisis, en una sola operación. Un análisis ajeno da el mismo 404 que uno inexistente, también para el administrador.
+  \item Se registra un evento que guarda solo el número del análisis o el conteo, nunca el contenido.
+\end{enumerate}
+
+El reporte se borra junto con su análisis, de modo que el derecho de supresión incluye la nota. Los dominios de amenazas confirmadas no se borran, porque solo guardan el dominio y no identifican al usuario. Eliminar la cuenta y cambiar el correo no tienen botón todavía; el aviso indica pedirlos al administrador.
+
+\apartado{Hora de Colombia}
+
+Las fechas se guardan en la base de datos en UTC y se convierten a hora de Colombia (UTC$-5$) solo al mostrarlas. Es la práctica recomendada, porque una hora guardada en UTC no cambia si cambia la zona horaria del servidor, y la conversión se hace en un solo lugar. Las tendencias agrupan los análisis por día de Colombia, de modo que un análisis hecho a las 22:00 en Colombia cuenta en ese día y no en el siguiente, como pasaría si se agrupara por día en UTC.
+
+\apartado{Páginas de error, cierre de sesión y respuestas sin caché}
+
+Los errores 400, 403, 404, 405, 429 y 500 se muestran en una página con el diseño de la aplicación, en español, con el mismo código HTTP y sin detalles técnicos. El 404 de un análisis ajeno es idéntico al de uno inexistente, para que nadie pueda saber si un análisis existe. El cierre de sesión es solo por POST con token CSRF, de modo que una página ajena no puede forzarlo, y con la sesión iniciada todas las respuestas llevan \texttt{Cache-Control: no-store}, para que en un computador compartido el botón ``Atrás'' no muestre las páginas del usuario anterior.
+
+\apartado{Bot de Telegram}
+
+El bot (\texttt{bot.py}) es un proceso aparte de la aplicación web y usa la API de bots de Telegram (Telegram, s.f.). Reutiliza el mismo motor de análisis, con los mismos pesos y las mismas amenazas confirmadas. Su funcionamiento es:
+
+\begin{enumerate}
+  \item El bot le pregunta a Telegram si hay mensajes nuevos (\texttt{getUpdates}, esperando hasta 30 segundos).
+  \item Para cada mensaje de texto, abre una conexión corta con la base de datos, lee los pesos y las amenazas confirmadas y analiza el texto con el motor. La cierra al terminar, así ve las amenazas nuevas sin reiniciar.
+  \item Responde con el puntaje, el nivel y las tres señales de más peso y, aparte, la alerta si hay una amenaza confirmada.
+  \item El texto que copia del mensaje del usuario (el enlace y las palabras detectadas) se neutraliza con \emph{defanging}: \texttt{http://} pasa a \texttt{hxxp://}, los puntos entre letras a \texttt{[.]}, la \texttt{@} a \texttt{[@]} y los comandos \texttt{/} a \texttt{[/]}, para que Telegram no los vuelva tocables.
+  \item No guarda nada: ni análisis, ni eventos, ni archivos, y no imprime el contenido de los mensajes.
+\end{enumerate}
+
+Solo responde a texto; otros tipos de mensaje reciben un aviso. Usa el mismo límite de largo que la web (2.000 caracteres; si se pasa, rechaza y no recorta) y limita a 10 mensajes por minuto por chat. El token del bot va en el archivo de entorno, que no está en el repositorio, y ningún error ni mensaje de la consola muestra la dirección de la API que lo contiene. Todas las peticiones llevan tiempo máximo, no siguen redirecciones, y si cae la red el bot reintenta con una espera que crece hasta 60 segundos. El texto que se le escribe al bot pasa por los servidores de Telegram, que lo guarda según sus propias políticas, y el aviso de privacidad lo explica.
+
+\apartado{Pruebas automatizadas}
+
+La carpeta \texttt{tests/} tiene 16 archivos de prueba. Cada uno se ejecuta por separado (\texttt{python tests\textbackslash probar\_nombre.py}), usa una base de datos SQLite en memoria, sin tocar MySQL, y termina con código 0 si todo pasa. Los 15 scripts imprimen una línea \texttt{OK} por cada verificación (163 en total; cada una puede revisar varios casos) y el del bot tiene 42 pruebas con \texttt{unittest}. Se ejecutaron los 16 archivos y todos terminaron sin errores.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.27\textwidth}|>{\raggedright\arraybackslash}p{0.56\textwidth}|>{\raggedright\arraybackslash}p{0.09\textwidth}|}
+\caption{Pruebas automatizadas de la carpeta \texttt{tests/}}\label{tab:pruebas}\\
+\hline
+\textbf{Archivo} & \textbf{Qué comprueba} & \textbf{Verif.} \\ \hline
+\endfirsthead
+\hline
+\textbf{Archivo} & \textbf{Qué comprueba} & \textbf{Verif.} \\ \hline
+\endhead
+\texttt{probar\_url.py} & Análisis de URL: host en mayúsculas, usuario@, IP y puerto; sitio legítimo sin puntos; URL mal formadas rechazadas por el formulario. & 6 \\ \hline
+\texttt{probar\_typosquatting.py} & Lista de URL que deben y que no deben marcarse como typosquatting: oficiales, subdominios, una letra de diferencia (\texttt{nequl.com.co}). & 31 \\ \hline
+\texttt{probar\_enlaces\_mensaje.py} & Enlaces dentro de mensajes: con y sin esquema, máximo tres, puntuación pegada, enlaces mal formados, repetidos, el de mayor puntaje y sin falsos positivos con texto normal. & 18 \\ \hline
+\texttt{probar\_origen.py} & El origen ``qr'' se acepta y los valores falsos se descartan. & 10 \\ \hline
+\texttt{probar\_indicadores.py} & Páginas de indicadores: solo el administrador (403 a un usuario normal), diseño sin estilos en línea, pesos válidos (0 a 100) e inválidos (vacío, texto, decimal) y evento de cambio de peso. & 9 \\ \hline
+\texttt{probar\_csv.py} & Exportación CSV: fórmulas con espacios o saltos antes quedan neutralizadas; saltos de línea internos pasan a un espacio. & 6 \\ \hline
+\texttt{probar\_csrf.py} & Token CSRF en todos los formularios POST, sin JavaScript que envíe peticiones por su cuenta, aviso al fallar, y cierre de sesión solo por POST (GET da 405). & 11 \\ \hline
+\texttt{probar\_cache.py} & \texttt{Cache-Control: no-store} con sesión iniciada (páginas, CSV y errores), no en archivos estáticos ni sin sesión. & 4 \\ \hline
+\texttt{probar\_errores.py} & Páginas 400, 403, 404, 405, 429 y 500: diseño propio, mismo código, sin detalles; el 404 ajeno es igual al inexistente. & 7 \\ \hline
+\texttt{probar\_eventos.py} & Registro de eventos: cada tipo de evento, sin contraseñas, una fila por minuto con conteo de repeticiones, la petición no se rompe si falla el registro, detalle de una línea y HTML escapado. & 16 \\ \hline
+\texttt{probar\_privacidad.py} & Aviso público con el apartado del bot, aceptación obligatoria al registrarse, borrado de análisis propio (uno o todos) y 404 ante uno ajeno, y avisos de datos personales. & 12 \\ \hline
+\texttt{probar\_reportes.py} & Reportes: solo análisis propios de riesgo medio o alto, no se repiten, nota de máximo 200 caracteres, límite de 10 por minuto, vista del administrador y borrado junto con el análisis. & 14 \\ \hline
+\texttt{probar\_amenazas.py} & Amenazas confirmadas: permisos, dominios oficiales y acortadores rechazados, detección con puntaje 100, quitar un dominio, CSRF y que borrar el historial no toque la lista. & 11 \\ \hline
+\texttt{probar\_tendencias.py} & Tendencias: 30 días en hora de Colombia, distribución por nivel y tipo, los 10 indicadores más detectados, solo para el administrador y adaptable al celular. & 7 \\ \hline
+\texttt{probar\_hora\_colombia.py} & Conversión de una fecha UTC a hora de Colombia (UTC$-5$). & 1 \\ \hline
+\texttt{probar\_bot.py} & Bot de Telegram (42 pruebas): formato de la respuesta, \emph{defanging}, comandos, límite de largo, uso de las amenazas nuevas, que no guarde nada, manejo de errores de red y de respuestas anómalas sin mostrar el token, y el límite de mensajes por chat. & 42 \\ \hline
+\end{longtable}
+\endgroup
+
+Estas pruebas tienen límites. Usan SQLite, que no detecta un error que MySQL sí rechaza en el borrado de análisis, por lo que ese borrado falta probarlo en MySQL. No miden el rendimiento (RNF-01) ni comparan navegadores (RNF-06). La lectura del código QR ocurre en el navegador y se comprobó a mano. La adaptación al celular solo se verifica de forma automática en las tendencias y en las páginas de error.
+
+\section{Análisis y discusión}\label{sec:discusion}
 
 \apartado{Dificultades y cómo se resolvieron}
 
@@ -1115,8 +1364,39 @@ La aplicación sigue el patrón de fábrica de aplicaciones de Flask y se divide
   \item \textbf{Validación del correo.} El validador de formato de correo necesitaba una librería adicional, que se agregó a las dependencias.
   \item \textbf{Política de seguridad de contenido.} Al implementar los ejemplos rápidos, el navegador bloqueó el código JavaScript escrito dentro del HTML. Se trasladó a un archivo propio, lo que confirmó en la práctica que la política CSP estaba funcionando.
   \item \textbf{Hallazgo en la exportación.} La revisión de seguridad del código encontró que un usuario podía escribir una fórmula que se ejecutaba al abrir el CSV en una hoja de cálculo. Se reprodujo con un caso inofensivo, se corrigió y se verificó (anexo A).
-  \item \textbf{Falsos positivos.} Se identificó que el indicador de typosquatting marca como sospechosos algunos dominios oficiales, por ejemplo cuando llevan ``www''. Su ajuste queda como corrección pendiente.
+  \item \textbf{Falsos positivos.} El indicador de typosquatting marcaba como sospechosos algunos dominios oficiales, por ejemplo cuando llevaban ``www''. Se corrigió con una lista de dominios oficiales por marca (tabla~\ref{tab:hallazgos}).
+  \item \textbf{Diferencia entre SQLite y MySQL.} Las pruebas usan SQLite en memoria, que no detecta que MySQL rechaza borrar con una subconsulta sobre la misma tabla. El borrado de análisis se escribió para evitarlo, pero falta probarlo en MySQL.
 \end{itemize}
+
+\apartado{Vulnerabilidades y errores encontrados y corregidos}
+
+Estos son los problemas que se encontraron en esta etapa, con su corrección y la prueba que la comprueba. Se incluyen los que son de seguridad y también los falsos positivos y falsos negativos del motor, porque en una herramienta de alerta también son fallas. Dos de ellos (H5 y H9) se identificaron al diseñar el registro de eventos y el bot, y se corrigieron antes de usarlos; el H8 apareció al escribir su prueba.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.06\textwidth}|>{\raggedright\arraybackslash}p{0.36\textwidth}|>{\raggedright\arraybackslash}p{0.12\textwidth}|>{\raggedright\arraybackslash}p{0.34\textwidth}|}
+\caption{Vulnerabilidades y errores encontrados y corregidos}\label{tab:hallazgos}\\
+\hline
+\textbf{ID} & \textbf{Hallazgo} & \textbf{Tipo} & \textbf{Corrección y prueba} \\ \hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Hallazgo} & \textbf{Tipo} & \textbf{Corrección y prueba} \\ \hline
+\endhead
+H1 & El typosquatting marcaba como sospechosos los dominios oficiales de una marca, por ejemplo con ``www''. & Falso positivo & Lista de dominios oficiales por marca: un dominio oficial o su subdominio real nunca se marca, y \texttt{bancolombia.com.seguro.xyz} sí. \texttt{probar\_typosquatting.py}. \\ \hline
+H2 & En una URL con usuario, como \texttt{usuario@sitio.com}, el dominio se calculaba mal y reglas como ``IP en lugar de dominio'' podían no activarse. & Seguridad (evasión del análisis) & Se usa el dominio real, en minúsculas y sin usuario ni puerto. \texttt{probar\_url.py}. \\ \hline
+H3 & Una URL mal formada, como \texttt{http://sitio.com:abc} o \texttt{http://[abc}, provocaba un error del servidor (500). & Robustez & El formulario la rechaza con un aviso; en los mensajes, los enlaces mal formados se saltan. \texttt{probar\_url.py}, \texttt{probar\_enlaces\_mensaje.py}. \\ \hline
+H4 & Una fórmula en el CSV precedida de espacios o saltos de línea (por ejemplo, dos espacios y \texttt{=1+1}) no se neutralizaba. & Seguridad (inyección de fórmulas) & Se quitan los espacios y saltos de los bordes antes de revisar el primer carácter. \texttt{probar\_csv.py}. \\ \hline
+H5 & Una ráfaga de eventos repetidos (403, 429, CSRF inválido) podía llenar el registro y empujar fuera de la vista los eventos importantes. & Seguridad (inundación del registro) & Una fila por minuto por IP y usuario, con el conteo de repeticiones en la misma fila. \texttt{probar\_eventos.py}. \\ \hline
+H6 & El typosquatting no detectaba \texttt{nequl.com.co}, con una letra cambiada, porque solo buscaba la marca dentro del dominio. & Falso negativo & Detección de una letra de diferencia para marcas de cinco letras o más, sin marcar nunca un dominio oficial. Límite aceptado: dos errores no se marcan. \texttt{probar\_typosquatting.py}. \\ \hline
+H7 & En un mensaje, un enlace sin \texttt{http://}, como \texttt{bit.ly/abc}, no se analizaba. & Falso negativo & Se reconocen acortadores y dominios con ruta y terminación conocida, sin confundirlos con texto normal ni con correos. \texttt{probar\_enlaces\_mensaje.py}. \\ \hline
+H8 & El formulario de pesos rechazaba el peso 0 aunque el rango declarado es de 0 a 100, porque el validador trataba el 0 como campo vacío. & Error funcional & Se cambió por un validador que distingue el 0 de un campo vacío; el vacío, el texto y los decimales siguen dando error. \texttt{probar\_indicadores.py}. \\ \hline
+H9 & La respuesta del bot copiaba el enlace del mensaje analizado y Telegram lo volvía tocable. & Seguridad (exposición del usuario) & \emph{Defanging} del texto copiado: \texttt{hxxp://}, \texttt{[.]}, \texttt{[@]}. \texttt{probar\_bot.py}. \\ \hline
+H10 & La explicación del TLD decía que era ``gratuito'', y la de las palabras de la URL, que eran ``típicas'' de páginas falsas, cuando no todos los TLD son gratuitos ni esas palabras son exclusivas de ellas. & Precisión del texto & Se reescribieron las dos explicaciones y las descripciones de los indicadores. Sin prueba automatizada. \\ \hline
+\end{longtable}
+\endgroup
+
+Los límites que se aceptaron a propósito en el typosquatting aproximado (por ejemplo, que \texttt{nequim.com} se marque aunque sea un sitio legítimo) están en los riesgos residuales.
 
 \apartado{Efectividad de las herramientas}
 
@@ -1124,15 +1404,15 @@ Las herramientas elegidas aportaron protección desde el diseño: el ORM genera 
 
 \apartado{Lo que aún no se logró}
 
-Quedan pendientes el registro de eventos de seguridad, la autenticación multifactor, el aviso de privacidad con la opción de eliminar análisis, las pruebas automatizadas y la presentación de las fechas en la zona horaria de Colombia. Estas brechas están documentadas en el análisis de riesgos (sección~\ref{sec:gap}).
+Quedan pendientes la autenticación multifactor, eliminar la cuenta y cambiar el correo, definir cuánto tiempo se guardan los eventos de seguridad, probar el borrado de análisis en MySQL y comprobar el rendimiento y los navegadores. Estas brechas están documentadas en el análisis de riesgos (sección~\ref{sec:gap}).
 
 \apartado{Logros adicionales}
 
-Se incorporaron funciones que no estaban en el plan inicial: el rol de administrador con historial global, el panel para ajustar los pesos de los indicadores, la exportación del historial a CSV, los ejemplos rápidos para demostrar la herramienta, el rediseño de la interfaz y la revisión de seguridad del código.
+Se incorporaron funciones que no estaban en el plan inicial: el rol de administrador con historial global, el panel para ajustar los pesos de los indicadores, la exportación del historial a CSV, los ejemplos rápidos para demostrar la herramienta, el rediseño de la interfaz y la revisión de seguridad del código. En esta etapa se sumaron la adaptación al celular, la lectura de códigos QR, el análisis de los enlaces dentro de los mensajes, el typosquatting aproximado, el registro de eventos de seguridad, el aviso de privacidad con el borrado de análisis, las páginas de error, los reportes, las amenazas confirmadas, las tendencias, la hora de Colombia, el bot de Telegram y las 16 pruebas automatizadas.
 
 \apartado{Discusión del enfoque}
 
-El enfoque basado en reglas cumplió el objetivo de explicar cada resultado: en el ejemplo del mensaje de la sección~\ref{sec:vectores}, cada uno de los 85 puntos se atribuye a un indicador. Su límite es que solo detecta lo que las reglas describen: un mensaje fraudulento bien redactado, sin palabras de urgencia ni enlaces evidentes, puede obtener un puntaje bajo, y una palabra común puede activar un indicador en un mensaje legítimo. Por eso el resultado se presenta como un nivel de riesgo y los pesos se pueden ajustar. Los trabajos basados en aprendizaje automático (Jain y Gupta, 2019; Jalil y Usman, 2020) buscan mayor cobertura, a costa de que el resultado sea más difícil de explicar.
+El enfoque basado en reglas cumplió el objetivo de explicar cada resultado: en el ejemplo del mensaje de la sección~\ref{sec:vectores}, cada uno de los 105 puntos que suman los indicadores (el puntaje se limita a 100) se atribuye a un indicador. Su límite es que solo detecta lo que las reglas describen: un mensaje fraudulento bien redactado, sin palabras de urgencia ni enlaces evidentes, puede obtener un puntaje bajo, y una palabra común puede activar un indicador en un mensaje legítimo. Por eso el resultado se presenta como un nivel de riesgo y los pesos se pueden ajustar. Hay además falsos positivos que se aceptaron a propósito: el typosquatting aproximado puede marcar un sitio legítimo con un nombre a una letra de una marca (por ejemplo, \texttt{nequim.com}). En una herramienta de alerta se prefiere un falso positivo a un falso negativo, y subir el mínimo de letras dejaría sin detectar casos como \texttt{nequl.com.co}. Los trabajos basados en aprendizaje automático (Jain y Gupta, 2019; Jalil y Usman, 2020) buscan mayor cobertura, a costa de que el resultado sea más difícil de explicar.
 
 \section{Conclusiones}
 
@@ -1141,10 +1421,22 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \begin{itemize}
   \item Es posible identificar indicadores de phishing en URL y mensajes con reglas explícitas y presentar un nivel de riesgo que se puede explicar, lo que responde a los dos primeros objetivos específicos.
   \item El análisis de riesgos con MAGERIT mostró que los riesgos más altos del caso de estudio dependen del factor humano: 8 de los 16 riesgos son altos y el mayor es el robo de credenciales. Esto respalda el enfoque educativo de la herramienta.
-  \item Aplicar los controles desde el diseño (hash de contraseñas, consultas parametrizadas, token CSRF, control de acceso por usuario y por rol, y política CSP) redujo a nivel bajo los riesgos altos de la propia aplicación.
-  \item Las pruebas de seguridad y la revisión del código permitieron encontrar y corregir una vulnerabilidad real, la inyección de fórmulas en el CSV, lo que muestra el valor de probar la aplicación más allá de su funcionamiento.
+  \item Aplicar los controles desde el diseño (hash de contraseñas, consultas parametrizadas, token CSRF, control de acceso por usuario y por rol, y política CSP) redujo a nivel bajo los riesgos altos de la propia aplicación, y el registro de eventos de seguridad cerró la brecha del control 8.15 de ISO/IEC 27002.
+  \item Las pruebas de seguridad y la revisión del código permitieron encontrar y corregir varios problemas reales: la inyección de fórmulas en el CSV, las URL mal formadas que provocaban un error del servidor, y falsos positivos y falsos negativos del typosquatting, entre otros (tabla~\ref{tab:hallazgos}). Los 16 archivos de pruebas automatizadas dejan esas correcciones comprobadas, lo que muestra el valor de probar la aplicación más allá de su funcionamiento.
+  \item Las funciones de esta etapa (reportes, amenazas confirmadas, tendencias, lectura de QR y bot de Telegram) llevan la herramienta de un uso individual a un apoyo para toda la comunidad, y se diseñaron para guardar lo mínimo: el bot no guarda nada, la imagen del QR no sale del navegador y las amenazas guardan solo el dominio. El texto que se envía al bot sí pasa por los servidores de Telegram, y el aviso de privacidad lo advierte.
   \item En el proyecto se aplicaron los temas del curso: los fundamentos de la seguridad de la información, las amenazas y vulnerabilidades, y los vectores de ataque, junto con el marco legal colombiano y las normas ISO/IEC 27001 y 27002.
-  \item Para la entrega final queda cerrar las brechas identificadas, en especial el registro de eventos de seguridad.
+  \item Quedan abiertas las brechas descritas en el análisis de brechas, en especial eliminar la cuenta, definir cuánto tiempo se guardan los eventos de seguridad y la autenticación multifactor.
+\end{itemize}
+
+\apartado{Mejoras futuras}
+
+\begin{itemize}
+  \item \textbf{Bot de WhatsApp.} Llevar el mismo análisis a WhatsApp, otro canal por el que llegan mensajes sospechosos. Habría que usar la plataforma oficial de WhatsApp y revisar sus condiciones y cómo se trata el texto que pasa por ella, como se hizo con Telegram.
+  \item \textbf{Confirmar enlaces exactos en servicios compartidos.} Hoy confirmar un dominio marca todos sus enlaces, por lo que no se pueden confirmar servicios compartidos como \texttt{docs.google.com}. Se podría confirmar el enlace exacto (dominio y ruta) para marcar un formulario malicioso sin afectar a los demás.
+  \item \textbf{Eliminar la cuenta y cambiar el correo.} Completar los derechos de supresión y actualización de la Ley 1581 de 2012, que hoy se piden al administrador.
+  \item \textbf{Plazo de conservación de los eventos de seguridad.} Definir cuánto tiempo se guardan y cómo se eliminan, porque la IP y el usuario que registran son datos personales.
+  \item \textbf{Probar en MySQL el borrado de análisis,} que hoy solo se prueba en SQLite.
+  \item \textbf{Para un despliegue real:} autenticación multifactor, y HTTPS con la cookie de sesión marcada como \emph{Secure}.
 \end{itemize}
 
 \section{Referencias}\label{sec:referencias}
@@ -1165,6 +1457,7 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \item Candanedo-Yau, R. M. (2026). Ciberseguridad como gestión sostenible: Defensa crítica ante la ingeniería social y ataques informáticos en la educación superior. \emph{Investigación y Ciencia de la Universidad Autónoma de Aguascalientes}, (98), e8640. \url{https://doi.org/10.33064/iycuaa2026988640}
 \item Congreso de la República de Colombia. (2009). \emph{Ley 1273 de 2009, por medio de la cual se modifica el Código Penal, se crea un nuevo bien jurídico tutelado --- denominado ``de la protección de la información y de los datos'' --- y se preservan integralmente los sistemas que utilicen las tecnologías de la información y las comunicaciones, entre otras disposiciones}. Diario Oficial No. 47.223. \url{https://www.anm.gov.co/sites/default/files/ley_1273_2009.pdf}
 \item Congreso de la República de Colombia. (2012). \emph{Ley Estatutaria 1581 de 2012, por la cual se dictan disposiciones generales para la protección de datos personales}. \url{https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=49981}
+\item cozmo. (s.f.). \emph{jsQR} (Versión 1.4.0) [Software]. GitHub. Recuperado el 2 de noviembre de 2026, de \url{https://github.com/cozmo/jsQR}
 \item Google. (s.f.). \emph{Google Safe Browsing}. Recuperado el 7 de octubre de 2026, de \url{https://safebrowsing.google.com/}
 \item Hong, J., Kim, T., Liu, J., Park, N., \& Kim, S.-W. (2020). Phishing URL detection with lexical features and blacklisted domains. En S. Jajodia, G. Cybenko, V. S. Subrahmanian, V. Swarup, C. Wang y M. Wellman (Eds.), \emph{Adaptive autonomous secure cyber systems} (pp. 253--267). Springer. \url{https://doi.org/10.1007/978-3-030-33432-1_12}
 \item International Organization for Standardization \& International Electrotechnical Commission. (2022a). \emph{ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection --- Information security management systems --- Requirements}. ISO. \url{https://www.iso.org/standard/27001}
@@ -1179,6 +1472,7 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \item Presidencia de la República de Colombia. (2013). \emph{Decreto 1377 de 2013, por el cual se reglamenta parcialmente la Ley 1581 de 2012}.
 \item Schwaber, K., \& Sutherland, J. (2020). \emph{The Scrum Guide}. \url{https://scrumguides.org/scrum-guide.html}
 \item Semana. (2024, 2 de abril). \emph{Cuidado, estos son los 5 delitos informáticos dejan más víctimas en Colombia}. \url{https://www.semana.com/nacion/articulo/cuidado-estos-son-los-5-delitos-informaticos-de-dejan-mas-victimas-en-colombia/202424/}
+\item Telegram. (s.f.). \emph{Telegram Bot API}. Recuperado el 2 de noviembre de 2026, de \url{https://core.telegram.org/bots/api}
 \item Telesemana. (2025, 24 de abril). \emph{Crecen los ciberataques en Colombia y diversos sectores piden retomar con urgencia la creación de una estrategia país}. \url{https://www.telesemana.com/blog/2025/04/24/crecen-las-ciberamenazas-en-colombia-y-diversos-sectores-piden-retomar-con-urgencia-la-creacion-de-una-estrategia-pais/}
 \item VirusTotal. (s.f.). \emph{VirusTotal}. Recuperado el 7 de octubre de 2026, de \url{https://www.virustotal.com/}
 \item Yeboah-Boateng, E. O., \& Amanor, P. M. (2014). Phishing, SMiShing \& Vishing: An assessment of threats against mobile devices. \emph{Journal of Emerging Trends in Computing and Information Sciences}, \emph{5}(4), 297--307.
@@ -1190,11 +1484,17 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \subsection*{Anexo A. Evidencias de las pruebas de seguridad}
 \addcontentsline{toc}{subsection}{Anexo A. Evidencias de las pruebas de seguridad}
 
-Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el prototipo.
+Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el prototipo. Las cuatro primeras corresponden a las pruebas del Momento 2; las seis siguientes, a las de esta etapa. Las pruebas automatizadas se describen en la tabla~\ref{tab:pruebas}.
 
 \captura{evidencias}{csv-antes.png}{Exportación CSV antes de la corrección: la fórmula =1+1 escrita por un usuario se ejecuta y muestra 2}{fig:csvantes}
 \captura{evidencias}{csv-despues.png}{Exportación CSV después de la corrección: el contenido que empieza por = se muestra como texto}{fig:csv}
 \captura{evidencias}{idor-404.png}{Un usuario normal recibe ``Not Found'' (``Extraviado'' en el navegador traducido) al pedir el análisis de otro usuario}{fig:idor404}
 \captura{evidencias}{prohibido-403.png}{Un usuario normal recibe ``Forbidden'' (``Prohibido'' en el navegador traducido) al entrar a una función de administración}{fig:prohibido}
+\captura{evidencias}{eventos-conteo-repeticiones.png}{Registro de eventos de seguridad: un evento repetido se cuenta en una sola fila (``al menos N repeticiones más'')}{fig:eventosconteo}
+\captura{evidencias}{logout-405.png}{Una petición GET a \texttt{/logout} responde 405: cerrar sesión exige POST con token}{fig:logout405}
+\captura{evidencias}{csrf-rechazado.png}{Un formulario enviado sin un token CSRF válido se rechaza y vuelve con un aviso}{fig:csrfrechazado}
+\captura{evidencias}{limite-429.png}{Al superar el límite de intentos de inicio de sesión, la página responde 429}{fig:limite429}
+\captura{evidencias}{typosquatting-nequl.png}{El enlace \texttt{nequl.com.co} dentro de un mensaje se marca como posible typosquatting}{fig:typonequl}
+\captura{evidencias}{pruebas-16-archivos.png}{Ejecución de los 16 archivos de pruebas, todos con salida correcta}{fig:pruebas16}
 
 \end{document}
