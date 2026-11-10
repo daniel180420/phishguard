@@ -596,18 +596,18 @@ El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores 
 \node[uc] (a4) at (9.6,-9.0) {Ver tendencias y\\eventos de seguridad};
 \pic at (-0.9,-3.8) {actor};
 \node[below] at (-0.9,-4.45) {Usuario};
-\pic at (13.4,-3.5) {actor};
-\node[below] at (13.4,-4.15) {Administrador};
+\pic at (14.4,-3.5) {actor};
+\node[below] at (14.4,-4.15) {Administrador};
 \foreach \n in {u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13} {\draw (-0.55,-3.6) -- (\n.west);}
-\draw (13.0,-3.3) -- (a1.east);
-\draw (13.0,-3.3) -- (a2.east);
-\draw (13.0,-3.3) -- (a3.east);
-\draw (13.0,-3.3) -- (a4.east);
+\draw (14.0,-3.3) -- (a1.east);
+\draw (14.0,-3.3) -- (a2.east);
+\draw (14.0,-3.3) -- (a3.east);
+\draw (14.0,-3.3) -- (a4.east);
 \begin{pgfonlayer}{background}
   \node[fit=(u1)(u13)(a1)(a2)(a3)(a4), draw, rounded corners=3pt, inner sep=8pt] (sis) {};
 \end{pgfonlayer}
 \node[anchor=south west, font=\scriptsize\bfseries] at (sis.north west) {PhishGuard};
-\draw[-{Triangle[open,length=3mm,width=2.5mm]}] (13.4,-4.75) -- (13.4,-12.9) -| (-0.9,-4.95);
+\draw[-{Triangle[open,length=3mm,width=2.5mm]}] (14.4,-4.75) -- (14.4,-12.9) -| (-0.9,-4.95);
 \node[font=\scriptsize, fill=white, inner sep=1pt] at (6.7,-12.9) {el administrador hereda los casos de uso del usuario};
 \end{tikzpicture}
 \end{figure}
@@ -643,9 +643,9 @@ La figura~\ref{fig:clases} muestra las cuatro tablas principales del modelo de d
 \begin{tabular}{|p{0.22\textwidth}|p{0.40\textwidth}|p{0.28\textwidth}|}
 \hline
 \textbf{Tabla} & \textbf{Qué guarda} & \textbf{Relación} \\ \hline
-\texttt{eventos\_seguridad} (EventoSeguridad) & El evento, un detalle en una sola línea (hasta 500 caracteres), la IP y la fecha. No guarda contraseñas ni contenidos. & Usuario opcional: queda vacío si no hay usuario, por ejemplo en un inicio de sesión fallido. \\ \hline
+\texttt{eventos\_\allowbreak seguridad} (EventoSeguridad) & El evento, un detalle en una sola línea (hasta 500 caracteres), la IP y la fecha. No guarda contraseñas ni contenidos. & Usuario opcional: queda vacío si no hay usuario, por ejemplo en un inicio de sesión fallido. \\ \hline
 \texttt{reportes} (Reporte) & El usuario que reporta, una nota opcional (200 caracteres), la fecha, el estado (pendiente o revisado) y quién y cuándo lo revisó. & Uno por análisis (clave única); se borra junto con el análisis. \\ \hline
-\texttt{amenazas\_confirmadas} (AmenazaConfirmada) & El dominio (único), la fecha y el administrador que lo confirmó. & Sin relación con el análisis ni con el reporte, para que sobreviva al borrado y no identifique al usuario. \\ \hline
+\texttt{amenazas\_\allowbreak confirmadas} (AmenazaConfirmada) & El dominio (único), la fecha y el administrador que lo confirmó. & Sin relación con el análisis ni con el reporte, para que sobreviva al borrado y no identifique al usuario. \\ \hline
 \end{tabular}
 \end{table}
 
