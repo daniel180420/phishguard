@@ -49,11 +49,12 @@
 \newcommand{\apartado}[1]{\par\medskip\noindent\textbf{#1}\par\smallskip}
 
 % Captura de pantalla: si la imagen no está en la carpeta, deja un recuadro que lo avisa
-\newcommand{\captura}[4]{%
+\newcommand{\captura}[4]{\capturaancho{0.85}{#1}{#2}{#3}{#4}}
+\newcommand{\capturaancho}[5]{%
 \begin{figure}[htbp]
 \centering
-\caption{#3}\label{#4}
-\IfFileExists{#1/#2}{\includegraphics[width=0.85\textwidth]{#1/#2}}{\fbox{\parbox[c][3.5cm][c]{0.8\textwidth}{\centering Falta la imagen \texttt{#1/#2}}}}
+\caption{#4}\label{#5}
+\IfFileExists{#2/#3}{\includegraphics[width=#1\textwidth]{#2/#3}}{\fbox{\parbox[c][3.5cm][c]{0.8\textwidth}{\centering Falta la imagen \texttt{#2/#3}}}}
 \end{figure}}
 
 \begin{document}
@@ -1094,7 +1095,7 @@ La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks ext
 \captura{capturas}{admin-tendencias.png}{Tendencias de los análisis}{fig:admintendencias}
 \captura{capturas}{admin-eventos.png}{Registro de eventos de seguridad}{fig:admineventos}
 \captura{capturas}{error-404.png}{Página de error 404}{fig:error404}
-\captura{capturas}{celular-analisis.png}{Análisis de un mensaje en la pantalla de un celular}{fig:celular}
+\capturaancho{0.40}{capturas}{celular-analisis.png}{Análisis de un mensaje en la pantalla de un celular}{fig:celular}
 \captura{capturas}{bot-analisis.png}{Respuesta del bot de Telegram, con el enlace neutralizado (defanging)}{fig:bot}
 
 \subsection{Descripción técnica del sistema}\label{sec:tecnica}
