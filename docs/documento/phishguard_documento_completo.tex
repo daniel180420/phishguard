@@ -1484,7 +1484,7 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \subsection*{Anexo A. Evidencias de las pruebas de seguridad}
 \addcontentsline{toc}{subsection}{Anexo A. Evidencias de las pruebas de seguridad}
 
-Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el prototipo. Las cuatro primeras corresponden a las pruebas del Momento 2; las seis siguientes, a las de esta etapa. Las pruebas automatizadas se describen en la tabla~\ref{tab:pruebas}.
+Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el prototipo. Las cuatro primeras corresponden a las pruebas del Momento 2; las cinco siguientes, a las de esta etapa. Las pruebas automatizadas se describen en la tabla~\ref{tab:pruebas}.
 
 \captura{evidencias}{csv-antes.png}{Exportación CSV antes de la corrección: la fórmula =1+1 escrita por un usuario se ejecuta y muestra 2}{fig:csvantes}
 \captura{evidencias}{csv-despues.png}{Exportación CSV después de la corrección: el contenido que empieza por = se muestra como texto}{fig:csv}
@@ -1492,7 +1492,6 @@ Las siguientes capturas documentan las pruebas de seguridad realizadas sobre el 
 \captura{evidencias}{prohibido-403.png}{Un usuario normal recibe ``Forbidden'' (``Prohibido'' en el navegador traducido) al entrar a una función de administración}{fig:prohibido}
 \captura{evidencias}{eventos-conteo-repeticiones.png}{Registro de eventos de seguridad: un evento repetido se cuenta en una sola fila (``al menos N repeticiones más'')}{fig:eventosconteo}
 \captura{evidencias}{logout-405.png}{Una petición GET a \texttt{/logout} responde 405: cerrar sesión exige POST con token}{fig:logout405}
-\captura{evidencias}{csrf-rechazado.png}{Un formulario enviado sin un token CSRF válido se rechaza y vuelve con un aviso}{fig:csrfrechazado}
 \captura{evidencias}{limite-429.png}{Al superar el límite de intentos de inicio de sesión, la página responde 429}{fig:limite429}
 \captura{evidencias}{typosquatting-nequl.png}{El enlace \texttt{nequl.com.co} dentro de un mensaje se marca como posible typosquatting}{fig:typonequl}
 \captura{evidencias}{pruebas-16-archivos.png}{Ejecución de los 16 archivos de pruebas, todos con salida correcta}{fig:pruebas16}
