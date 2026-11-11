@@ -1356,6 +1356,67 @@ La carpeta \texttt{tests/} tiene 16 archivos de prueba. Cada uno se ejecuta por 
 
 Estas pruebas tienen límites. Usan SQLite, que no detecta un error que MySQL sí rechaza en el borrado de análisis, por lo que ese borrado falta probarlo en MySQL. No miden el rendimiento (RNF-01) ni comparan navegadores (RNF-06). La lectura del código QR ocurre en el navegador y se comprobó a mano. La adaptación al celular solo se verifica de forma automática en las tendencias y en las páginas de error.
 
+\subsection{Código fuente}\label{sec:codigo}
+
+El código fuente de PhishGuard está en un repositorio de GitHub: \url{https://github.com/daniel180420/phishguard}. El repositorio es privado; se da acceso de lectura al docente para la revisión.
+
+La estructura de carpetas es la siguiente:
+
+\begin{itemize}
+  \item \texttt{app/}: la aplicación web. Contiene la fábrica de la aplicación (\texttt{\_\_init\_\_.py}), los modelos de la base de datos (\texttt{models.py}), los módulos de apoyo (\texttt{seguridad.py}, \texttt{reportes.py}, \texttt{tendencias.py}, \texttt{tiempo.py}, \texttt{decorators.py}) y tres módulos: \texttt{auth/} (registro e inicio de sesión), \texttt{analysis/} (el motor de reglas en \texttt{analyzer.py}, las rutas, los formularios y la lectura de pesos y amenazas) y \texttt{dashboard/} (panel de inicio). Las plantillas HTML están en \texttt{app/templates/} y el CSS y el JavaScript propios, en \texttt{app/static/}.
+  \item \texttt{tests/}: los 16 archivos de pruebas (\texttt{probar\_*.py}).
+  \item \texttt{docs/}: este documento en LaTeX, las figuras y las ideas de diseño de la interfaz.
+  \item \texttt{bot.py}: el bot de Telegram, que es un proceso aparte de la web.
+  \item \texttt{config.py}, \texttt{run.py}, \texttt{init\_db.py} y \texttt{seed\_indicadores.py}: la configuración, el arranque del servidor, la creación de las tablas y la carga de los pesos de los indicadores.
+  \item \texttt{README.md}, \texttt{CLAUDE.md} y \texttt{requirements.txt}: la guía de instalación, la guía técnica y las dependencias.
+\end{itemize}
+
+El código está documentado de tres maneras. El \texttt{README.md} explica cómo instalar, ejecutar y probar el proyecto, paso a paso. El archivo \texttt{CLAUDE.md} describe la arquitectura, el flujo del puntaje, las decisiones de diseño que no se cambian y los riesgos conocidos. Y los módulos llevan comentarios y descripciones al inicio de cada archivo y de las funciones principales, por ejemplo la descripción del bot al comienzo de \texttt{bot.py}.
+
+Las pruebas se ejecutan una por una con \texttt{python tests\textbackslash probar\_nombre.py}. Cada archivo usa una base de datos SQLite en memoria, sin tocar MySQL, y termina con código 0 si todo pasa. Lo que cubre cada archivo está en la tabla~\ref{tab:pruebas}.
+
+\subsection{Manual de usuario}\label{sec:manual}
+
+Este manual explica cómo usar PhishGuard desde el navegador y desde Telegram. Las figuras a las que remite están en la sección~\ref{sec:interfaz}.
+
+\apartado{Funciones del usuario}
+
+\begin{enumerate}
+  \item \textbf{Registrarse y aceptar el aviso de privacidad.} En la pantalla de inicio de sesión, entra a ``Regístrate aquí''. Escribe un nombre de usuario, un correo y una contraseña de al menos 8 caracteres, lee el aviso de privacidad (figura~\ref{fig:privacidad}), marca la casilla ``Acepto el aviso de privacidad'' y pulsa ``Registrarse''. Sin la casilla marcada no se crea la cuenta.
+  \item \textbf{Iniciar sesión.} Escribe tu usuario y tu contraseña y pulsa ``Iniciar sesión'' (figura~\ref{fig:login}). Después de 5 intentos fallidos en un minuto hay que esperar. La sesión se cierra sola tras 30 minutos sin actividad. Al entrar llegas al panel de inicio (figura~\ref{fig:inicio}).
+  \item \textbf{Analizar una URL.} En el menú lateral, entra a ``Analizar URL'', escribe o pega el enlace y pulsa ``Analizar URL''. Debajo del campo hay enlaces de ejemplo para probar.
+  \item \textbf{Leer un código QR.} En la misma pantalla, pulsa ``Leer QR desde una imagen'' y elige una foto o una captura del código (hasta 10~MB). La imagen se lee en tu navegador y nunca se envía al servidor: solo el enlace que contiene se pone en el campo, y solo si es una dirección web. Después pulsa ``Analizar URL'' (figura~\ref{fig:qr}).
+  \item \textbf{Analizar un mensaje.} En el menú, entra a ``Analizar mensaje'', pega el texto del SMS, del correo o del chat (hasta 2000 caracteres) y pulsa ``Analizar mensaje'' (figura~\ref{fig:analisis}). No pegues datos personales, porque el análisis se guarda en tu historial.
+  \item \textbf{Entender el resultado.} El resultado muestra un puntaje de 0 a 100 y un nivel: \emph{bajo} (hasta 30), \emph{medio} (hasta 60) o \emph{alto} (más de 60). Debajo hay una tabla con cada señal detectada, su peso y una explicación en palabras sencillas. Un puntaje bajo no garantiza que el enlace sea seguro: es una ayuda para tu criterio, no una garantía. Si el dominio fue confirmado antes como phishing por el administrador, aparece una alerta roja y el puntaje es 100 (figura~\ref{fig:amenazares}).
+  \item \textbf{Reportar un análisis.} Si el resultado es de riesgo medio o alto, aparece el botón ``Reportar al área de tecnología'', con una nota opcional de hasta 200 caracteres (sin datos personales). Cada análisis se puede reportar una sola vez.
+  \item \textbf{Ver el historial.} Entra a ``Mi historial'' en el menú. Ahí están tus análisis con su fecha, tipo, puntaje y nivel; el enlace ``Ver detalle'' abre el análisis completo (figura~\ref{fig:historial}).
+  \item \textbf{Borrar análisis.} En el historial, ``Eliminar'' borra un análisis y ``Borrar todo mi historial'' borra todos. Ambos piden confirmación y no se pueden deshacer. Si el análisis tenía un reporte, el reporte se borra con él (figura~\ref{fig:historialborrar}).
+  \item \textbf{Exportar a CSV.} En el historial, pulsa ``Exportar a CSV'' para descargar tus análisis en un archivo que se abre con una hoja de cálculo.
+  \item \textbf{Cerrar sesión.} Al terminar, pulsa ``Cerrar sesión'' al final del menú lateral, sobre todo si usas un computador compartido.
+\end{enumerate}
+
+\apartado{Funciones del administrador}
+
+Un administrador ve además la sección ``Administración'' del menú. El historial global muestra los análisis de todos los usuarios.
+
+\begin{enumerate}
+  \item \textbf{Indicadores.} En ``Indicadores'' se ven las señales con su descripción y su peso (figura~\ref{fig:indicadores}). Con ``Editar'' se cambia el peso, un número entero de 0 a 100, y se pulsa ``Guardar''. El cambio vale para los análisis nuevos; los anteriores no se modifican.
+  \item \textbf{Reportes.} En ``Reportes'' (el menú muestra cuántos hay pendientes) se ven los análisis que los usuarios reportaron (figura~\ref{fig:adminreportes}). ``Ver análisis'' abre el detalle y ``Marcar como revisado'' cierra el reporte.
+  \item \textbf{Confirmar una amenaza.} En un reporte, ``Confirmar como phishing'' muestra los dominios del enlace o de los enlaces del mensaje. Marca los que quieras confirmar y guarda. Confirmar un dominio marca como peligrosos todos sus enlaces, así que no se debe confirmar un servicio compartido como \texttt{docs.google.com}. No se aceptan dominios oficiales ni acortadores.
+  \item \textbf{Quitar una amenaza.} En ``Amenazas'' está la lista de dominios confirmados; ``Quitar'' elimina uno (figura~\ref{fig:adminamenazas}).
+  \item \textbf{Tendencias.} Muestra cifras generales: análisis por día en los últimos 30 días, distribución por nivel y por tipo, y los 10 indicadores más detectados. Solo son números, no se ven contenidos (figura~\ref{fig:admintendencias}).
+  \item \textbf{Eventos de seguridad.} Lista los últimos 200 eventos: inicios y cierres de sesión, fallos, borrados, reportes, cambios de peso y otros (figura~\ref{fig:admineventos}).
+\end{enumerate}
+
+\apartado{Bot de Telegram}
+
+\begin{enumerate}
+  \item Abre Telegram, busca el bot de PhishGuard (\texttt{@phishguard\_ucc\_bot}) y pulsa ``Iniciar'', o escribe \texttt{/start}. El comando \texttt{/ayuda} repite la explicación.
+  \item Pega el mensaje sospechoso como texto (hasta 2000 caracteres). El bot no lee fotos ni stickers, solo texto.
+  \item El bot responde con el puntaje, el nivel y las tres señales de más peso. Si el enlace es una amenaza confirmada, avisa aparte. Los enlaces de la respuesta se escriben de forma que no se pueden tocar, por ejemplo \texttt{hxxp://sitio[.]com} (figura~\ref{fig:bot}).
+  \item El bot atiende hasta 10 mensajes por minuto en cada chat. No guarda los análisis. Si el administrador no tiene el bot encendido, no responde.
+\end{enumerate}
+
 \section{Análisis y discusión}\label{sec:discusion}
 
 \apartado{Dificultades y cómo se resolvieron}
