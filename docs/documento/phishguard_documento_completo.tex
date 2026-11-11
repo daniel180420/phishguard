@@ -139,9 +139,9 @@ El documento se organiza así: el capítulo 2 plantea el problema y justifica la
 
 \subsubsection{Magnitud del problema}
 
-El phishing es una de las formas de ingeniería social más extendidas. El Anti-Phishing Working Group (APWG), que consolida reportes de la industria, observó cerca de 3,8 millones de ataques de phishing durante 2025, ligeramente por encima de los 3,76 millones de 2024 (APWG, 2026c). En el primer trimestre de 2026 el volumen aumentó 13,8\,\% frente al trimestre anterior, al pasar de 853.244 a 971.181 ataques (APWG, 2026a), y en el segundo trimestre volvió a crecer 10,1\,\%, hasta 1.069.681 ataques (APWG, 2026b). En ese último periodo, la categoría de servicios en la nube y correo web (SaaS/webmail) fue la más atacada, con 29,1\,\% de los casos (APWG, 2026b), que es la misma categoría de servicios que usa a diario una comunidad universitaria.
+El phishing es una de las formas de ingeniería social más extendidas. El Anti-Phishing Working Group (APWG), que consolida reportes de la industria, observó cerca de 3,8 millones de ataques de phishing durante 2025, ligeramente por encima de los 3,76 millones de 2024 \cite{apwg-q4}. En el primer trimestre de 2026 el volumen aumentó 13,8\,\% frente al trimestre anterior, al pasar de 853.244 a 971.181 ataques \cite{apwg-q1}, y en el segundo trimestre volvió a crecer 10,1\,\%, hasta 1.069.681 ataques \cite{apwg-q2}. En ese último periodo, la categoría de servicios en la nube y correo web (SaaS/webmail) fue la más atacada, con 29,1\,\% de los casos \cite{apwg-q2}, que es la misma categoría de servicios que usa a diario una comunidad universitaria.
 
-En Colombia, según el informe \emph{Estado de la ciberseguridad en Colombia} de la Cámara Colombiana de Informática y Telecomunicaciones (CCIT) y la Universidad Externado, que cita datos del Centro Cibernético de la Policía Nacional, en 2024 se presentaron 77.866 denuncias por delitos informáticos, un aumento de 23\,\% frente a 2023, año en que se registraron 63.249 (Telesemana, 2025). Dentro de esos delitos, la suplantación de sitios web para capturar datos personales, tipificada en el artículo 269G del Código Penal, fue el cuarto más frecuente, con 1.038 denuncias entre enero y comienzos de abril de 2024, 10,19\,\% más que en el mismo periodo de 2023 (Semana, 2024). Al tratarse de denuncias, es probable que estas cifras subestimen la magnitud real del fenómeno.
+En Colombia, según el informe \emph{Estado de la ciberseguridad en Colombia} de la Cámara Colombiana de Informática y Telecomunicaciones (CCIT) y la Universidad Externado, que cita datos del Centro Cibernético de la Policía Nacional, en 2024 se presentaron 77.866 denuncias por delitos informáticos, un aumento de 23\,\% frente a 2023, año en que se registraron 63.249 \cite{telesemana}. Dentro de esos delitos, la suplantación de sitios web para capturar datos personales, tipificada en el artículo 269G del Código Penal, fue el cuarto más frecuente, con 1.038 denuncias entre enero y comienzos de abril de 2024, 10,19\,\% más que en el mismo periodo de 2023 \cite{semana}. Al tratarse de denuncias, es probable que estas cifras subestimen la magnitud real del fenómeno.
 
 \subsubsection{La institución del caso de estudio}
 
@@ -214,7 +214,7 @@ PhishGuard será desarrollado como una aplicación web orientada al análisis de
 
 \subsubsection{Beneficios}
 
-Una institución de educación superior concentra en pocos servicios información de alto valor: credenciales institucionales, correo, datos personales y académicos, y procesos de pago. Una sola credencial capturada mediante un mensaje o un enlace falso puede dar acceso a todos ellos. A esto se suma que la comunidad universitaria es numerosa, cambia cada semestre y tiene niveles muy distintos de formación en seguridad, lo que hace difícil depender únicamente de controles técnicos. Por eso resulta pertinente una herramienta que ayude a cada persona a reconocer, antes de actuar, los indicadores que hacen sospechoso un enlace o un mensaje. Candanedo-Yau (2026) llega a una conclusión en la misma línea: al analizar los riesgos de la ingeniería social en instituciones de educación superior, plantea estrategias de prevención que combinan las dimensiones tecnológica, organizativa y humana. A su vez, Zwilling et al. (2022) encontraron que los usuarios de internet tienen una conciencia adecuada de las amenazas, pero aplican solo medidas de protección mínimas, y que un mayor conocimiento se asocia con una mayor conciencia; es decir, enseñar a reconocer las señales tiene efecto.
+Una institución de educación superior concentra en pocos servicios información de alto valor: credenciales institucionales, correo, datos personales y académicos, y procesos de pago. Una sola credencial capturada mediante un mensaje o un enlace falso puede dar acceso a todos ellos. A esto se suma que la comunidad universitaria es numerosa, cambia cada semestre y tiene niveles muy distintos de formación en seguridad, lo que hace difícil depender únicamente de controles técnicos. Por eso resulta pertinente una herramienta que ayude a cada persona a reconocer, antes de actuar, los indicadores que hacen sospechoso un enlace o un mensaje. Candanedo-Yau \cite{candanedo} llega a una conclusión en la misma línea: al analizar los riesgos de la ingeniería social en instituciones de educación superior, plantea estrategias de prevención que combinan las dimensiones tecnológica, organizativa y humana. A su vez, Zwilling et al. \cite{zwilling} encontraron que los usuarios de internet tienen una conciencia adecuada de las amenazas, pero aplican solo medidas de protección mínimas, y que un mayor conocimiento se asocia con una mayor conciencia; es decir, enseñar a reconocer las señales tiene efecto.
 
 El proyecto aporta una herramienta preventiva y educativa que explica por qué una URL o un mensaje resulta sospechoso, y a la vez sirve como caso práctico de desarrollo seguro: contraseñas con hash, consultas parametrizadas, validación de entradas, control de acceso por usuario y por rol, y gestión segura de sesiones, cuyo cumplimiento se verifica mediante pruebas descritas en el documento.
 
@@ -222,7 +222,7 @@ La relación del proyecto con los temas del curso se desarrolla en el marco teó
 
 \subsubsection{Por qué un enfoque basado en reglas}
 
-PhishGuard no utiliza inteligencia artificial ni aprendizaje automático. Esta decisión es deliberada, tiene respaldo en trabajos que detectan phishing con reglas explícitas (Jeeva y Rajsingh, 2016; Moghimi y Varjani, 2016) y responde a tres razones:
+PhishGuard no utiliza inteligencia artificial ni aprendizaje automático. Esta decisión es deliberada, tiene respaldo en trabajos que detectan phishing con reglas explícitas \cite{jeeva}, \cite{moghimi} y responde a tres razones:
 
 \begin{itemize}
   \item \textbf{Explicabilidad.} Cada punto del puntaje de riesgo se puede justificar con un indicador concreto y su peso. El usuario no recibe un veredicto, sino una explicación que puede aprender a reproducir por sí mismo.
@@ -265,13 +265,13 @@ Diseñar e implementar un sistema web denominado PhishGuard que permita analizar
 
 \subsection{Estado del arte}\label{sec:estado}
 
-En el mercado existen servicios que ayudan a identificar sitios y enlaces maliciosos. Google Safe Browsing mantiene listas de sitios inseguros que los navegadores consultan para advertir al usuario antes de abrirlos (Google, s.f.). VirusTotal permite enviar una URL o un archivo para que sea revisado por múltiples motores antivirus y servicios de análisis (VirusTotal, s.f.). PhishTank es una comunidad en la que los usuarios reportan y verifican URL de phishing (PhishTank, s.f.). Estos servicios dependen de listas o de motores externos, entregan un veredicto y, en general, no le explican al usuario por qué un enlace es sospechoso; además, no analizan el texto de un mensaje. PhishGuard se diferencia en que funciona sin servicios externos, analiza también mensajes y explica cada indicador, con un fin educativo.
+En el mercado existen servicios que ayudan a identificar sitios y enlaces maliciosos. Google Safe Browsing mantiene listas de sitios inseguros que los navegadores consultan para advertir al usuario antes de abrirlos \cite{safebrowsing}. VirusTotal permite enviar una URL o un archivo para que sea revisado por múltiples motores antivirus y servicios de análisis \cite{virustotal}. PhishTank es una comunidad en la que los usuarios reportan y verifican URL de phishing \cite{phishtank}. Estos servicios dependen de listas o de motores externos, entregan un veredicto y, en general, no le explican al usuario por qué un enlace es sospechoso; además, no analizan el texto de un mensaje. PhishGuard se diferencia en que funciona sin servicios externos, analiza también mensajes y explica cada indicador, con un fin educativo.
 
 \apartado{Enfoques en la literatura académica}
 
-La detección automática de phishing se ha abordado con dos enfoques principales. Una parte importante de los trabajos recientes usa aprendizaje automático: Jain y Gupta (2019) clasifican sitios web a partir de la información de los hipervínculos de su código HTML, y Jalil y Usman (2020) revisan los clasificadores de aprendizaje automático aplicados a la detección de URL de phishing. El segundo enfoque usa reglas explícitas: Moghimi y Varjani (2016) proponen un método basado en reglas para detectar phishing contra la banca por internet, implementado como una extensión de navegador, y Jeeva y Rajsingh (2016) definen catorce características heurísticas de la URL, entre ellas la presencia de ciertas palabras clave, de las que obtienen reglas del tipo ``si\ldots{} entonces'' para distinguir URL legítimas de fraudulentas.
+La detección automática de phishing se ha abordado con dos enfoques principales. Una parte importante de los trabajos recientes usa aprendizaje automático: Jain y Gupta \cite{jain} clasifican sitios web a partir de la información de los hipervínculos de su código HTML, y Jalil y Usman \cite{jalil} revisan los clasificadores de aprendizaje automático aplicados a la detección de URL de phishing. El segundo enfoque usa reglas explícitas: Moghimi y Varjani \cite{moghimi} proponen un método basado en reglas para detectar phishing contra la banca por internet, implementado como una extensión de navegador, y Jeeva y Rajsingh \cite{jeeva} definen catorce características heurísticas de la URL, entre ellas la presencia de ciertas palabras clave, de las que obtienen reglas del tipo ``si\ldots{} entonces'' para distinguir URL legítimas de fraudulentas.
 
-Sobre las características que se analizan, Hong et al. (2020) reúnen características léxicas de la URL identificadas en trabajos previos y las combinan con listas de dominios maliciosos. Para los mensajes, Yeboah-Boateng y Amanor (2014) proponen una taxonomía de palabras ``atrayentes'' y ``señuelo'' usadas en los ataques de phishing, smishing y vishing, como referencia para que los usuarios se protejan. PhishGuard toma de estos trabajos la idea de analizar características léxicas de la URL y palabras típicas de los mensajes fraudulentos, y se ubica en el enfoque basado en reglas por las razones que se exponen a continuación.
+Sobre las características que se analizan, Hong et al. \cite{hong} reúnen características léxicas de la URL identificadas en trabajos previos y las combinan con listas de dominios maliciosos. Para los mensajes, Yeboah-Boateng y Amanor \cite{yeboah} proponen una taxonomía de palabras ``atrayentes'' y ``señuelo'' usadas en los ataques de phishing, smishing y vishing, como referencia para que los usuarios se protejan. PhishGuard toma de estos trabajos la idea de analizar características léxicas de la URL y palabras típicas de los mensajes fraudulentos, y se ubica en el enfoque basado en reglas por las razones que se exponen a continuación.
 
 \subsection{Marco teórico}\label{sec:teorico}
 
@@ -279,35 +279,35 @@ El proyecto se relaciona con los tres temas obligatorios de la asignatura de la 
 
 \begin{itemize}
   \item \textbf{Fundamentos de la seguridad de la información.} El análisis de riesgos del proyecto (sección~\ref{sec:riesgos}) parte de los conceptos de activo, amenaza, vulnerabilidad, impacto y riesgo, y valora los activos según las dimensiones de confidencialidad, integridad, disponibilidad, autenticidad y trazabilidad.
-  \item \textbf{Amenazas y vulnerabilidades.} Se estudian dos planos: la amenaza de ingeniería social (phishing) que explota la vulnerabilidad humana, y las vulnerabilidades de la propia aplicación web (control de acceso, inyección, XSS, CSRF, gestión de sesiones), tomando como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025).
-  \item \textbf{Vectores de ataque.} Los vectores que analiza PhishGuard son los enlaces (URL) y los mensajes de texto, que llegan por correo, SMS o mensajería instantánea (Yeboah-Boateng y Amanor, 2014). El canal SMS gana peso: el smishing aumentó 40\,\% entre el primer y el segundo trimestre de 2026 (APWG, 2026b). Los indicadores del sistema corresponden a características observables de esos vectores.
+  \item \textbf{Amenazas y vulnerabilidades.} Se estudian dos planos: la amenaza de ingeniería social (phishing) que explota la vulnerabilidad humana, y las vulnerabilidades de la propia aplicación web (control de acceso, inyección, XSS, CSRF, gestión de sesiones), tomando como referencia el OWASP Top 10:2025 \cite{owasp}.
+  \item \textbf{Vectores de ataque.} Los vectores que analiza PhishGuard son los enlaces (URL) y los mensajes de texto, que llegan por correo, SMS o mensajería instantánea \cite{yeboah}. El canal SMS gana peso: el smishing aumentó 40\,\% entre el primer y el segundo trimestre de 2026 \cite{apwg-q2}. Los indicadores del sistema corresponden a características observables de esos vectores.
 \end{itemize}
 
 \subsubsection{Fundamentos de la seguridad de la información}
 
-La seguridad de la información busca preservar la confidencialidad, la integridad y la disponibilidad de la información mediante un proceso de gestión de riesgos (ISO \& IEC, 2022a). La confidencialidad asegura que solo accedan a la información las personas autorizadas; la integridad, que no sea alterada de forma indebida, y la disponibilidad, que esté accesible cuando se necesita. MAGERIT agrega dos dimensiones útiles para este proyecto: la autenticidad, que garantiza que una persona o un origen son quienes dicen ser, y la trazabilidad, que permite saber quién hizo qué y cuándo (Ministerio de Hacienda y Administraciones Públicas, 2012).
+La seguridad de la información busca preservar la confidencialidad, la integridad y la disponibilidad de la información mediante un proceso de gestión de riesgos \cite{iso27001}. La confidencialidad asegura que solo accedan a la información las personas autorizadas; la integridad, que no sea alterada de forma indebida, y la disponibilidad, que esté accesible cuando se necesita. MAGERIT agrega dos dimensiones útiles para este proyecto: la autenticidad, que garantiza que una persona o un origen son quienes dicen ser, y la trazabilidad, que permite saber quién hizo qué y cuándo \cite{magerit}.
 
-Para analizar la seguridad se usan cuatro conceptos relacionados: un \emph{activo} es un recurso de valor que debe protegerse; una \emph{amenaza} es un evento que puede dañarlo; una \emph{vulnerabilidad} es una debilidad que permite que la amenaza se materialice, y el \emph{riesgo} estima el daño posible a partir de la probabilidad y el impacto de la amenaza (Ministerio de Hacienda y Administraciones Públicas, 2012).
+Para analizar la seguridad se usan cuatro conceptos relacionados: un \emph{activo} es un recurso de valor que debe protegerse; una \emph{amenaza} es un evento que puede dañarlo; una \emph{vulnerabilidad} es una debilidad que permite que la amenaza se materialice, y el \emph{riesgo} estima el daño posible a partir de la probabilidad y el impacto de la amenaza \cite{magerit}.
 
 Para controlar el acceso a un sistema se usa el modelo AAA: la \emph{autenticación} verifica la identidad del usuario, la \emph{autorización} determina qué puede hacer y la \emph{contabilidad} registra lo que hace. Este modelo organiza el diseño de los controles de PhishGuard (sección~\ref{sec:controles}).
 
 \subsubsection{Ingeniería social y phishing}
 
-La ingeniería social consiste en manipular a las personas para que revelen información o actúen en contra de su propia seguridad. El APWG define el phishing como un delito que combina ingeniería social y engaño técnico para robar datos de identidad y credenciales financieras: el atacante se hace pasar por una entidad de confianza mediante direcciones de correo y mensajes engañosos, sitios web falsos o nombres de dominio que imitan a los legítimos (APWG, 2026b). Además del correo, el phishing usa los mensajes de texto (smishing) y las llamadas (vishing) (Yeboah-Boateng y Amanor, 2014). Estos medios son los vectores de ataque que analiza el proyecto (sección~\ref{sec:vectores}).
+La ingeniería social consiste en manipular a las personas para que revelen información o actúen en contra de su propia seguridad. El APWG define el phishing como un delito que combina ingeniería social y engaño técnico para robar datos de identidad y credenciales financieras: el atacante se hace pasar por una entidad de confianza mediante direcciones de correo y mensajes engañosos, sitios web falsos o nombres de dominio que imitan a los legítimos \cite{apwg-q2}. Además del correo, el phishing usa los mensajes de texto (smishing) y las llamadas (vishing) \cite{yeboah}. Estos medios son los vectores de ataque que analiza el proyecto (sección~\ref{sec:vectores}).
 
 \subsubsection{Seguridad en aplicaciones web}
 
-Para el plano de la aplicación web se toma como referencia el OWASP Top 10:2025 (OWASP Foundation, 2025). Las categorías más relacionadas con las medidas del proyecto son: control de acceso roto (A01), configuración de seguridad incorrecta (A02), fallos en la cadena de suministro de software (A03), inyección (A05), fallos de autenticación (A07), fallos en el registro y alerta de seguridad (A09) y manejo incorrecto de condiciones excepcionales (A10). La tabla~\ref{tab:owasp} relaciona cada una con los controles de la aplicación.
+Para el plano de la aplicación web se toma como referencia el OWASP Top 10:2025 \cite{owasp}. Las categorías más relacionadas con las medidas del proyecto son: control de acceso roto (A01), configuración de seguridad incorrecta (A02), fallos en la cadena de suministro de software (A03), inyección (A05), fallos de autenticación (A07), fallos en el registro y alerta de seguridad (A09) y manejo incorrecto de condiciones excepcionales (A10). La tabla~\ref{tab:owasp} relaciona cada una con los controles de la aplicación.
 
 \subsubsection{Análisis y gestión de riesgos}
 
-MAGERIT es la metodología de análisis y gestión de riesgos de los sistemas de información elaborada por el Ministerio de Hacienda y Administraciones Públicas de España. Su versión 3 se publicó en 2012 y se organiza en tres libros: método, catálogo de elementos y guía de técnicas (Ministerio de Hacienda y Administraciones Públicas, 2012). Es de uso libre y sigue la terminología de ISO 31000. El método identifica \emph{activos}, \emph{amenazas} y \emph{salvaguardas}, y estima el \emph{impacto} y el \emph{riesgo}, tanto potencial como residual. El catálogo propone tipos de activos, cinco dimensiones de valoración (disponibilidad, integridad, confidencialidad, autenticidad y trazabilidad) y una lista de amenazas agrupadas por origen.
+MAGERIT es la metodología de análisis y gestión de riesgos de los sistemas de información elaborada por el Ministerio de Hacienda y Administraciones Públicas de España. Su versión 3 se publicó en 2012 y se organiza en tres libros: método, catálogo de elementos y guía de técnicas \cite{magerit}. Es de uso libre y sigue la terminología de ISO 31000. El método identifica \emph{activos}, \emph{amenazas} y \emph{salvaguardas}, y estima el \emph{impacto} y el \emph{riesgo}, tanto potencial como residual. El catálogo propone tipos de activos, cinco dimensiones de valoración (disponibilidad, integridad, confidencialidad, autenticidad y trazabilidad) y una lista de amenazas agrupadas por origen.
 
 En este proyecto se adopta MAGERIT de forma \textbf{simplificada y cualitativa} (sección~\ref{sec:metriesgos}): se usan sus conceptos y su catálogo como vocabulario, pero con escalas de tres niveles y sin la herramienta PILAR ni el cálculo completo de frecuencia y degradación.
 
 \subsection{Marco legal}\label{sec:marco}
 
-\textbf{Ley 1273 de 2009.} Modifica el Código Penal y crea el bien jurídico tutelado ``de la protección de la información y de los datos'' (Congreso de la República de Colombia, 2009). Tiene relación directa con el phishing por los siguientes tipos penales:
+\textbf{Ley 1273 de 2009.} Modifica el Código Penal y crea el bien jurídico tutelado ``de la protección de la información y de los datos'' \cite{ley1273}. Tiene relación directa con el phishing por los siguientes tipos penales:
 
 \begin{itemize}
   \item \textbf{Artículo 269F, violación de datos personales:} sanciona obtener, compilar, divulgar o emplear códigos y datos personales sin estar facultado para ello.
@@ -315,7 +315,7 @@ En este proyecto se adopta MAGERIT de forma \textbf{simplificada y cualitativa} 
   \item \textbf{Artículo 269I, hurto por medios informáticos y semejantes} y \textbf{artículo 269J, transferencia no consentida de activos:} cubren el uso de credenciales o datos capturados para sustraer dinero.
 \end{itemize}
 
-\textbf{Ley Estatutaria 1581 de 2012.} Establece el régimen general de protección de datos personales (Congreso de la República de Colombia, 2012). Su artículo 4, literal g, consagra el \emph{principio de seguridad}: la información sujeta a tratamiento debe manejarse con las medidas técnicas, humanas y administrativas necesarias para evitar su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento. El Decreto 1377 de 2013 desarrolla el deber de los responsables de poder demostrar, ante la Superintendencia de Industria y Comercio, que han implementado medidas apropiadas y efectivas (Presidencia de la República de Colombia, 2013). Además, la ley reconoce al titular los derechos de conocer, actualizar, rectificar y suprimir sus datos (artículo 8) y exige su autorización para tratarlos (artículo 9) (Congreso de la República de Colombia, 2012).
+\textbf{Ley Estatutaria 1581 de 2012.} Establece el régimen general de protección de datos personales \cite{ley1581}. Su artículo 4, literal g, consagra el \emph{principio de seguridad}: la información sujeta a tratamiento debe manejarse con las medidas técnicas, humanas y administrativas necesarias para evitar su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento. El Decreto 1377 de 2013 desarrolla el deber de los responsables de poder demostrar, ante la Superintendencia de Industria y Comercio, que han implementado medidas apropiadas y efectivas \cite{decreto1377}. Además, la ley reconoce al titular los derechos de conocer, actualizar, rectificar y suprimir sus datos (artículo 8) y exige su autorización para tratarlos (artículo 9) \cite{ley1581}.
 
 \begin{table}[htbp]
 \centering
@@ -334,7 +334,7 @@ Ley 1581/2012, arts.\ 8 y 9 & PhishGuard pide aceptar el aviso de privacidad al 
 
 \apartado{Estándares internacionales: ISO/IEC 27001 e ISO/IEC 27002}
 
-La norma ISO/IEC 27001:2022 especifica los requisitos de un sistema de gestión de seguridad de la información (SGSI) basado en la gestión de riesgos (International Organization for Standardization [ISO] \& International Electrotechnical Commission [IEC], 2022a). La norma ISO/IEC 27002:2022 es la guía de controles asociada: reúne 93 controles agrupados en cuatro temas (organizacionales, de personas, físicos y tecnológicos) (ISO \& IEC, 2022b). En este proyecto no se plantea implantar un SGSI completo, sino usar ISO/IEC 27002 como referente para evaluar qué controles aplica la herramienta y cuáles quedan pendientes (análisis de brechas, sección~\ref{sec:gap}). Los controles más relevantes son:
+La norma ISO/IEC 27001:2022 especifica los requisitos de un sistema de gestión de seguridad de la información (SGSI) basado en la gestión de riesgos \cite{iso27001}. La norma ISO/IEC 27002:2022 es la guía de controles asociada: reúne 93 controles agrupados en cuatro temas (organizacionales, de personas, físicos y tecnológicos) \cite{iso27002}. En este proyecto no se plantea implantar un SGSI completo, sino usar ISO/IEC 27002 como referente para evaluar qué controles aplica la herramienta y cuáles quedan pendientes (análisis de brechas, sección~\ref{sec:gap}). Los controles más relevantes son:
 
 \begin{table}[htbp]
 \centering
@@ -378,7 +378,7 @@ OWASP Top 10 & Orienta las pruebas y medidas de seguridad de la aplicación. \\ 
 
 \subsection{Metodología de desarrollo}\label{sec:metodologia}
 
-El proyecto se desarrolló con un enfoque iterativo e incremental, organizado en sprints e inspirado en Scrum, un marco de trabajo en el que el producto se construye en ciclos cortos que terminan en un incremento utilizable (Schwaber y Sutherland, 2020). Por el tamaño del equipo, de dos integrantes, no se aplicaron todos los roles y eventos de Scrum; se tomó su idea central: cada sprint terminaba con una parte funcional de la aplicación, probada antes de avanzar. Los sprints realizados fueron:
+El proyecto se desarrolló con un enfoque iterativo e incremental, organizado en sprints e inspirado en Scrum, un marco de trabajo en el que el producto se construye en ciclos cortos que terminan en un incremento utilizable \cite{scrum}. Por el tamaño del equipo, de dos integrantes, no se aplicaron todos los roles y eventos de Scrum; se tomó su idea central: cada sprint terminaba con una parte funcional de la aplicación, probada antes de avanzar. Los sprints realizados fueron:
 
 \begin{enumerate}
   \item \textbf{Arquitectura y base de datos:} estructura del proyecto en módulos, entorno de desarrollo y modelo de datos.
@@ -739,7 +739,7 @@ PhishGuard analiza cada URL o mensaje con un motor de reglas, en seis pasos:
   \item \textbf{Explicación:} se muestra cada indicador detectado, con su peso y por qué es sospechoso; en los mensajes también se muestran las palabras que lo activaron.
 \end{enumerate}
 
-Los indicadores retoman características usadas en la literatura: características léxicas de la URL (Hong et al., 2020; Jeeva y Rajsingh, 2016) y palabras típicas de los mensajes fraudulentos (Yeboah-Boateng y Amanor, 2014). Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09). Los diez indicadores de la primera tabla se aplican a una URL; los ocho de la segunda, al texto de un mensaje. Los enlaces que trae un mensaje también pasan por los indicadores de URL, pero su resultado aparece resumido en ``Enlace sospechoso en el mensaje''. La descripción de cada indicador es la que muestra la aplicación en la página de indicadores.
+Los indicadores retoman características usadas en la literatura: características léxicas de la URL \cite{hong}, \cite{jeeva} y palabras típicas de los mensajes fraudulentos \cite{yeboah}. Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09). Los diez indicadores de la primera tabla se aplican a una URL; los ocho de la segunda, al texto de un mensaje. Los enlaces que trae un mensaje también pasan por los indicadores de URL, pero su resultado aparece resumido en ``Enlace sospechoso en el mensaje''. La descripción de cada indicador es la que muestra la aplicación en la página de indicadores.
 
 \begingroup
 \footnotesize
@@ -1229,7 +1229,7 @@ Jinja2, HTML, CSS y JavaScript & Plantillas e interfaz, con escape automático d
 requests & Cliente HTTP que usa solo el bot para hablar con la API de Telegram. \\ \hline
 jsQR & Lectura de códigos QR en el navegador (copia local, licencia Apache-2.0). \\ \hline
 zoneinfo y tzdata & Conversión de las fechas de UTC a hora de Colombia. \\ \hline
-API de bots de Telegram & Servicio con el que se comunica el bot (\texttt{getUpdates}) (Telegram, s.f.). \\ \hline
+API de bots de Telegram & Servicio con el que se comunica el bot (\texttt{getUpdates}) \cite{telegram}. \\ \hline
 Git & Control de versiones. \\ \hline
 Visual Studio Code y MySQL Workbench & Entorno de desarrollo y administración de la base de datos. \\ \hline
 \end{tabular}
@@ -1246,7 +1246,7 @@ El código QR se lee dentro del navegador y la imagen nunca llega al servidor. E
 \begin{enumerate}
   \item En el análisis de URL, el usuario pulsa ``Leer QR desde una imagen'' y elige una foto o una captura.
   \item El navegador revisa que la imagen pese hasta 10 MB y que no pase de 50 megapíxeles; si es grande, la reduce antes de leerla.
-  \item La librería jsQR (cozmo, s.f.) lee el código. La imagen no se envía al servidor.
+  \item La librería jsQR \cite{jsqr} lee el código. La imagen no se envía al servidor.
   \item Si el contenido es un enlace web (\texttt{http://}, \texttt{https://} o \texttt{www.}), se pone en el campo de URL. Si es texto u otro tipo de enlace, el sistema lo avisa y no lo pone.
   \item El usuario analiza la URL como cualquier otra. El formulario marca el origen ``qr'', que se usa en las tendencias; es solo informativo, porque lo envía el navegador y se podría falsificar.
 \end{enumerate}
@@ -1308,7 +1308,7 @@ Los errores 400, 403, 404, 405, 429 y 500 se muestran en una página con el dise
 
 \apartado{Bot de Telegram}
 
-El bot (\texttt{bot.py}) es un proceso aparte de la aplicación web y usa la API de bots de Telegram (Telegram, s.f.). Reutiliza el mismo motor de análisis, con los mismos pesos y las mismas amenazas confirmadas. Su funcionamiento es:
+El bot (\texttt{bot.py}) es un proceso aparte de la aplicación web y usa la API de bots de Telegram \cite{telegram}. Reutiliza el mismo motor de análisis, con los mismos pesos y las mismas amenazas confirmadas. Su funcionamiento es:
 
 \begin{enumerate}
   \item El bot le pregunta a Telegram si hay mensajes nuevos (\texttt{getUpdates}, esperando hasta 30 segundos).
@@ -1474,7 +1474,7 @@ Se incorporaron funciones que no estaban en el plan inicial: el rol de administr
 
 \apartado{Discusión del enfoque}
 
-El enfoque basado en reglas cumplió el objetivo de explicar cada resultado: en el ejemplo del mensaje de la sección~\ref{sec:vectores}, cada uno de los 105 puntos que suman los indicadores (el puntaje se limita a 100) se atribuye a un indicador. Su límite es que solo detecta lo que las reglas describen: un mensaje fraudulento bien redactado, sin palabras de urgencia ni enlaces evidentes, puede obtener un puntaje bajo, y una palabra común puede activar un indicador en un mensaje legítimo. Por eso el resultado se presenta como un nivel de riesgo y los pesos se pueden ajustar. Hay además falsos positivos que se aceptaron a propósito: el typosquatting aproximado puede marcar un sitio legítimo con un nombre a una letra de una marca (por ejemplo, \texttt{nequim.com}). En una herramienta de alerta se prefiere un falso positivo a un falso negativo, y subir el mínimo de letras dejaría sin detectar casos como \texttt{nequl.com.co}. Los trabajos basados en aprendizaje automático (Jain y Gupta, 2019; Jalil y Usman, 2020) buscan mayor cobertura, a costa de que el resultado sea más difícil de explicar.
+El enfoque basado en reglas cumplió el objetivo de explicar cada resultado: en el ejemplo del mensaje de la sección~\ref{sec:vectores}, cada uno de los 105 puntos que suman los indicadores (el puntaje se limita a 100) se atribuye a un indicador. Su límite es que solo detecta lo que las reglas describen: un mensaje fraudulento bien redactado, sin palabras de urgencia ni enlaces evidentes, puede obtener un puntaje bajo, y una palabra común puede activar un indicador en un mensaje legítimo. Por eso el resultado se presenta como un nivel de riesgo y los pesos se pueden ajustar. Hay además falsos positivos que se aceptaron a propósito: el typosquatting aproximado puede marcar un sitio legítimo con un nombre a una letra de una marca (por ejemplo, \texttt{nequim.com}). En una herramienta de alerta se prefiere un falso positivo a un falso negativo, y subir el mínimo de letras dejaría sin detectar casos como \texttt{nequl.com.co}. Los trabajos basados en aprendizaje automático \cite{jain}, \cite{jalil} buscan mayor cobertura, a costa de que el resultado sea más difícil de explicar.
 
 \section{Conclusiones}
 
@@ -1504,42 +1504,45 @@ Por tratarse de un documento de avance, las conclusiones son preliminares.
 \section{Referencias}\label{sec:referencias}
 
 % REQUISITO DE LA GUIA UCC: al menos 2 libros de la biblioteca fisica de la universidad.
-% Agregarlos aqui (formato APA) y citarlos en el texto cuando se consulten.
+% Agregarlos aqui (formato IEEE) y citarlos en el texto cuando se consulten.
 
 % Permite que las URL largas se partan en los guiones:
 \makeatletter
 \g@addto@macro\UrlBreaks{\do\-}
 \makeatother
 
-\begin{list}{}{\setlength{\leftmargin}{1.27cm}\setlength{\itemindent}{-1.27cm}\setlength{\itemsep}{0.5em}\setlength{\parsep}{0pt}}
+\begingroup
 \raggedright
-\item Anti-Phishing Working Group. (2026a). \emph{Phishing activity trends report, 1st quarter 2026}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q1_2026.pdf}
-\item Anti-Phishing Working Group. (2026b). \emph{Phishing activity trends report, 2nd quarter 2026}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q2_2026.pdf}
-\item Anti-Phishing Working Group. (2026c). \emph{Phishing activity trends report, 4th quarter 2025}. APWG. \url{https://docs.apwg.org/reports/apwg_trends_report_q4_2025.pdf}
-\item Candanedo-Yau, R. M. (2026). Ciberseguridad como gestión sostenible: Defensa crítica ante la ingeniería social y ataques informáticos en la educación superior. \emph{Investigación y Ciencia de la Universidad Autónoma de Aguascalientes}, (98), e8640. \url{https://doi.org/10.33064/iycuaa2026988640}
-\item Congreso de la República de Colombia. (2009). \emph{Ley 1273 de 2009, por medio de la cual se modifica el Código Penal, se crea un nuevo bien jurídico tutelado --- denominado ``de la protección de la información y de los datos'' --- y se preservan integralmente los sistemas que utilicen las tecnologías de la información y las comunicaciones, entre otras disposiciones}. Diario Oficial No. 47.223. \url{https://www.anm.gov.co/sites/default/files/ley_1273_2009.pdf}
-\item Congreso de la República de Colombia. (2012). \emph{Ley Estatutaria 1581 de 2012, por la cual se dictan disposiciones generales para la protección de datos personales}. \url{https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=49981}
-\item cozmo. (s.f.). \emph{jsQR} (Versión 1.4.0) [Software]. GitHub. Recuperado el 2 de noviembre de 2026, de \url{https://github.com/cozmo/jsQR}
-\item Google. (s.f.). \emph{Google Safe Browsing}. Recuperado el 7 de octubre de 2026, de \url{https://safebrowsing.google.com/}
-\item Hong, J., Kim, T., Liu, J., Park, N., \& Kim, S.-W. (2020). Phishing URL detection with lexical features and blacklisted domains. En S. Jajodia, G. Cybenko, V. S. Subrahmanian, V. Swarup, C. Wang y M. Wellman (Eds.), \emph{Adaptive autonomous secure cyber systems} (pp. 253--267). Springer. \url{https://doi.org/10.1007/978-3-030-33432-1_12}
-\item International Organization for Standardization \& International Electrotechnical Commission. (2022a). \emph{ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection --- Information security management systems --- Requirements}. ISO. \url{https://www.iso.org/standard/27001}
-\item International Organization for Standardization \& International Electrotechnical Commission. (2022b). \emph{ISO/IEC 27002:2022. Information security, cybersecurity and privacy protection --- Information security controls}. ISO. \url{https://www.iso.org/obp/ui/#iso:std:iso-iec:27002:ed-3:v2:en}
-\item Jain, A. K., \& Gupta, B. B. (2019). A machine learning based approach for phishing detection using hyperlinks information. \emph{Journal of Ambient Intelligence and Humanized Computing}, \emph{10}(5), 2015--2028. \url{https://doi.org/10.1007/s12652-018-0798-z}
-\item Jalil, S., \& Usman, M. (2020). A review of phishing URL detection using machine learning classifiers. En \emph{Intelligent systems and applications: Proceedings of the 2020 Intelligent Systems Conference (IntelliSys)} (Advances in Intelligent Systems and Computing, Vol. 1251, pp. 646--665). Springer. \url{https://doi.org/10.1007/978-3-030-55187-2_47}
-\item Jeeva, S. C., \& Rajsingh, E. B. (2016). Intelligent phishing url detection using association rule mining. \emph{Human-centric Computing and Information Sciences}, \emph{6}, Artículo 10. \url{https://doi.org/10.1186/s13673-016-0064-3}
-\item Ministerio de Hacienda y Administraciones Públicas. (2012). \emph{MAGERIT --- versión 3.0. Metodología de análisis y gestión de riesgos de los sistemas de información} (Libros I, II y III). Gobierno de España. \url{https://administracionelectronica.gob.es/pae_Home/pae_Documentacion/pae_Metodolog/pae_Magerit.html}
-\item Moghimi, M., \& Varjani, A. Y. (2016). New rule-based phishing detection method. \emph{Expert Systems with Applications}, \emph{53}, 231--242. \url{https://doi.org/10.1016/j.eswa.2016.01.028}
-\item OWASP Foundation. (2025). \emph{OWASP Top 10:2025}. \url{https://owasp.org/Top10/2025/}
-\item PhishTank. (s.f.). \emph{PhishTank}. Recuperado el 7 de octubre de 2026, de \url{https://phishtank.org/}
-\item Presidencia de la República de Colombia. (2013). \emph{Decreto 1377 de 2013, por el cual se reglamenta parcialmente la Ley 1581 de 2012}.
-\item Schwaber, K., \& Sutherland, J. (2020). \emph{The Scrum Guide}. \url{https://scrumguides.org/scrum-guide.html}
-\item Semana. (2024, 2 de abril). \emph{Cuidado, estos son los 5 delitos informáticos dejan más víctimas en Colombia}. \url{https://www.semana.com/nacion/articulo/cuidado-estos-son-los-5-delitos-informaticos-de-dejan-mas-victimas-en-colombia/202424/}
-\item Telegram. (s.f.). \emph{Telegram Bot API}. Recuperado el 2 de noviembre de 2026, de \url{https://core.telegram.org/bots/api}
-\item Telesemana. (2025, 24 de abril). \emph{Crecen los ciberataques en Colombia y diversos sectores piden retomar con urgencia la creación de una estrategia país}. \url{https://www.telesemana.com/blog/2025/04/24/crecen-las-ciberamenazas-en-colombia-y-diversos-sectores-piden-retomar-con-urgencia-la-creacion-de-una-estrategia-pais/}
-\item VirusTotal. (s.f.). \emph{VirusTotal}. Recuperado el 7 de octubre de 2026, de \url{https://www.virustotal.com/}
-\item Yeboah-Boateng, E. O., \& Amanor, P. M. (2014). Phishing, SMiShing \& Vishing: An assessment of threats against mobile devices. \emph{Journal of Emerging Trends in Computing and Information Sciences}, \emph{5}(4), 297--307.
-\item Zwilling, M., Klien, G., Lesjak, D., Wiechetek, Ł., Cetin, F., \& Basim, H. N. (2022). Cyber security awareness, knowledge and behavior: A comparative study. \emph{Journal of Computer Information Systems}, \emph{62}(1), 82--97. \url{https://doi.org/10.1080/08874417.2020.1712269}
-\end{list}
+\def\section*#1{}
+\begin{thebibliography}{99}
+\bibitem{apwg-q4} Anti-Phishing Working Group, ``Phishing activity trends report, 4th quarter 2025,'' APWG, 2026. [En línea]. Disponible en: \url{https://docs.apwg.org/reports/apwg_trends_report_q4_2025.pdf}
+\bibitem{apwg-q1} Anti-Phishing Working Group, ``Phishing activity trends report, 1st quarter 2026,'' APWG, 2026. [En línea]. Disponible en: \url{https://docs.apwg.org/reports/apwg_trends_report_q1_2026.pdf}
+\bibitem{apwg-q2} Anti-Phishing Working Group, ``Phishing activity trends report, 2nd quarter 2026,'' APWG, 2026. [En línea]. Disponible en: \url{https://docs.apwg.org/reports/apwg_trends_report_q2_2026.pdf}
+\bibitem{telesemana} ``Crecen los ciberataques en Colombia y diversos sectores piden retomar con urgencia la creación de una estrategia país,'' \emph{Telesemana}, 24 de abr. de 2025. [En línea]. Disponible en: \url{https://www.telesemana.com/blog/2025/04/24/crecen-las-ciberamenazas-en-colombia-y-diversos-sectores-piden-retomar-con-urgencia-la-creacion-de-una-estrategia-pais/}
+\bibitem{semana} ``Cuidado, estos son los 5 delitos informáticos dejan más víctimas en Colombia,'' \emph{Semana}, 2 de abr. de 2024. [En línea]. Disponible en: \url{https://www.semana.com/nacion/articulo/cuidado-estos-son-los-5-delitos-informaticos-de-dejan-mas-victimas-en-colombia/202424/}
+\bibitem{candanedo} R. M. Candanedo-Yau, ``Ciberseguridad como gestión sostenible: Defensa crítica ante la ingeniería social y ataques informáticos en la educación superior,'' \emph{Investigación y Ciencia de la Universidad Autónoma de Aguascalientes}, n.º 98, p. e8640, 2026, doi: \url{10.33064/iycuaa2026988640}.
+\bibitem{zwilling} M. Zwilling, G. Klien, D. Lesjak, Ł. Wiechetek, F. Cetin y H. N. Basim, ``Cyber security awareness, knowledge and behavior: A comparative study,'' \emph{Journal of Computer Information Systems}, vol. 62, n.º 1, pp. 82--97, 2022, doi: \url{10.1080/08874417.2020.1712269}.
+\bibitem{jeeva} S. C. Jeeva y E. B. Rajsingh, ``Intelligent phishing url detection using association rule mining,'' \emph{Human-centric Computing and Information Sciences}, vol. 6, art. 10, 2016, doi: \url{10.1186/s13673-016-0064-3}.
+\bibitem{moghimi} M. Moghimi y A. Y. Varjani, ``New rule-based phishing detection method,'' \emph{Expert Systems with Applications}, vol. 53, pp. 231--242, 2016, doi: \url{10.1016/j.eswa.2016.01.028}.
+\bibitem{safebrowsing} Google, ``Google Safe Browsing.'' [En línea]. Disponible en: \url{https://safebrowsing.google.com/}. Accedido: 7 de oct. de 2026.
+\bibitem{virustotal} VirusTotal, ``VirusTotal.'' [En línea]. Disponible en: \url{https://www.virustotal.com/}. Accedido: 7 de oct. de 2026.
+\bibitem{phishtank} PhishTank, ``PhishTank.'' [En línea]. Disponible en: \url{https://phishtank.org/}. Accedido: 7 de oct. de 2026.
+\bibitem{jain} A. K. Jain y B. B. Gupta, ``A machine learning based approach for phishing detection using hyperlinks information,'' \emph{Journal of Ambient Intelligence and Humanized Computing}, vol. 10, n.º 5, pp. 2015--2028, 2019, doi: \url{10.1007/s12652-018-0798-z}.
+\bibitem{jalil} S. Jalil y M. Usman, ``A review of phishing URL detection using machine learning classifiers,'' en \emph{Intelligent Systems and Applications: Proceedings of the 2020 Intelligent Systems Conference (IntelliSys)}, ser. Advances in Intelligent Systems and Computing, vol. 1251. Springer, 2020, pp. 646--665, doi: \url{10.1007/978-3-030-55187-2_47}.
+\bibitem{hong} J. Hong, T. Kim, J. Liu, N. Park y S.-W. Kim, ``Phishing URL detection with lexical features and blacklisted domains,'' en \emph{Adaptive Autonomous Secure Cyber Systems}, S. Jajodia, G. Cybenko, V. S. Subrahmanian, V. Swarup, C. Wang y M. Wellman, Eds. Springer, 2020, pp. 253--267, doi: \url{10.1007/978-3-030-33432-1_12}.
+\bibitem{yeboah} E. O. Yeboah-Boateng y P. M. Amanor, ``Phishing, SMiShing \& Vishing: An assessment of threats against mobile devices,'' \emph{Journal of Emerging Trends in Computing and Information Sciences}, vol. 5, n.º 4, pp. 297--307, 2014.
+\bibitem{owasp} OWASP Foundation, ``OWASP Top 10:2025,'' 2025. [En línea]. Disponible en: \url{https://owasp.org/Top10/2025/}
+\bibitem{iso27001} International Organization for Standardization e International Electrotechnical Commission, ``ISO/IEC 27001:2022. Information security, cybersecurity and privacy protection --- Information security management systems --- Requirements,'' ISO, 2022. [En línea]. Disponible en: \url{https://www.iso.org/standard/27001}
+\bibitem{magerit} Ministerio de Hacienda y Administraciones Públicas, ``MAGERIT --- versión 3.0. Metodología de análisis y gestión de riesgos de los sistemas de información (Libros I, II y III),'' Gobierno de España, 2012. [En línea]. Disponible en: \url{https://administracionelectronica.gob.es/pae_Home/pae_Documentacion/pae_Metodolog/pae_Magerit.html}
+\bibitem{ley1273} Congreso de la República de Colombia, ``Ley 1273 de 2009, por medio de la cual se modifica el Código Penal, se crea un nuevo bien jurídico tutelado --- denominado `de la protección de la información y de los datos' --- y se preservan integralmente los sistemas que utilicen las tecnologías de la información y las comunicaciones, entre otras disposiciones,'' \emph{Diario Oficial}, n.º 47.223, 2009. [En línea]. Disponible en: \url{https://www.anm.gov.co/sites/default/files/ley_1273_2009.pdf}
+\bibitem{ley1581} Congreso de la República de Colombia, ``Ley Estatutaria 1581 de 2012, por la cual se dictan disposiciones generales para la protección de datos personales,'' 2012. [En línea]. Disponible en: \url{https://www.funcionpublica.gov.co/eva/gestornormativo/norma_pdf.php?i=49981}
+\bibitem{decreto1377} Presidencia de la República de Colombia, ``Decreto 1377 de 2013, por el cual se reglamenta parcialmente la Ley 1581 de 2012,'' 2013.
+\bibitem{iso27002} International Organization for Standardization e International Electrotechnical Commission, ``ISO/IEC 27002:2022. Information security, cybersecurity and privacy protection --- Information security controls,'' ISO, 2022. [En línea]. Disponible en: \url{https://www.iso.org/obp/ui/#iso:std:iso-iec:27002:ed-3:v2:en}
+\bibitem{scrum} K. Schwaber y J. Sutherland, ``The Scrum Guide,'' 2020. [En línea]. Disponible en: \url{https://scrumguides.org/scrum-guide.html}
+\bibitem{telegram} Telegram, ``Telegram Bot API.'' [En línea]. Disponible en: \url{https://core.telegram.org/bots/api}. Accedido: 2 de nov. de 2026.
+\bibitem{jsqr} cozmo, ``jsQR,'' versión 1.4.0, GitHub. [Software]. [En línea]. Disponible en: \url{https://github.com/cozmo/jsQR}. Accedido: 2 de nov. de 2026.
+\end{thebibliography}
+\endgroup
 
 \section{Anexos}
 
