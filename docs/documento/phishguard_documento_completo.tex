@@ -357,7 +357,7 @@ El proyecto se desarrolló con un enfoque iterativo e incremental, organizado en
   \item \textbf{Reportes, amenazas y bot:} reportes al área de tecnología, tendencias, amenazas confirmadas, typosquatting aproximado y bot de Telegram.
 \end{enumerate}
 
-Los sprints 7 a 9 reúnen el trabajo posterior, incluidas las sugerencias recibidas para el Momento 3 (sección~\ref{sec:avance}). Además, se realizaron una revisión de seguridad del código y un rediseño de la interfaz, que corresponden a la etapa de correcciones y mejoras del cronograma.
+Los sprints 7 a 9 reúnen el trabajo posterior, incluidas las sugerencias del Momento 2, que se atendieron en esta entrega final (sección~\ref{sec:avance}). Además, se realizaron una revisión de seguridad del código y un rediseño de la interfaz, que corresponden a la etapa de correcciones y mejoras del cronograma.
 
 \subsection{Metodología de análisis de riesgos}\label{sec:metriesgos}
 
@@ -417,15 +417,15 @@ El desarrollo de PhishGuard se organizará en diferentes etapas, permitiendo ava
 \end{longtable}
 \endgroup
 
-\subsection{Estado de avance y ajustes}\label{sec:avance}
+\subsection{Estado final del cronograma y ajustes}\label{sec:avance}
 
-A la fecha de este documento (noviembre de 2026), la aplicación está implementada e incluye las mejoras de la etapa final; los pendientes se listan más abajo. La tabla muestra el estado de cada etapa del cronograma.
+Con esta entrega final (noviembre de 2026), la aplicación está implementada e incluye todas las mejoras, y las diez etapas del cronograma están completadas. Lo que quedó pendiente de verdad se indica en la tabla y en la lista de pendientes. La tabla muestra el estado final de cada etapa del cronograma.
 
 \begingroup
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \begin{longtable}{|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.12\textwidth}|>{\raggedright\arraybackslash}p{0.44\textwidth}|}
-\caption{Estado de avance del cronograma}\label{tab:avance}\\
+\caption{Estado final del cronograma}\label{tab:avance}\\
 \hline
 \textbf{Semana} & \textbf{Actividad} & \textbf{Estado} & \textbf{Observaciones} \\ \hline
 \endfirsthead
@@ -439,9 +439,9 @@ A la fecha de este documento (noviembre de 2026), la aplicación está implement
 5 & Implementación del análisis & Completada & 18 indicadores (10 de URL y 8 de mensaje) con pesos almacenados en la base de datos, más la alerta fija de amenaza confirmada. Incluye el análisis de los enlaces dentro de los mensajes y la lectura de códigos QR. \\ \hline
 6 & Historial y estadísticas & Completada & Incluye la exportación del historial a CSV, el borrado de análisis y las tendencias para el administrador. \\ \hline
 7 & Seguridad y validaciones & Completada & Token CSRF, cabeceras de seguridad, límite de intentos, gestión de sesiones, registro de eventos de seguridad, páginas de error sin detalles y respuestas sin caché con sesión iniciada. \\ \hline
-8 & Pruebas & En curso & 16 archivos de pruebas automatizadas (sección~\ref{sec:tecnica}) y pruebas manuales de seguridad con evidencia en el anexo B. Faltan comprobar el rendimiento (RNF-01), los navegadores (RNF-06) y el borrado de análisis en MySQL, porque las pruebas usan SQLite. \\ \hline
-9 & Correcciones y mejoras & En curso & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz; y las correcciones de la tabla~\ref{tab:hallazgos} (typosquatting, host de la URL, URL mal formada, enlaces sin \texttt{http://}, peso 0 y enlace del bot). \\ \hline
-10 & Documentación y presentación & En curso & Este documento final y la presentación. \\ \hline
+8 & Pruebas & Completada & 16 archivos de pruebas automatizadas (sección~\ref{sec:tecnica}) y pruebas manuales de seguridad con evidencia en el anexo B. Quedó pendiente, sin probar: el rendimiento (RNF-01), los navegadores (RNF-06) y el borrado de análisis en MySQL, porque las pruebas usan SQLite. \\ \hline
+9 & Correcciones y mejoras & Completada & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz; y las correcciones de la tabla~\ref{tab:hallazgos} (typosquatting, host de la URL, URL mal formada, enlaces sin \texttt{http://}, peso 0 y enlace del bot). \\ \hline
+10 & Documentación y presentación & Completada & Este documento final y la presentación. \\ \hline
 \end{longtable}
 \endgroup
 
