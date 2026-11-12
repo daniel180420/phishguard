@@ -10,6 +10,7 @@
 \usepackage{array}
 \usepackage{xcolor}
 \usepackage{colortbl}
+\usepackage{adjustbox}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.multipart,shapes.geometric}
 \usepackage[hidelinks]{hyperref}
@@ -34,6 +35,7 @@
 
 \addto\captionsspanish{%
   \renewcommand{\contentsname}{Tabla de contenido}%
+  \renewcommand{\abstractname}{Abstract}%
 }
 
 % Encabezado sin número dentro de una subsección
@@ -51,11 +53,16 @@
 
 \begin{document}
 
-\title{PhishGuard: proyecto de aula}
+\title{PhishGuard: herramienta web basada en reglas para detectar phishing y educar a la comunidad de una institución de educación superior}
 
-\author{\IEEEauthorblockN{Daniel A. Arias C. y Juan C. García}
-\IEEEauthorblockA{Universidad Cooperativa de Colombia, Ingeniería de Sistemas, Villavicencio}%
-\thanks{Documento de la asignatura Seguridad Informática, a cargo del docente Carlos I. Torres L. Villavicencio, noviembre de 2026.}}
+\author{\IEEEauthorblockN{Daniel A. Arias C.}
+\IEEEauthorblockA{Universidad Cooperativa de Colombia\\Facultad de Ingeniería\\Programa de Ingeniería de Sistemas\\Villavicencio}
+\and
+\IEEEauthorblockN{Juan C. García}
+\IEEEauthorblockA{Universidad Cooperativa de Colombia\\Facultad de Ingeniería\\Programa de Ingeniería de Sistemas\\Villavicencio}
+\and
+\IEEEauthorblockN{Docente: Carlos I. Torres L.}
+\IEEEauthorblockA{Asignatura: Seguridad Informática\\Noviembre de 2026}}
 
 \maketitle
 
@@ -67,7 +74,9 @@ PhishGuard is a web application that helps the community of a higher education i
 phishing, social engineering, risk analysis, MAGERIT, web application security
 \end{IEEEkeywords}
 
+\clearpage
 \tableofcontents
+\clearpage
 
 
 \section*{Introducción}
@@ -410,7 +419,7 @@ El desarrollo de PhishGuard se organizará en diferentes etapas, permitiendo ava
 
 \subsection{Estado de avance y ajustes}\label{sec:avance}
 
-A la fecha de este documento (noviembre de 2026, Momento 3), la aplicación está implementada, incluye las mejoras de esta etapa y sigue en pruebas y correcciones. La tabla muestra el estado de cada etapa del cronograma.
+A la fecha de este documento (noviembre de 2026), la aplicación está implementada e incluye las mejoras de la etapa final; los pendientes se listan más abajo. La tabla muestra el estado de cada etapa del cronograma.
 
 \begingroup
 \footnotesize
@@ -432,7 +441,7 @@ A la fecha de este documento (noviembre de 2026, Momento 3), la aplicación est�
 7 & Seguridad y validaciones & Completada & Token CSRF, cabeceras de seguridad, límite de intentos, gestión de sesiones, registro de eventos de seguridad, páginas de error sin detalles y respuestas sin caché con sesión iniciada. \\ \hline
 8 & Pruebas & En curso & 16 archivos de pruebas automatizadas (sección~\ref{sec:tecnica}) y pruebas manuales de seguridad con evidencia en el anexo B. Faltan comprobar el rendimiento (RNF-01), los navegadores (RNF-06) y el borrado de análisis en MySQL, porque las pruebas usan SQLite. \\ \hline
 9 & Correcciones y mejoras & En curso & Corrección de la inyección de fórmulas en el CSV, del modo de depuración y de la política CSP; rediseño de la interfaz; y las correcciones de la tabla~\ref{tab:hallazgos} (typosquatting, host de la URL, URL mal formada, enlaces sin \texttt{http://}, peso 0 y enlace del bot). \\ \hline
-10 & Documentación y presentación & En curso & Este documento y la presentación del Momento 3. \\ \hline
+10 & Documentación y presentación & En curso & Este documento final y la presentación. \\ \hline
 \end{longtable}
 \endgroup
 
@@ -538,6 +547,7 @@ El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores 
 \begin{figure}[htbp]
 \centering
 \hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{adjustbox}{max width=\textwidth,center}
 \begin{tikzpicture}[
   font=\footnotesize,
   uc/.style={ellipse, draw, fill=azulclaro, minimum width=3.9cm, minimum height=0.75cm, align=center, inner sep=1pt},
@@ -566,6 +576,7 @@ El diagrama de casos de uso (figura~\ref{fig:casosuso}) muestra los dos actores 
 \draw[-{Triangle[open,length=3mm,width=2.5mm]}] (14.4,-4.75) -- (14.4,-12.9) -| (-0.9,-4.95);
 \node[font=\scriptsize, fill=white, inner sep=1pt] at (6.7,-12.9) {el administrador hereda los casos de uso del usuario};
 \end{tikzpicture}
+\end{adjustbox}
 \caption{Diagrama de casos de uso de PhishGuard}\label{fig:casosuso}
 \end{figure}
 
@@ -576,6 +587,7 @@ La figura~\ref{fig:clases} muestra las cuatro tablas principales del modelo de d
 \begin{figure}[htbp]
 \centering
 \hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{adjustbox}{max width=\textwidth,center}
 \begin{tikzpicture}[
   font=\footnotesize,
   clase/.style={rectangle split, rectangle split parts=2, draw, text width=5.2cm, align=left, inner sep=3pt,
@@ -589,6 +601,7 @@ La figura~\ref{fig:clases} muestra las cuatro tablas principales del modelo de d
 \draw (a.south) -- node[right] {contiene} node[pos=0.1, right] {1} node[pos=0.88, right] {0..*} (d.north);
 \draw[dashed, -{Stealth[length=2.2mm]}] (d.west) -- node[above, align=center] {copia nombre\\y peso} (c.east);
 \end{tikzpicture}
+\end{adjustbox}
 \caption{Diagrama de clases del modelo de datos}\label{fig:clases}
 \end{figure}
 
@@ -818,7 +831,7 @@ V-16 & Confirmar un dominio por error (servicio compartido) marca como peligroso
 \begingroup
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.05\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.048\textwidth}|>{\raggedright\arraybackslash}p{0.125\textwidth}|>{\raggedright\arraybackslash}p{0.164\textwidth}|>{\raggedright\arraybackslash}p{0.164\textwidth}|>{\raggedright\arraybackslash}p{0.034\textwidth}|>{\raggedright\arraybackslash}p{0.034\textwidth}|>{\raggedright\arraybackslash}p{0.077\textwidth}|>{\raggedright\arraybackslash}p{0.183\textwidth}|}
 \caption{Matriz de riesgos del caso de estudio}\label{tab:riesgoscaso}\\
 \hline
 \textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
@@ -840,7 +853,7 @@ A6 & Comunidad universitaria & [E.1] Errores de los usuarios & Falta de formaci�
 \begingroup
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.05\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.17\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.035\textwidth}|>{\raggedright\arraybackslash}p{0.08\textwidth}|>{\raggedright\arraybackslash}p{0.19\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.048\textwidth}|>{\raggedright\arraybackslash}p{0.125\textwidth}|>{\raggedright\arraybackslash}p{0.164\textwidth}|>{\raggedright\arraybackslash}p{0.164\textwidth}|>{\raggedright\arraybackslash}p{0.034\textwidth}|>{\raggedright\arraybackslash}p{0.034\textwidth}|>{\raggedright\arraybackslash}p{0.077\textwidth}|>{\raggedright\arraybackslash}p{0.183\textwidth}|}
 \caption{Matriz de riesgos de la aplicación PhishGuard}\label{tab:riesgosapp}\\
 \hline
 \textbf{ID} & \textbf{Activo} & \textbf{Amenaza} & \textbf{Vulnerabilidad} & \textbf{P} & \textbf{I} & \textbf{Riesgo} & \textbf{Salvaguarda y residual} \\ \hline
@@ -889,7 +902,7 @@ La siguiente tabla compara los controles relevantes con lo que implementa PhishG
 \begingroup
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.085\textwidth}|>{\raggedright\arraybackslash}p{0.16\textwidth}|>{\raggedright\arraybackslash}p{0.13\textwidth}|>{\raggedright\arraybackslash}p{0.27\textwidth}|>{\raggedright\arraybackslash}p{0.24\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.084\textwidth}|>{\raggedright\arraybackslash}p{0.158\textwidth}|>{\raggedright\arraybackslash}p{0.128\textwidth}|>{\raggedright\arraybackslash}p{0.267\textwidth}|>{\raggedright\arraybackslash}p{0.237\textwidth}|}
 \caption{Análisis de brechas frente a ISO/IEC 27002:2022}\label{tab:gap}\\
 \hline
 \textbf{Control} & \textbf{Nombre} & \textbf{Estado} & \textbf{Evidencia en PhishGuard} & \textbf{Brecha o acción} \\ \hline
@@ -930,7 +943,7 @@ Tras las salvaguardas implementadas, se aceptan los siguientes riesgos residuale
 
 \subsubsection{Diseño lógico de los controles de seguridad}\label{sec:controles}
 
-Este apartado presenta el diseño lógico preliminar de los controles de seguridad de PhishGuard, organizado según el modelo AAA (autenticación, autorización y contabilidad) y la tríada CID (confidencialidad, integridad y disponibilidad). Cada control indica su estado, que puede ser \emph{implementado}, \emph{parcial} o \emph{propuesto}, y los riesgos de la sección~\ref{sec:riesgos} que mitiga.
+Este apartado presenta el diseño lógico de los controles de seguridad de PhishGuard, organizado según el modelo AAA (autenticación, autorización y contabilidad) y la tríada CID (confidencialidad, integridad y disponibilidad). Cada control indica su estado, que puede ser \emph{implementado}, \emph{parcial} o \emph{propuesto}, y los riesgos de la sección~\ref{sec:riesgos} que mitiga.
 
 \apartado{Modelo AAA}
 
@@ -1008,6 +1021,7 @@ La figura~\ref{fig:conceptual} muestra los actores, los componentes principales 
 \centering
 \label{fig:conceptual}
 \hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{adjustbox}{max width=\textwidth,center}
 \begin{tikzpicture}[
   font=\footnotesize,
   caja/.style={draw, rounded corners=2pt, fill=azulclaro, align=center, minimum height=0.9cm, inner sep=4pt},
@@ -1048,6 +1062,7 @@ La figura~\ref{fig:conceptual} muestra los actores, los componentes principales 
 \end{pgfonlayer}
 \node[anchor=north west, font=\scriptsize\bfseries] at (frontera.south west) {PhishGuard (entorno local de desarrollo y pruebas)};
 \end{tikzpicture}
+\end{adjustbox}
 \caption{Arquitectura conceptual de PhishGuard.}
 \end{figure}
 
@@ -1057,6 +1072,7 @@ La figura~\ref{fig:logica} detalla el recorrido de una petición dentro de la ap
 \centering
 \label{fig:logica}
 \hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{adjustbox}{max width=\textwidth,center}
 \begin{tikzpicture}[
   font=\footnotesize,
   caja/.style={draw, rounded corners=2pt, fill=azulclaro, minimum width=5.6cm, minimum height=0.85cm, align=center, inner sep=3pt},
@@ -1096,6 +1112,7 @@ La figura~\ref{fig:logica} detalla el recorrido de una petición dentro de la ap
 \end{pgfonlayer}
 \node[anchor=west, font=\scriptsize\bfseries, align=left] at ([xshift=0.15cm]app.east) {Aplicación\\Flask};
 \end{tikzpicture}
+\end{adjustbox}
 \caption{Arquitectura lógica de PhishGuard con sus puntos de control.}
 \end{figure}
 
@@ -1219,7 +1236,7 @@ La carpeta \texttt{tests/} tiene 16 archivos de prueba. Cada uno se ejecuta por 
 \begingroup
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|>{\raggedright\arraybackslash}p{0.27\textwidth}|>{\raggedright\arraybackslash}p{0.56\textwidth}|>{\raggedright\arraybackslash}p{0.09\textwidth}|}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.265\textwidth}|>{\raggedright\arraybackslash}p{0.551\textwidth}|>{\raggedright\arraybackslash}p{0.088\textwidth}|}
 \caption{Pruebas automatizadas de la carpeta \texttt{tests/}}\label{tab:pruebas}\\
 \hline
 \textbf{Archivo} & \textbf{Qué comprueba} & \textbf{Verif.} \\ \hline
@@ -1425,8 +1442,6 @@ El total estimado es de 1.581.624 COP, que equivalen a unos 484 USD a la TRM usa
 \section{Conclusiones y recomendaciones}
 
 \subsection{Conclusiones}
-
-Por tratarse de un documento de avance, las conclusiones son preliminares.
 
 \begin{itemize}
   \item Es posible identificar indicadores de phishing en URL y mensajes con reglas explícitas y presentar un nivel de riesgo que se puede explicar, lo que responde a los dos primeros objetivos específicos.
