@@ -376,7 +376,13 @@ Se analizan dos planos: (a) los riesgos del caso de estudio, es decir, de la ins
 \end{tabular}
 \end{table}
 
-El \textbf{riesgo} se calcula como $P \times I$ y se clasifica así: \textbf{Bajo} (1 a 2), \textbf{Medio} (3 a 4) y \textbf{Alto} (6 a 9). El valor calculado es el riesgo \emph{potencial}, es decir, sin considerar las salvaguardas; la última columna de cada matriz indica la salvaguarda aplicada y el riesgo \emph{residual}.
+El \textbf{riesgo} se calcula con la ecuación~\eqref{eq:riesgo}:
+
+\begin{equation}\label{eq:riesgo}
+R = P \times I
+\end{equation}
+
+donde $R$ es el riesgo, $P$ la probabilidad e $I$ el impacto, ambos con valores de 1 a 3. El riesgo se clasifica así: \textbf{Bajo} (1 a 2), \textbf{Medio} (3 a 4) y \textbf{Alto} (6 a 9). El valor calculado es el riesgo \emph{potencial}, es decir, sin considerar las salvaguardas; la última columna de cada matriz indica la salvaguarda aplicada y el riesgo \emph{residual}.
 
 \subsection{Técnicas de recolección de información}
 
@@ -700,10 +706,18 @@ PhishGuard analiza cada URL o mensaje con un motor de reglas, en seis pasos:
   \item \textbf{Validación de la entrada:} el campo no puede ir vacío ni superar la longitud máxima (500 caracteres para una URL y 2.000 para un mensaje), y una URL debe empezar por \texttt{http://} o \texttt{https://} y estar bien formada (por ejemplo, el puerto debe ser un número). Si no se cumple, el formulario la rechaza con un aviso en lugar de fallar.
   \item \textbf{Preparación:} la URL se descompone en protocolo, dominio real (sin el usuario que pueda ir antes de la \texttt{@}), puerto y ruta; el mensaje se pasa a minúsculas y se le quitan las tildes, para que, por ejemplo, ``código'' y ``codigo'' se detecten igual. Del mensaje también se sacan hasta tres enlaces, con \texttt{http://}, con \texttt{www.} o sin esquema (como \texttt{bit.ly/abc}); esos enlaces se revisan como texto y nunca se abren.
   \item \textbf{Evaluación de indicadores:} se revisan 10 indicadores para URL u 8 para mensajes. Cada indicador que se cumple suma su peso, que se lee de la base de datos. Cada enlace del mensaje se analiza como una URL; si alguno es de riesgo medio o alto, o imita a una marca aunque use HTTPS, se suma ``Enlace sospechoso en el mensaje''. Si el dominio está en la lista de amenazas confirmadas, se agrega además un indicador fijo y el puntaje queda en 100.
-  \item \textbf{Puntaje:} la suma de los pesos se limita a 100.
+  \item \textbf{Puntaje:} la suma de los pesos se limita a 100 (ecuación~\eqref{eq:puntaje}).
   \item \textbf{Clasificación:} riesgo bajo (0 a 30), medio (31 a 60) o alto (61 a 100).
   \item \textbf{Explicación:} se muestra cada indicador detectado, con su peso y por qué es sospechoso; en los mensajes también se muestran las palabras que lo activaron.
 \end{enumerate}
+
+El puntaje de riesgo se calcula con la ecuación~\eqref{eq:puntaje}:
+
+\begin{equation}\label{eq:puntaje}
+P = \min\left(100,\ \sum_{i=1}^{n} w_i\right)
+\end{equation}
+
+donde $P$ es el puntaje, $n$ es el número de indicadores detectados y $w_i$ es el peso del indicador $i$. Si el dominio está en la lista de amenazas confirmadas, el puntaje queda en 100 sin importar los pesos.
 
 Los indicadores retoman características usadas en la literatura: características léxicas de la URL \cite{hong}, \cite{jeeva} y palabras típicas de los mensajes fraudulentos \cite{yeboah}. Las tablas siguientes muestran los pesos iniciales, que el administrador puede ajustar (RF-09). Los diez indicadores de la primera tabla se aplican a una URL; los ocho de la segunda, al texto de un mensaje. Los enlaces que trae un mensaje también pasan por los indicadores de URL, pero su resultado aparece resumido en ``Enlace sospechoso en el mensaje''. La descripción de cada indicador es la que muestra la aplicación en la página de indicadores.
 
@@ -1358,6 +1372,22 @@ La interfaz se construyó con HTML, CSS y JavaScript propios, sin frameworks ext
   \item \textbf{Bot de Telegram:} la respuesta del bot, con los enlaces neutralizados (figura~\ref{fig:bot}).
 \end{itemize}
 
+\apartado{Justificación de las decisiones de diseño (UX/UI)}
+
+La interfaz se diseñó pensando en la comunidad universitaria, con niveles muy distintos de formación en seguridad, y dentro de las restricciones técnicas del proyecto. Estas son las decisiones y su razón; solo se incluyen funciones que existen en la aplicación.
+
+\begin{itemize}
+  \item \textbf{CSS propio, sin frameworks.} La política de seguridad de contenido (\texttt{default-src 'self'}) no permite CDN, fuentes externas ni estilos en línea. Por eso todo el CSS y el JavaScript son archivos propios de la aplicación, y no se usan frameworks como Bootstrap o Tailwind.
+  \item \textbf{Barra lateral por módulos.} Agrupa las funciones en análisis, registro y administración, para que cada persona encuentre lo que necesita y las opciones del administrador queden aparte.
+  \item \textbf{Adaptable al celular.} Los mensajes sospechosos llegan por SMS y mensajería instantánea, así que la aplicación se adapta a pantallas angostas: el menú se pliega tras un botón y las tablas se desplazan hacia los lados.
+  \item \textbf{Colores por nivel de riesgo y barra de escala.} El verde indica riesgo bajo, el ámbar medio y el rojo alto, y una barra de 0 a 100 marca dónde cae el puntaje. El nombre del nivel se escribe siempre junto al color, para que el resultado se entienda de un vistazo.
+  \item \textbf{Cada indicador con su explicación.} La tabla de indicadores detectados muestra el peso y por qué es sospechoso cada uno. Es una decisión educativa: el usuario aprende qué señales buscar la próxima vez.
+  \item \textbf{Ejemplos rápidos.} Los formularios de análisis ofrecen ejemplos para probar la herramienta sin tener que escribir.
+  \item \textbf{Confirmación antes de borrar.} Borrar un análisis o todo el historial pide confirmación, porque no se puede deshacer.
+  \item \textbf{Alerta roja destacada para las amenazas confirmadas.} Cuando el dominio fue confirmado antes como phishing, el resultado muestra una alerta roja que se distingue del resto de la página.
+  \item \textbf{Páginas de error en español y sin detalles técnicos.} Las páginas de error (400, 403, 404, 405, 429 y 500) explican en español qué pasó y ofrecen un botón para volver, sin revelar información interna del sistema.
+\end{itemize}
+
 \captura{capturas}{login.png}{Pantalla de inicio de sesión}{fig:login}
 \captura{capturas}{inicio.png}{Panel de inicio con estadísticas}{fig:inicio}
 \captura{capturas}{analisis-mensaje.png}{Formulario de análisis de un mensaje}{fig:analisis}
@@ -1438,6 +1468,25 @@ El total estimado es de 1.581.624 COP, que equivalen a unos 484 USD a la TRM usa
 
 \section{Conclusiones y recomendaciones}
 
+\subsection{Cumplimiento de los objetivos}
+
+La tabla~\ref{tab:objetivos} toma el objetivo general y cada objetivo específico tal como están en la sección de objetivos, indica si se cumplió y con qué evidencia del documento. Si un objetivo se cumplió solo en parte, se dice.
+
+\begin{table}[htbp]
+\centering
+\caption{Cumplimiento de los objetivos}\label{tab:objetivos}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{0.30\textwidth}|p{0.14\textwidth}|p{0.40\textwidth}|}
+\hline
+\textbf{Objetivo} & \textbf{Estado} & \textbf{Evidencia} \\ \hline
+\textbf{General.} Diseñar e implementar un sistema web denominado PhishGuard que permita analizar URLs y mensajes, identificar indicadores asociados a posibles ataques de phishing y clasificar su nivel de riesgo, con el fin de apoyar la identificación temprana de amenazas de ingeniería social. & Cumplido, con límites & Sistema implementado (sección~\ref{sec:tecnica}) que analiza URL y mensajes, detecta indicadores y clasifica el riesgo (sección~\ref{sec:vectores}), con 16 archivos de pruebas automatizadas (tabla~\ref{tab:pruebas}). Límites: el documento no incluye una medición del efecto en usuarios, y quedan sin verificar el rendimiento, los navegadores y el borrado en MySQL (tabla~\ref{tab:avance}). \\ \hline
+\textbf{1.} Identificar y analizar las principales características presentes en URLs y mensajes que puedan estar asociadas a posibles ataques de phishing. & Cumplido & Indicadores de URL y de mensaje con su peso y su justificación (sección~\ref{sec:vectores}), apoyados en la literatura \cite{hong}, \cite{jeeva}, \cite{yeboah}; pruebas \texttt{probar\_typosquatting.py}, \texttt{probar\_enlaces\_mensaje.py} y \texttt{probar\_url.py} (tabla~\ref{tab:pruebas}). \\ \hline
+\textbf{2.} Desarrollar un mecanismo de análisis que permita asignar un puntaje y clasificar el nivel de riesgo de las URLs y mensajes a partir de los indicadores identificados. & Cumplido & Puntaje como suma de pesos limitada a 100 (ecuación~\eqref{eq:puntaje}) y niveles bajo, medio y alto (sección~\ref{sec:vectores}); pesos editables por el administrador (RF-09), probados en \texttt{probar\_indicadores.py} (tabla~\ref{tab:pruebas}). \\ \hline
+\textbf{3.} Implementar una aplicación web que permita al usuario ingresar URLs y mensajes, ejecutar el análisis y visualizar los indicadores detectados y el nivel de riesgo obtenido. & Cumplido, con verificaciones pendientes & Formularios de URL y mensaje, y resultado con los indicadores y el nivel (sección~\ref{sec:interfaz}, figuras~\ref{fig:analisis} y~\ref{fig:amenazares}); pruebas automatizadas (tabla~\ref{tab:pruebas}) y manuales (anexo B). Pendientes de verificar: rendimiento (RNF-01), navegadores (RNF-06) y borrado en MySQL (tabla~\ref{tab:avance}). \\ \hline
+\end{tabular}
+\end{table}
+
 \subsection{Conclusiones}
 
 \begin{itemize}
@@ -1493,9 +1542,18 @@ Quedan pendientes la autenticación multifactor, eliminar la cuenta y cambiar el
 \g@addto@macro\UrlBreaks{\do\-}
 \makeatother
 
-\renewcommand{\refname}{Bibliografía}
+\section{Bibliografía}
+
+% El título numerado es el de arriba: dentro del grupo se anulan el encabezado y la entrada de índice
+% que IEEEtran agrega por su cuenta, para que no salga un segundo título.
+\begingroup
+\makeatletter
+\let\addcontentsline\@gobblethree
+\def\section*#1{}
+\makeatother
 \bibliographystyle{IEEEtran}
 \bibliography{referencias}
+\endgroup
 
 \section*{Anexo A. Manual de usuario}
 \addcontentsline{toc}{section}{Anexo A. Manual de usuario}
